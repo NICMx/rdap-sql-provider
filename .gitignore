@@ -1,0 +1,14 @@
+*.class
+
+# Eclipse
+/bin/
+.settings
+.classpath
+.project
+
+# Maven
+/target/
+
+# Files potentially containing passwords
+/src/test/resources/config/*.properties
+
