@@ -88,8 +88,8 @@ public class AutnumTest extends DatabaseTest {
 
 		Autnum autnum = new AutnumDAO();
 		autnum.setCountry("MX");
-		autnum.setStartAutnum(15L);
-		autnum.setEndAutnum(35L);
+		autnum.setStartAutnum(100L);
+		autnum.setEndAutnum(101L);
 		autnum.setName("testName");
 		autnum.setType("testType");
 		autnum.getEntities().add(registrant);
@@ -110,20 +110,21 @@ public class AutnumTest extends DatabaseTest {
 		Autnum getByRange = null;
 
 		try {
+			getByRange = AutnumModel.getByRange(autnum.getStartAutnum(), connection);
+		} catch (SQLException | ObjectNotFoundException e) {
+			e.printStackTrace();
+			fail();
+		}
+
+		autnum.equals(getByRange);
+
+		try {
 			getById = AutnumModel.getAutnumById(autnum.getId(), connection);
 		} catch (SQLException | ObjectNotFoundException e) {
 			e.printStackTrace();
 			fail();
 		}
-
-		try {
-			getByRange = AutnumModel.getByRange(20L, connection);
-		} catch (SQLException | ObjectNotFoundException e) {
-			e.printStackTrace();
-			fail();
-		}
 		autnum.equals(getById);
-		autnum.equals(getByRange);
-	}
 
+	}
 }
