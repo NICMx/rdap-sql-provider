@@ -2,9 +2,11 @@ package mx.nic.rdap.db.impl;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.SQLSyntaxErrorException;
 
 import mx.nic.rdap.core.db.Nameserver;
 import mx.nic.rdap.db.DBConnection;
+import mx.nic.rdap.db.exception.InvalidValueException;
 import mx.nic.rdap.db.exception.NotImplementedException;
 import mx.nic.rdap.db.exception.RdapDatabaseException;
 import mx.nic.rdap.db.model.NameserverModel;
@@ -54,6 +56,8 @@ public class NameserverDAOImpl implements NameserverSpi {
 	public SearchResultStruct searchByRegexName(String namePattern, Integer resultLimit) throws RdapDatabaseException {
 		try (Connection connection = DBConnection.getConnection()) {
 			return NameserverModel.searchByRegexName(namePattern, resultLimit, connection);
+		} catch (SQLSyntaxErrorException e) {
+			throw new InvalidValueException(e.getMessage(), e);
 		} catch (SQLException e) {
 			throw new RdapDatabaseException(e);
 		}
