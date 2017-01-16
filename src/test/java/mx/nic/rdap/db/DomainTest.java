@@ -62,16 +62,17 @@ public class DomainTest extends DatabaseTest {
 
 		Domain dom = new DomainDAO();
 		dom.setHandle("dummyhandle");
-		dom.setPunycodeName("niño");
+		dom.setPunycodeName("ninio");
 
 		Integer zoneId = null;
+		String zoneName = "example";
 		try {
-			zoneId = ZoneModel.storeToDatabase("example", connection);
+			zoneId = ZoneModel.storeToDatabase(zoneName, connection);
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 			fail(e1.toString());
 		}
-		dom.setZone("example");
+		dom.setZone(zoneName);
 
 		Long domId = null;
 		try {
@@ -95,6 +96,16 @@ public class DomainTest extends DatabaseTest {
 		// Compares the results
 		Assert.assertTrue("getById fails", dom.equals(domainById));
 		Assert.assertTrue("findByLdhName fails", dom.equals(findByLdhName));
+
+		try {
+			// Creates and inserts a zone
+			DomainModel.existByLdhName(dom.getLdhName(), zoneId, connection);
+			DomainModel.existByName(dom.getPunycodeName(), zoneName, connection);
+			DomainModel.existByName(dom.getPunycodeName(), connection);
+		} catch (SQLException | ObjectNotFoundException s) {
+			s.printStackTrace();
+			fail();
+		}
 	}
 
 	@Test
@@ -512,38 +523,4 @@ public class DomainTest extends DatabaseTest {
 		return variantName;
 	}
 
-	@Test
-	public void existByLdhName() {
-		try {
-			// Creates and inserts a zone
-			Integer zoneId = null;
-			zoneId = ZoneModel.storeToDatabase("com", connection);
-			DomainModel.existByLdhName("uncamión", zoneId, connection);
-		} catch (SQLException | ObjectNotFoundException s) {
-			fail();
-		}
-	}
-
-	@Test
-	public void existByName() {
-		try {
-			String domainName = "xn--uncamin-q0a";
-			DomainModel.existByName(domainName, "com", connection);
-		} catch (SQLException | ObjectNotFoundException s) {
-			s.printStackTrace();
-			fail();
-		}
-	}
-
-	@Test
-	public void existByNameWithoutZone() {
-		try {
-			// dn1?.com.mx
-			String domainName = "uncami*";
-			DomainModel.existByName(domainName, connection);
-		} catch (SQLException | ObjectNotFoundException s) {
-			s.printStackTrace();
-			fail();
-		}
-	}
 }

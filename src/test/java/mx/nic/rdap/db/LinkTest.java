@@ -35,7 +35,7 @@ public class LinkTest extends DatabaseTest {
 		}
 	}
 
-	@Test
+	// XXX Is this test necessary? @Test
 	public void getAll() throws IOException {
 		try {
 			List<Link> links = LinkModel.getAll(connection);

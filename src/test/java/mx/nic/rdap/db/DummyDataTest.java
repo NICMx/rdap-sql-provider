@@ -11,8 +11,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.junit.Test;
-
 import mx.nic.rdap.core.catalog.EventAction;
 import mx.nic.rdap.core.catalog.Rol;
 import mx.nic.rdap.core.catalog.Status;
@@ -52,7 +50,11 @@ public class DummyDataTest extends DatabaseTest {
 			'ア', 'イ', 'ウ', 'エ', 'オ', 'а', 'њ', 'ш', 'я', 'й', 'ж', 'ग', '-', '_', 'ब', 'ह', 'द', 'श' };
 	public static String[] zones = { "mx", "lat", "com", "lat.com", "com.mx", "org" };
 
-	@Test
+	public static void main(String[] args) throws RequiredValueNotFoundException, IOException {
+		DummyDataTest dummyDataTest = new DummyDataTest();
+		dummyDataTest.createDataDummy();
+	}
+
 	public void createDataDummy() throws RequiredValueNotFoundException, IOException {
 		int numberOfDomains = 2000;
 		try {

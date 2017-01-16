@@ -35,7 +35,7 @@ import mx.nic.rdap.db.objects.RemarkDescriptionDAO;
  */
 public class AutnumTest extends DatabaseTest {
 
-	@Test
+	// @Test
 	public void existByRange() {
 		try {
 			AutnumModel.existByRange(10l, connection);
@@ -126,5 +126,10 @@ public class AutnumTest extends DatabaseTest {
 		}
 		autnum.equals(getById);
 
+		try {
+			AutnumModel.existByRange(101L, connection);
+		} catch (SQLException | ObjectNotFoundException s) {
+			fail();
+		}
 	}
 }

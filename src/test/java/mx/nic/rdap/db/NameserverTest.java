@@ -52,6 +52,12 @@ public class NameserverTest extends DatabaseTest {
 			e.printStackTrace();
 			assert false;
 		}
+
+		try {
+			NameserverModel.existByName("ns.xn--test-minumun.example", connection);
+		} catch (SQLException | ObjectNotFoundException s) {
+			fail("fail existByName");
+		}
 	}
 
 	@Test
@@ -177,15 +183,6 @@ public class NameserverTest extends DatabaseTest {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			assert false;
-		}
-	}
-
-	@Test
-	public void existByName() {
-		try {
-			NameserverModel.existByName("ns1.fóo.example", connection);
-		} catch (SQLException | ObjectNotFoundException s) {
-			fail();
 		}
 	}
 

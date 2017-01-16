@@ -71,7 +71,7 @@ public class RemarkTest extends DatabaseTest {
 
 	}
 
-	@Test
+	// XXX Is this test necessary? @Test
 	public void getAll() {
 		try {
 			List<Remark> remarks = RemarkModel.getAll(connection);

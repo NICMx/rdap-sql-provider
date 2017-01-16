@@ -3,8 +3,6 @@ package mx.nic.rdap.db;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.junit.Test;
-
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.model.IpAddressModel;
 import mx.nic.rdap.db.objects.IpAddressDAO;
@@ -15,7 +13,8 @@ import mx.nic.rdap.db.objects.IpAddressDAO;
  */
 public class IpAddressTest extends DatabaseTest {
 
-	@Test
+	// XXX Is this test necessary?
+	// @Test
 	public void getAll() {
 		try {
 			List<IpAddressDAO> addresses = IpAddressModel.getAll(connection);
@@ -24,8 +23,8 @@ public class IpAddressTest extends DatabaseTest {
 			}
 			assert true;
 		} catch (SQLException | ObjectNotFoundException e) {
-			assert false;
 			e.printStackTrace();
+			assert false;
 		}
 
 	}

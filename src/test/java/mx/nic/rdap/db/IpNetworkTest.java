@@ -70,6 +70,13 @@ public class IpNetworkTest extends DatabaseTest {
 
 		// Compares the results
 		Assert.assertTrue("getByIp fails", ipNetwork.equals(byIp));
+
+		// check if exists
+		try {
+			IpNetworkModel.existByInetAddress("192.168.1.0", connection);
+		} catch (SQLException | ObjectNotFoundException | InvalidValueException e) {
+			fail("fail existByInetAddress");
+		}
 	}
 
 	/**
@@ -108,6 +115,13 @@ public class IpNetworkTest extends DatabaseTest {
 
 		// Compares the results
 		Assert.assertTrue("getByIp fails", ipNetwork.equals(byIp));
+
+		// check if exists
+		try {
+			IpNetworkModel.existByInetAddress("2001:BABA:CAFE:0003::", connection);
+		} catch (SQLException | ObjectNotFoundException | InvalidValueException e) {
+			fail("fail existByInetAddress");
+		}
 	}
 
 	/**
@@ -323,15 +337,6 @@ public class IpNetworkTest extends DatabaseTest {
 		ipNetwork.setParentHandle(parentHandle);
 		ipNetwork.setCidr(cidr);
 		return ipNetwork;
-	}
-
-	@Test
-	public void exist() throws InvalidValueException {
-		try {
-			IpNetworkModel.existByInetAddress("127.0.0.1", connection);
-		} catch (SQLException | ObjectNotFoundException e) {
-			fail();
-		}
 	}
 
 }

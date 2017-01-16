@@ -47,6 +47,13 @@ public class EntityTest extends DatabaseTest {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
+
+		// check if exists
+		try {
+			EntityModel.existByHandle("minimunEntity", connection);
+		} catch (SQLException | ObjectNotFoundException s) {
+			fail();
+		}
 	}
 
 	/**
@@ -591,15 +598,6 @@ public class EntityTest extends DatabaseTest {
 
 		entity.getPublicIds().addAll(listPids);
 		return entity;
-	}
-
-	@Test
-	public void existByHandle() {
-		try {
-			EntityModel.existByHandle("NS-1-xn--dn1-kkhcom.mx1-Ent-1-Handle", connection);
-		} catch (SQLException | ObjectNotFoundException s) {
-			fail();
-		}
 	}
 
 }

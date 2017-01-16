@@ -43,7 +43,7 @@ public class EventTest extends DatabaseTest {
 
 	}
 
-	@Test
+	// XXX Is this test necessary? @Test
 	/**
 	 * Test that retrieve an array of events from the DB
 	 */
