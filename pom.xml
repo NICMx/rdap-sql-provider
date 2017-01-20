@@ -25,6 +25,10 @@
 			<version>0.0.1</version>
 		</dependency>
 		<dependency>
+			<!--
+				Heads up: If you intend to add some other driver, please note that rdap-server is not supposed to
+				inherit it. See mysql's comment at rdap-server's pom.xml.
+			-->
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.39</version>
