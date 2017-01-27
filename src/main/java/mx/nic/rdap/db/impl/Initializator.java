@@ -29,11 +29,11 @@ public class Initializator implements InitializeSpi {
 		} catch (SQLException | IOException e) {
 			throw new RuntimeException("Error inserting catalogs", e);
 		}
-//		try {
-//			DummyDatabaseCreator.insertDummyData();
-//		} catch (SQLException | IOException e) {
-//			throw new RuntimeException("Error inserting dummy data", e);
-//		}
+		try {
+			DummyDatabaseCreator.insertDummyData();
+		} catch (SQLException | IOException e) {
+			throw new RuntimeException("Error inserting dummy data", e);
+		}
 
 		try (Connection connection = DBConnection.getConnection()) {
 			CountryCodeModel.loadAllFromDatabase(connection);

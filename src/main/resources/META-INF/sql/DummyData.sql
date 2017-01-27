@@ -31,7 +31,7 @@ INSERT INTO rdap.domain VALUES(15,'','pajaro_amarillo',null,'whois.mx',3);
 INSERT INTO rdap.domain VALUES(16,'DOM4','choco',null,'whois.lat',4);
 INSERT INTO rdap.domain VALUES(17,'DOMLAT','moka',null,'whois.lat',4);
 INSERT INTO rdap.domain VALUES(18,'XXX6','1.0.168.192',null,'whois.lat',5);
-INSERT INTO rdap.domain VALUES(19,'1236','méxico','xn--mxico-bsa','whois.lat',4);
+INSERT INTO rdap.domain VALUES(19,'1238','méxico','xn--mxico-bsa','whois.lat',4);
 INSERT INTO rdap.domain VALUES(20,'xnxn','xn--elpjaroamarillo-pjb','elpájaroamarillo','whois.lat',4);
 
 INSERT INTO rdap.entity VALUES(1,'mr_rabbit','whois.com');
