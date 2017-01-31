@@ -58,14 +58,15 @@ INSERT INTO rdap.entity VALUES(18,'perr','whois.lat');
 INSERT INTO rdap.entity VALUES(19,'gat','whois.lat');
 INSERT INTO rdap.entity VALUES(20,'paj','whois.lat');
 
-INSERT INTO rdap.autonomous_system_number VALUES(1,'ASN1',1,10,'ASN-ONE-TEN','mx-type','whois.mx','484');
-INSERT INTO rdap.autonomous_system_number VALUES(2,'ASN2',10,20,'ASN-TEN-TWELVE','mx-type','whois.mx','484');
-INSERT INTO rdap.autonomous_system_number VALUES(3,'ASN3',20,30,'ASN-TWELVE-THIRTY','mx-type','whois.mx','484');
-INSERT INTO rdap.autonomous_system_number VALUES(4,'ASN4',30,40,'ASN-THIRTY-FOURTY','mx-type','whois.mx','484');
-INSERT INTO rdap.autonomous_system_number VALUES(5,'ASN5',40,50,'ASN-FOURTY-FIFTY','mx-type','whois.mx','484');
+--INSERT INTO rdap.autonomous_system_number VALUES(1,'ASN1',1,10,'ASN-ONE-TEN','mx-type','whois.mx','484');
+--INSERT INTO rdap.autonomous_system_number VALUES(2,'ASN2',10,20,'ASN-TEN-TWELVE','mx-type','whois.mx','484');
+--INSERT INTO rdap.autonomous_system_number VALUES(3,'ASN3',20,30,'ASN-TWELVE-THIRTY','mx-type','whois.mx','484');
+--INSERT INTO rdap.autonomous_system_number VALUES(4,'ASN4',30,40,'ASN-THIRTY-FOURTY','mx-type','whois.mx','484');
+--INSERT INTO rdap.autonomous_system_number VALUES(5,'ASN5',40,50,'ASN-FOURTY-FIFTY','mx-type','whois.mx','484');
 
-INSERT INTO rdap.autonomous_system_number VALUES(6,'ASN6',100,200,'ASN100','com-type','whois.com','826');
-INSERT INTO rdap.autonomous_system_number VALUES(7,'ASN7',200,300,'ASN200','com-type','whois.com','826');
-INSERT INTO rdap.autonomous_system_number VALUES(8,'ASN8',300,400,'ASN300','com-type','whois.com','826');
-INSERT INTO rdap.autonomous_system_number VALUES(9,'ASN9',400,500,'ASN400','com-type','whois.com','826');
-INSERT INTO rdap.autonomous_system_number VALUES(10,'ASN10',500,1000,'ASN500','com-type','whois.com','826');
+--INSERT INTO rdap.autonomous_system_number VALUES(6,'ASN6',100,200,'ASN100','com-type','whois.com','826');
+--INSERT INTO rdap.autonomous_system_number VALUES(7,'ASN7',200,300,'ASN200','com-type','whois.com','826');
+--INSERT INTO rdap.autonomous_system_number VALUES(8,'ASN8',300,400,'ASN300','com-type','whois.com','826');
+--INSERT INTO rdap.autonomous_system_number VALUES(9,'ASN9',400,500,'ASN400','com-type','whois.com','826');
+--INSERT INTO rdap.autonomous_system_number VALUES(10,'ASN10',500,1000,'ASN500','com-type','whois.com','826');
+Commit;
