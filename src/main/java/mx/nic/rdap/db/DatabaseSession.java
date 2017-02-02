@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
+import javax.sql.DataSource;
+
 import org.apache.tomcat.dbcp.dbcp2.BasicDataSource;
 
 /**
@@ -60,6 +62,10 @@ public class DatabaseSession {
 		testDatabase(originDataSource);
 	}
 
+	public static DataSource getRdapDataSource(){
+		return rdapDataSource;
+	}
+	
 	public static void closeRdapDataSource() throws SQLException {
 		rdapDataSource.close();
 	}
