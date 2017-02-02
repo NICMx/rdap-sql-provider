@@ -612,7 +612,7 @@ public class DomainModel {
 	 * Validate if the zone of the request domain is managed by the server
 	 * 
 	 */
-	public static void validateDomainZone(String domainName) throws InvalidValueException, ObjectNotFoundException {
+	public static void validateDomainZone(String domainName) throws ObjectNotFoundException {
 		String domainZone;
 
 		if (ZoneModel.isReverseAddress(domainName)) {

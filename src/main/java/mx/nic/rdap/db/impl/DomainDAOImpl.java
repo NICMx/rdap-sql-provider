@@ -31,10 +31,23 @@ public class DomainDAOImpl implements DomainSpi {
 
 	@Override
 	public Domain getByName(String domainName, Boolean useNsAsAttribute) throws RdapDatabaseException {
+
+		String name;
+		String zone;
+
 		if (!domainName.contains("."))
 			throw new InvalidValueException("Invalid fqdn");
-		String name = domainName.substring(0, domainName.indexOf('.'));
-		String zone = domainName.substring(domainName.indexOf('.') + 1);
+
+		if (ZoneModel.isReverseAddress(domainName)) {
+			zone = ZoneModel.getArpaZoneNameFromAddress(domainName);
+			if (zone == null) {
+				throw new ObjectNotFoundException("Zone not found.");
+			}
+			name = ZoneModel.getAddressWithoutArpaZone(domainName);
+		} else {
+			name = domainName.substring(0, domainName.indexOf('.'));
+			zone = domainName.substring(domainName.indexOf('.') + 1);
+		}
 		if (!ZoneModel.existsZone(zone))
 			throw new ObjectNotFoundException("Zone not found.");
 

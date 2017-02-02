@@ -206,11 +206,11 @@ public class ZoneModel {
 
 	public static String getAddressWithoutArpaZone(String address) {
 		if (address.endsWith(REVERSE_IP_V4)) {
-			return address.substring(0, address.length() - (REVERSE_IP_V4.length() + 2));
+			return address.substring(0, address.length() - (REVERSE_IP_V4.length() + 1));
 		}
 
 		if (address.endsWith(REVERSE_IP_V6)) {
-			return address.substring(0, address.length() - (REVERSE_IP_V6.length() + 2));
+			return address.substring(0, address.length() - (REVERSE_IP_V6.length() + 1));
 		}
 
 		return address;
