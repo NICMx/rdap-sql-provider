@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>mx.nic.rdap</groupId>
 	<artifactId>rdap-sql-provider</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<packaging>jar</packaging>
 	<name>rdap-sql-provider</name>
 
@@ -21,7 +21,7 @@
 		</dependency> -->
 		<dependency>
 			<groupId>mx.nic.rdap</groupId>
-			<artifactId>rdap-db</artifactId>
+			<artifactId>rdap-data-access-api</artifactId>
 			<version>0.0.1</version>
 		</dependency>
 		<dependency>

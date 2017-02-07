@@ -172,7 +172,7 @@ public class NameserverTest extends DatabaseTest {
 		assert true;
 	}
 
-	@Test
+	// @Test
 	public void getAll() {
 		try {
 			List<Nameserver> nameservers = NameserverModel.getAll(connection);
