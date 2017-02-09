@@ -171,18 +171,14 @@ public class RolModel {
 			return Collections.emptyList();
 		}
 		String query = queryGroup.getQuery(MAIN_ENTITY_GET_QUERY);
-
-		StringBuilder sb = new StringBuilder();
-		int i;
-		for (i = 0; i < nestedEntitiesId.size() - 1; i++) {
-			sb.append(nestedEntitiesId.get(i).getId() + ", ");
-		}
-		sb.append(nestedEntitiesId.get(i).getId());
+		query = createDynamicQueryWithInClause(nestedEntitiesId.size(), query);
 
 		List<Rol> resultRoles = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setLong(1, mainEntity.getId());
-			statement.setString(2, sb.toString());
+			for (int i = 0; i < nestedEntitiesId.size(); i++) {
+				statement.setLong(2 + i, nestedEntitiesId.get(i).getId());
+			}
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			ResultSet rs = statement.executeQuery();
 			if (!rs.next())
@@ -199,6 +195,16 @@ public class RolModel {
 		}
 
 		return resultRoles;
+	}
+
+	private static String createDynamicQueryWithInClause(int listSize, String query) {
+		StringBuilder builder = new StringBuilder();
+		for (int i = 0; i < listSize; i++) {
+			builder.append("?,");
+		}
+
+		String dynamicQuery = query.replace("IN (?", "IN (" + builder.deleteCharAt(builder.length() - 1).toString());
+		return dynamicQuery;
 	}
 
 }
