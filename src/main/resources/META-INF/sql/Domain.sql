@@ -38,13 +38,13 @@ SELECT d.* FROM rdap.domain d WHERE d.zone_id IN (?) AND (d.dom_ldh_name LIKE ? 
 SELECT DISTINCT (dom.dom_id), dom.dom_ldh_name, dom.dom_handle, dom.dom_port43, dom.zone_id, dom.dom_unicode_name FROM rdap.domain dom JOIN rdap.domain_nameservers dom_ns ON dom_ns.dom_id = dom.dom_id JOIN rdap.nameserver ns ON ns.nse_id = dom_ns.nse_id WHERE  (ns.nse_ldh_name LIKE ? OR ns.nse_unicode_name LIKE ?) ORDER BY 1 LIMIT ?;
 
 #searchByNsIp
-SELECT DISTINCT (dom.dom_id), dom.dom_ldh_name, dom.dom_handle, dom.dom_port43, dom.zone_id, dom.dom_unicode_name FROM rdap.domain dom JOIN rdap.domain_nameservers dom_ns ON dom_ns.dom_id = dom.dom_id JOIN rdap.nameserver ns ON ns.nse_id = dom_ns.nse_id JOIN rdap.ip_address ip	ON ip.nse_id = ns.nse_id WHERE IF(?=4, INET_ATON(?),INET6_ATON(?)) = ip.iad_value ORDER BY 1 LIMIT ?;
+SELECT DISTINCT (dom.dom_id), dom.dom_ldh_name, dom.dom_handle, dom.dom_port43, dom.zone_id, dom.dom_unicode_name FROM rdap.domain dom JOIN rdap.domain_nameservers dom_ns ON dom_ns.dom_id = dom.dom_id JOIN rdap.nameserver ns ON ns.nse_id = dom_ns.nse_id JOIN rdap.ip_address ip	ON ip.nse_id = ns.nse_id WHERE ip.iad_type = ? AND (ip.iad_value = ? OR ip.iad_value = ?) ORDER BY 1 LIMIT ?;
 
 #existByNsLdhName
 SELECT EXISTS(SELECT 1 FROM rdap.domain dom JOIN rdap.domain_nameservers dom_ns ON dom_ns.dom_id = dom.dom_id JOIN rdap.nameserver ns ON ns.nse_id = dom_ns.nse_id WHERE ( ns.nse_ldh_name LIKE ? OR ns.nse_unicode_name LIKE ?));
 
 #existByNsIp
-SELECT EXISTS(SELECT 1 FROM rdap.domain dom JOIN rdap.domain_nameservers dom_ns ON dom_ns.dom_id = dom.dom_id JOIN rdap.nameserver ns ON ns.nse_id = dom_ns.nse_id JOIN rdap.ip_address ip	ON ip.nse_id = ns.nse_id WHERE IF(?=4, INET_ATON(?),INET6_ATON(?)) = ip.iad_value);
+SELECT EXISTS(SELECT 1 FROM rdap.domain dom JOIN rdap.domain_nameservers dom_ns ON dom_ns.dom_id = dom.dom_id JOIN rdap.nameserver ns ON ns.nse_id = dom_ns.nse_id JOIN rdap.ip_address ip	ON ip.nse_id = ns.nse_id WHERE ip.iad_value = ?);
 
 #existByNameWZone
 SELECT EXISTS(SELECT 1 FROM rdap.domain WHERE (domain.dom_ldh_name = ? OR domain.dom_unicode_name = ?) AND domain.zone_id = ? );

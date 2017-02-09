@@ -548,17 +548,17 @@ INSERT INTO rdap.event VALUES(15, 3, 'XXXXX', '2017-3-30');
 -- -----------------------------------------------------
 -- Ip Address
 -- -----------------------------------------------------
-INSERT INTO rdap.ip_address VALUES(1, 1, 4, 2013265920);
-INSERT INTO rdap.ip_address VALUES(2, 2, 4, 2013331455);
-INSERT INTO rdap.ip_address VALUES(3, 3, 4, 2185974528);
-INSERT INTO rdap.ip_address VALUES(4, 4, 4, 2185974783);
-INSERT INTO rdap.ip_address VALUES(5, 5, 4, 2083653760);
+INSERT INTO rdap.ip_address VALUES(1, 1, 4, '192.168.1.1');
+INSERT INTO rdap.ip_address VALUES(2, 2, 4, '192.168.1.2');
+INSERT INTO rdap.ip_address VALUES(3, 3, 4, '192.168.1.3');
+INSERT INTO rdap.ip_address VALUES(4, 4, 6, '1::1');
+INSERT INTO rdap.ip_address VALUES(5, 5, 6, '2::2');
 
-INSERT INTO rdap.ip_address VALUES(6, 6, 4, 2083653887);
-INSERT INTO rdap.ip_address VALUES(7, 7, 4, 2084964352);
-INSERT INTO rdap.ip_address VALUES(8, 8, 4, 2084964863);
-INSERT INTO rdap.ip_address VALUES(9, 9, 4, 2085668864);
-INSERT INTO rdap.ip_address VALUES(10, 10, 4, 2085668871);
+INSERT INTO rdap.ip_address VALUES(6, 6, 4, '192.168.1.4');
+INSERT INTO rdap.ip_address VALUES(7, 7, 4, '192.168.1.5');
+INSERT INTO rdap.ip_address VALUES(8, 8, 4, '192.168.1.6');
+INSERT INTO rdap.ip_address VALUES(9, 9, 4, '192.168.1.7');
+INSERT INTO rdap.ip_address VALUES(10, 10, 4, '192.168.1.8');
 
 -- -----------------------------------------------------
 -- Link

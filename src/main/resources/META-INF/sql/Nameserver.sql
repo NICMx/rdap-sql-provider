@@ -23,10 +23,10 @@ SELECT DISTINCT(nse.nse_id), nse.nse_handle,nse.nse_ldh_name, nse.nse_port43, ns
 SELECT DISTINCT(nse.nse_id), nse.nse_handle,nse.nse_ldh_name, nse.nse_port43, nse.nse_unicode_name FROM rdap.nameserver nse WHERE nse.nse_ldh_name=? OR nse.nse_unicode_name=? ORDER BY 1 LIMIT ?;
 
 #searchByIp4
-SELECT DISTINCT(nse.nse_id), nse.nse_handle,nse.nse_ldh_name, nse.nse_port43, nse.nse_unicode_name FROM rdap.nameserver nse join rdap.ip_address ipa on ipa.nse_id=nse.nse_id WHERE ipa.iad_value=INET_ATON(?) ORDER BY 1 LIMIT ?;
+SELECT DISTINCT(nse.nse_id), nse.nse_handle,nse.nse_ldh_name, nse.nse_port43, nse.nse_unicode_name FROM rdap.nameserver nse join rdap.ip_address ipa on ipa.nse_id=nse.nse_id WHERE ipa.iad_value = ? ORDER BY 1 LIMIT ?;
 
 #searchByIp6
-SELECT DISTINCT(nse.nse_id), nse.nse_handle,nse.nse_ldh_name, nse.nse_port43, nse.nse_unicode_name FROM rdap.nameserver nse join rdap.ip_address ipa on ipa.nse_id=nse.nse_id WHERE ipa.iad_value=INET6_ATON(?) ORDER BY 1 LIMIT ?;
+SELECT DISTINCT(nse.nse_id), nse.nse_handle,nse.nse_ldh_name, nse.nse_port43, nse.nse_unicode_name FROM rdap.nameserver nse join rdap.ip_address ipa on ipa.nse_id=nse.nse_id WHERE ipa.iad_value= ? ORDER BY 1 LIMIT ?;
 
 #getAll
 SELECT * FROM rdap.nameserver nse;
@@ -41,10 +41,10 @@ SELECT EXISTS(SELECT 1 FROM rdap.nameserver nse WHERE nse.nse_ldh_name=? OR nse.
 SELECT EXISTS(SELECT 1  FROM rdap.nameserver nse WHERE nse.nse_ldh_name LIKE ? OR nse.nse_unicode_name LIKE ?);
 
 #existByIp4
-SELECT EXISTS(SELECT 1 FROM rdap.nameserver nse join rdap.ip_address ipa on ipa.nse_id=nse.nse_id WHERE ipa.iad_value=INET_ATON(?));
+SELECT EXISTS(SELECT 1 FROM rdap.nameserver nse join rdap.ip_address ipa on ipa.nse_id=nse.nse_id WHERE ipa.iad_value = ?);
 
 #existByIp6
-SELECT EXISTS(SELECT 1 FROM rdap.nameserver nse join rdap.ip_address ipa on ipa.nse_id=nse.nse_id WHERE ipa.iad_value=INET6_ATON(?));
+SELECT EXISTS(SELECT 1 FROM rdap.nameserver nse join rdap.ip_address ipa on ipa.nse_id=nse.nse_id WHERE ipa.iad_value= ?);
 
 #searchByRegexName
 SELECT DISTINCT(nse.nse_id), nse.nse_handle,nse.nse_ldh_name, nse.nse_port43, nse.nse_unicode_name FROM rdap.nameserver nse WHERE nse.nse_ldh_name REGEXP ? OR nse.nse_unicode_name REGEXP ? ORDER BY 1 LIMIT ?;

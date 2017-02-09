@@ -647,7 +647,7 @@ CREATE TABLE IF NOT EXISTS `rdap`.`ip_address` (
   `iad_id` INT NOT NULL AUTO_INCREMENT,
   `nse_id` BIGINT NOT NULL,
   `iad_type` TINYINT NOT NULL,
-  `iad_value` VARBINARY(16) NOT NULL,
+  `iad_value` VARCHAR(200) NOT NULL,
   PRIMARY KEY (`iad_id`, `nse_id`),
   UNIQUE INDEX `iad_id_UNIQUE` (`iad_id` ASC),
   CONSTRAINT `fk_nameserver_ip_addresses_nameserver1`
