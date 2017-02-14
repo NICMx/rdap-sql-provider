@@ -3,6 +3,7 @@ package mx.nic.rdap.db.model;
 import java.io.IOException;
 import java.net.IDN;
 import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -515,7 +516,7 @@ public class DomainModel {
 		if (ipAddress.getAddress() instanceof Inet4Address) {
 			ipAddress.setType(4);
 
-		} else if (ipAddress.getAddress() instanceof Inet4Address) {
+		} else if (ipAddress.getAddress() instanceof Inet6Address) {
 			ipAddress.setType(6);
 		}
 		try (PreparedStatement statement = connection
