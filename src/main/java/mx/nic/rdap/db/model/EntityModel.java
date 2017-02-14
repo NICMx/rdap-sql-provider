@@ -323,7 +323,7 @@ public class EntityModel {
 		return;
 	}
 
-	public static SearchResultStruct searchByHandle(String handle, Integer resultLimit, Connection connection)
+	public static SearchResultStruct<Entity> searchByHandle(String handle, Integer resultLimit, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		String query = null;
 		if (handle.contains("*")) {
@@ -336,8 +336,8 @@ public class EntityModel {
 		return searchBy(handle, resultLimit, connection, query);
 	}
 
-	public static SearchResultStruct searchByVCardName(String vcardName, Integer resultLimit, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	public static SearchResultStruct<Entity> searchByVCardName(String vcardName, Integer resultLimit,
+			Connection connection) throws SQLException, ObjectNotFoundException {
 		String query = null;
 		if (vcardName.contains("*")) {
 			vcardName = vcardName.replace("*", "%");
@@ -349,19 +349,19 @@ public class EntityModel {
 		return searchBy(vcardName, resultLimit, connection, query);
 	}
 
-	public static SearchResultStruct searchByRegexHandle(String regexHandle, Integer resultLimit, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	public static SearchResultStruct<Entity> searchByRegexHandle(String regexHandle, Integer resultLimit,
+			Connection connection) throws SQLException, ObjectNotFoundException {
 		return searchBy(regexHandle, resultLimit, connection, queryGroup.getQuery(SEARCH_BY_HANDLE_REGEX_QUERY));
 	}
 
-	public static SearchResultStruct searchByRegexName(String regexName, Integer resultLimit, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	public static SearchResultStruct<Entity> searchByRegexName(String regexName, Integer resultLimit,
+			Connection connection) throws SQLException, ObjectNotFoundException {
 		return searchBy(regexName, resultLimit, connection, queryGroup.getQuery(SEARCH_BY_NAME_REGEX_QUERY));
 	}
 
-	private static SearchResultStruct searchBy(String criteria, Integer resultLimit, Connection connection,
+	private static SearchResultStruct<Entity> searchBy(String criteria, Integer resultLimit, Connection connection,
 			String query) throws SQLException, ObjectNotFoundException {
-		SearchResultStruct result = new SearchResultStruct();
+		SearchResultStruct<Entity> result = new SearchResultStruct<Entity>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
 		resultLimit = resultLimit + 1;

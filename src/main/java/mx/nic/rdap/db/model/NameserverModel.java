@@ -160,8 +160,8 @@ public class NameserverModel {
 		}
 	}
 
-	public static SearchResultStruct searchByName(String namePattern, Integer resultLimit, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	public static SearchResultStruct<Nameserver> searchByName(String namePattern, Integer resultLimit,
+			Connection connection) throws SQLException, ObjectNotFoundException {
 		String query = null;
 		if (namePattern.contains("*")) {// check if is a partial search
 			query = queryGroup.getQuery(SEARCH_BY_PARTIAL_NAME_QUERY);
@@ -172,14 +172,14 @@ public class NameserverModel {
 		return searchByName(namePattern, resultLimit, connection, query);
 	}
 
-	public static SearchResultStruct searchByRegexName(String namePattern, Integer resultLimit, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	public static SearchResultStruct<Nameserver> searchByRegexName(String namePattern, Integer resultLimit,
+			Connection connection) throws SQLException, ObjectNotFoundException {
 		return searchByName(namePattern, resultLimit, connection, queryGroup.getQuery(SEARCH_BY_NAME_REGEX_QUERY));
 	}
 
-	private static SearchResultStruct searchByName(String namePattern, Integer resultLimit, Connection connection,
-			String query) throws SQLException, ObjectNotFoundException {
-		SearchResultStruct result = new SearchResultStruct();
+	private static SearchResultStruct<Nameserver> searchByName(String namePattern, Integer resultLimit,
+			Connection connection, String query) throws SQLException, ObjectNotFoundException {
+		SearchResultStruct<Nameserver> result = new SearchResultStruct<Nameserver>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
 		resultLimit = resultLimit + 1;
@@ -215,9 +215,9 @@ public class NameserverModel {
 		}
 	}
 
-	public static SearchResultStruct searchByIp(String ipaddressPattern, Integer resultLimit, Connection connection)
-			throws SQLException, InvalidValueException, ObjectNotFoundException {
-		SearchResultStruct result = new SearchResultStruct();
+	public static SearchResultStruct<Nameserver> searchByIp(String ipaddressPattern, Integer resultLimit,
+			Connection connection) throws SQLException, InvalidValueException, ObjectNotFoundException {
+		SearchResultStruct<Nameserver> result = new SearchResultStruct<Nameserver>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
 		resultLimit = resultLimit + 1;

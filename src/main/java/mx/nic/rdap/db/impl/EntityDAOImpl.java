@@ -33,7 +33,7 @@ public class EntityDAOImpl implements EntitySpi {
 	}
 
 	@Override
-	public SearchResultStruct searchByHandle(String handle, Integer resultLimit) throws RdapDatabaseException {
+	public SearchResultStruct<Entity> searchByHandle(String handle, Integer resultLimit) throws RdapDatabaseException {
 		try (Connection connection = DBConnection.getConnection()) {
 			return EntityModel.searchByHandle(handle, resultLimit, connection);
 		} catch (SQLException e) {
@@ -42,7 +42,8 @@ public class EntityDAOImpl implements EntitySpi {
 	}
 
 	@Override
-	public SearchResultStruct searchByVCardName(String vCardName, Integer resultLimit) throws RdapDatabaseException {
+	public SearchResultStruct<Entity> searchByVCardName(String vCardName, Integer resultLimit)
+			throws RdapDatabaseException {
 		try (Connection connection = DBConnection.getConnection()) {
 			return EntityModel.searchByVCardName(vCardName, resultLimit, connection);
 		} catch (SQLException e) {
@@ -51,7 +52,7 @@ public class EntityDAOImpl implements EntitySpi {
 	}
 
 	@Override
-	public SearchResultStruct searchByRegexHandle(String regexHandle, Integer resultLimit)
+	public SearchResultStruct<Entity> searchByRegexHandle(String regexHandle, Integer resultLimit)
 			throws RdapDatabaseException {
 		try (Connection connection = DBConnection.getConnection()) {
 			return EntityModel.searchByRegexHandle(regexHandle, resultLimit, connection);
@@ -63,7 +64,7 @@ public class EntityDAOImpl implements EntitySpi {
 	}
 
 	@Override
-	public SearchResultStruct searchByRegexVCardName(String regexName, Integer resultLimit)
+	public SearchResultStruct<Entity> searchByRegexVCardName(String regexName, Integer resultLimit)
 			throws RdapDatabaseException {
 		try (Connection connection = DBConnection.getConnection()) {
 			return EntityModel.searchByRegexName(regexName, resultLimit, connection);

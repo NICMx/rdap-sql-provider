@@ -35,7 +35,8 @@ public class NameserverDAOImpl implements NameserverSpi {
 	}
 
 	@Override
-	public SearchResultStruct searchByName(String namePattern, Integer resultLimit) throws RdapDatabaseException {
+	public SearchResultStruct<Nameserver> searchByName(String namePattern, Integer resultLimit)
+			throws RdapDatabaseException {
 		try (Connection connection = DBConnection.getConnection()) {
 			return NameserverModel.searchByName(namePattern, resultLimit, connection);
 		} catch (SQLException e) {
@@ -44,7 +45,8 @@ public class NameserverDAOImpl implements NameserverSpi {
 	}
 
 	@Override
-	public SearchResultStruct searchByIp(String ipaddressPattern, Integer resultLimit) throws RdapDatabaseException {
+	public SearchResultStruct<Nameserver> searchByIp(String ipaddressPattern, Integer resultLimit)
+			throws RdapDatabaseException {
 		try (Connection connection = DBConnection.getConnection()) {
 			return NameserverModel.searchByIp(ipaddressPattern, resultLimit, connection);
 		} catch (SQLException e) {
@@ -53,7 +55,8 @@ public class NameserverDAOImpl implements NameserverSpi {
 	}
 
 	@Override
-	public SearchResultStruct searchByRegexName(String namePattern, Integer resultLimit) throws RdapDatabaseException {
+	public SearchResultStruct<Nameserver> searchByRegexName(String namePattern, Integer resultLimit)
+			throws RdapDatabaseException {
 		try (Connection connection = DBConnection.getConnection()) {
 			return NameserverModel.searchByRegexName(namePattern, resultLimit, connection);
 		} catch (SQLSyntaxErrorException e) {
@@ -64,7 +67,7 @@ public class NameserverDAOImpl implements NameserverSpi {
 	}
 
 	@Override
-	public SearchResultStruct searchByRegexIp(String ipaddressPattern, Integer resultLimit)
+	public SearchResultStruct<Nameserver> searchByRegexIp(String ipaddressPattern, Integer resultLimit)
 			throws NotImplementedException {
 		throw new NotImplementedException();
 	}

@@ -61,7 +61,7 @@ public class DomainDAOImpl implements DomainSpi {
 	}
 
 	@Override
-	public SearchResultStruct searchByName(String domainName, Integer resultLimit,
+	public SearchResultStruct<Domain> searchByName(String domainName, Integer resultLimit,
 			boolean useNameserverAsDomainAttribute) throws RdapDatabaseException {
 		if (domainName.contains("*")) {
 			List<String> labels = Arrays.asList(domainName.split("\\."));
@@ -70,7 +70,7 @@ public class DomainDAOImpl implements DomainSpi {
 					throw new InvalidValueException("Patterns can only have an * at the end.");
 			}
 		}
-		SearchResultStruct domains = null;
+		SearchResultStruct<Domain> domains = null;
 		try (Connection connection = DBConnection.getConnection()) {
 			if (domainName.contains(".")) {
 				String name = domainName.substring(0, domainName.indexOf('.'));
@@ -86,7 +86,7 @@ public class DomainDAOImpl implements DomainSpi {
 	}
 
 	@Override
-	public SearchResultStruct searchByNsName(String nsName, Integer resultLimit, boolean useNsAsAttribute)
+	public SearchResultStruct<Domain> searchByNsName(String nsName, Integer resultLimit, boolean useNsAsAttribute)
 			throws RdapDatabaseException {
 		if (nsName.contains("*")) {
 			List<String> labels = Arrays.asList(nsName.split("\\."));
@@ -103,7 +103,7 @@ public class DomainDAOImpl implements DomainSpi {
 	}
 
 	@Override
-	public SearchResultStruct searchByNsIp(String ip, Integer resultLimit, boolean useNsAsAttribute)
+	public SearchResultStruct<Domain> searchByNsIp(String ip, Integer resultLimit, boolean useNsAsAttribute)
 			throws RdapDatabaseException {
 		try (Connection connection = DBConnection.getConnection()) {
 			return DomainModel.searchByNsIp(ip, resultLimit, useNsAsAttribute, connection);
@@ -113,9 +113,9 @@ public class DomainDAOImpl implements DomainSpi {
 	}
 
 	@Override
-	public SearchResultStruct searchByRegexName(String regexName, Integer resultLimit, boolean useNsAsDomainAttribute)
-			throws RdapDatabaseException {
-		SearchResultStruct domains = null;
+	public SearchResultStruct<Domain> searchByRegexName(String regexName, Integer resultLimit,
+			boolean useNsAsDomainAttribute) throws RdapDatabaseException {
+		SearchResultStruct<Domain> domains = null;
 		String[] regexWZone = null;
 		if (regexName.contains("\\.")) {
 			regexWZone = regexName.split("\\\\.", 2);
@@ -136,7 +136,7 @@ public class DomainDAOImpl implements DomainSpi {
 	}
 
 	@Override
-	public SearchResultStruct searchByRegexNsName(String regexNsName, Integer resultLimit,
+	public SearchResultStruct<Domain> searchByRegexNsName(String regexNsName, Integer resultLimit,
 			boolean useNameserverAsDomainAttribute) throws RdapDatabaseException {
 		try (Connection connection = DBConnection.getConnection()) {
 			return DomainModel.searchByRegexNsLdhName(regexNsName, resultLimit, useNameserverAsDomainAttribute,
@@ -149,7 +149,7 @@ public class DomainDAOImpl implements DomainSpi {
 	}
 
 	@Override
-	public SearchResultStruct searchByRegexNsIp(String ip, Integer resultLimit, boolean useNsAsAttribute)
+	public SearchResultStruct<Domain> searchByRegexNsIp(String ip, Integer resultLimit, boolean useNsAsAttribute)
 			throws NotImplementedException {
 		throw new NotImplementedException();
 	}
