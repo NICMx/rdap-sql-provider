@@ -352,7 +352,7 @@ INSERT INTO rdap.domain VALUES(15,'','pajaro_amarillo',null,'whois.test',3);
 INSERT INTO rdap.domain VALUES(16,'DOM4','choco',null,'whois.net',4);
 INSERT INTO rdap.domain VALUES(17,'DOMLAT','moka',null,'whois.net',4);
 INSERT INTO rdap.domain VALUES(18,'XXX6','1.0.168.192',null,'whois.net',5);
-INSERT INTO rdap.domain VALUES(19,'1238','méxico','xn--mxico-bsa','whois.net',4);
+INSERT INTO rdap.domain VALUES(19,'1238','xn--mxico-bsa','méxico','whois.net',4); 
 INSERT INTO rdap.domain VALUES(20,'xnxn','xn--elpjaroamarillo-pjb','elpájaroamarillo','whois.net',4);
 
 -- -----------------------------------------------------
@@ -551,8 +551,8 @@ INSERT INTO rdap.event VALUES(15, 3, 'XXXXX', '2017-3-30');
 INSERT INTO rdap.ip_address VALUES(1, 1, 4, '192.168.1.1');
 INSERT INTO rdap.ip_address VALUES(2, 2, 4, '192.168.1.2');
 INSERT INTO rdap.ip_address VALUES(3, 3, 4, '192.168.1.3');
-INSERT INTO rdap.ip_address VALUES(4, 4, 6, '1::1');
-INSERT INTO rdap.ip_address VALUES(5, 5, 6, '2::2');
+INSERT INTO rdap.ip_address VALUES(4, 4, 6, '1:0:0:0:0:0:0:1');
+INSERT INTO rdap.ip_address VALUES(5, 5, 6, '2:0:0:0:0:0:0:2');
 
 INSERT INTO rdap.ip_address VALUES(6, 6, 4, '192.168.1.4');
 INSERT INTO rdap.ip_address VALUES(7, 7, 4, '192.168.1.5');
