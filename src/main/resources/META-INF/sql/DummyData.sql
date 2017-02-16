@@ -461,11 +461,11 @@ INSERT INTO rdap.nameserver VALUES (3, 'NSE3', 'ns3.chopsuey.net', null, 'whois.
 INSERT INTO rdap.nameserver VALUES (4, 'NSE4', 'ns4.chopsuey.net', null, 'whois.net');
 INSERT INTO rdap.nameserver VALUES (5, 'NSE5', 'ns5.chopsuey.net', null, 'whois.net');
 
-INSERT INTO rdap.nameserver VALUES (6, 'NSE6', 'ns1.white.cz', null, 'whois.example');
-INSERT INTO rdap.nameserver VALUES (7, 'NSE7', 'ns2.white.cz', null, 'whois.example');
-INSERT INTO rdap.nameserver VALUES (8, 'NSE8', 'ns3.white.cz', null, 'whois.example');
-INSERT INTO rdap.nameserver VALUES (9, 'NSE9', 'ns4.white.cz', null, 'whois.example');
-INSERT INTO rdap.nameserver VALUES (10,'NSE10', 'ns5.white.cz', null, 'whois.example');
+INSERT INTO rdap.nameserver VALUES (6, 'NSE6', 'ns1.white.example', null, 'whois.example');
+INSERT INTO rdap.nameserver VALUES (7, 'NSE7', 'ns2.white.example', null, 'whois.example');
+INSERT INTO rdap.nameserver VALUES (8, 'NSE8', 'ns3.white.example', null, 'whois.example');
+INSERT INTO rdap.nameserver VALUES (9, 'NSE9', 'ns4.white.example', null, 'whois.example');
+INSERT INTO rdap.nameserver VALUES (10,'NSE10', 'ns5.white.example', null, 'whois.example');
 
 INSERT INTO rdap.nameserver VALUES (11, 'NSE11', 'ns1.bright.info', null, 'whois.info');
 INSERT INTO rdap.nameserver VALUES (12, 'NSE12', 'ns2.bright.info', null, 'whois.info');
@@ -473,11 +473,11 @@ INSERT INTO rdap.nameserver VALUES (13, 'NSE13', 'ns3.bright.info', null, 'whois
 INSERT INTO rdap.nameserver VALUES (14, 'NSE14', 'ns4.bright.info', null, 'whois.info');
 INSERT INTO rdap.nameserver VALUES (15, 'NSE15', 'ns5.bright.info', null, 'whois.info');
 
-INSERT INTO rdap.nameserver VALUES (16, 'NSE16', 'ns1.camión.net', 'ns1.xn--camin-3ta.net', 'whois.test');
-INSERT INTO rdap.nameserver VALUES (17, 'NSE17', 'ns2.camión.net', 'ns2.xn--camin-3ta.net', 'whois.test');
-INSERT INTO rdap.nameserver VALUES (18, 'NSE18', 'ns3.camión.net', 'ns3.xn--camin-3ta.net', 'whois.test');
-INSERT INTO rdap.nameserver VALUES (19, 'NSE19', 'ns4.camión.net', 'ns4.xn--camin-3ta.net', 'whois.test');
-INSERT INTO rdap.nameserver VALUES (20, 'NSE20', 'ns5.camión.net', 'ns5.xn--camin-3ta.net', 'whois.test');
+INSERT INTO rdap.nameserver VALUES (16, 'NSE16', 'ns1.camión.test', 'ns1.xn--camin-3ta.net', 'whois.test');
+INSERT INTO rdap.nameserver VALUES (17, 'NSE17', 'ns2.camión.test', 'ns2.xn--camin-3ta.net', 'whois.test');
+INSERT INTO rdap.nameserver VALUES (18, 'NSE18', 'ns3.camión.test', 'ns3.xn--camin-3ta.net', 'whois.test');
+INSERT INTO rdap.nameserver VALUES (19, 'NSE19', 'ns4.camión.test', 'ns4.xn--camin-3ta.net', 'whois.test');
+INSERT INTO rdap.nameserver VALUES (20, 'NSE20', 'ns5.camión.test', 'ns5.xn--camin-3ta.net', 'whois.test');
 
 -- -----------------------------------------------------
 -- Remark 
