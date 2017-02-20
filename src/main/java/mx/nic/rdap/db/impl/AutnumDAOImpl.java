@@ -12,15 +12,6 @@ import mx.nic.rdap.db.spi.AutnumSpi;
 public class AutnumDAOImpl implements AutnumSpi {
 
 	@Override
-	public Long storeToDatabase(Autnum autnum) throws RdapDatabaseException {
-		try (Connection connection = DBConnection.getConnection()) {
-			return AutnumModel.storeToDatabase(autnum, connection);
-		} catch (SQLException e) {
-			throw new RdapDatabaseException(e);
-		}
-	}
-
-	@Override
 	public Autnum getByRange(Long autnumValue) throws RdapDatabaseException {
 		try (Connection connection = DBConnection.getConnection()) {
 			return AutnumModel.getByRange(autnumValue, connection);

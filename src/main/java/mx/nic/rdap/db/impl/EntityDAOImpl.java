@@ -15,15 +15,6 @@ import mx.nic.rdap.db.struct.SearchResultStruct;
 public class EntityDAOImpl implements EntitySpi {
 
 	@Override
-	public long storeToDatabase(Entity entity) throws RdapDatabaseException {
-		try (Connection connection = DBConnection.getConnection()) {
-			return EntityModel.storeToDatabase(entity, connection);
-		} catch (SQLException e) {
-			throw new RdapDatabaseException(e);
-		}
-	}
-
-	@Override
 	public Entity getByHandle(String entityHandle) throws RdapDatabaseException {
 		try (Connection connection = DBConnection.getConnection()) {
 			return EntityModel.getByHandle(entityHandle, connection);

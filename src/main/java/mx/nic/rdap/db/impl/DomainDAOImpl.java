@@ -21,15 +21,6 @@ import mx.nic.rdap.db.struct.SearchResultStruct;
 public class DomainDAOImpl implements DomainSpi {
 
 	@Override
-	public Long storeToDatabase(Domain domain, Boolean useNsAsAttribute) throws RdapDatabaseException {
-		try (Connection connection = DBConnection.getConnection()) {
-			return DomainModel.storeToDatabase(domain, useNsAsAttribute, connection);
-		} catch (SQLException e) {
-			throw new RdapDatabaseException(e);
-		}
-	}
-
-	@Override
 	public Domain getByName(String domainName, Boolean useNsAsAttribute) throws RdapDatabaseException {
 
 		String name;

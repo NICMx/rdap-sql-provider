@@ -12,15 +12,6 @@ import mx.nic.rdap.db.spi.IpNetworkSpi;
 public class IpNetworkDAOImpl implements IpNetworkSpi {
 
 	@Override
-	public Long storeToDatabase(IpNetwork ipNetwork) throws RdapDatabaseException {
-		try (Connection connection = DBConnection.getConnection()) {
-			return IpNetworkModel.storeToDatabase(ipNetwork, connection);
-		} catch (SQLException e) {
-			throw new RdapDatabaseException(e);
-		}
-	}
-
-	@Override
 	public IpNetwork getByInetAddress(String ipAddress) throws RdapDatabaseException {
 		try (Connection connection = DBConnection.getConnection()) {
 			return IpNetworkModel.getByInetAddress(ipAddress, connection);

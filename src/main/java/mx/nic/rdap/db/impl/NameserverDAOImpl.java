@@ -16,16 +16,6 @@ import mx.nic.rdap.db.struct.SearchResultStruct;
 public class NameserverDAOImpl implements NameserverSpi {
 
 	@Override
-	public void storeToDatabase(Nameserver nameserver) throws RdapDatabaseException {
-		try (Connection connection = DBConnection.getConnection()) {
-			NameserverModel.storeToDatabase(nameserver, connection);
-		} catch (SQLException e) {
-			throw new RdapDatabaseException(e);
-		}
-
-	}
-
-	@Override
 	public Nameserver getByName(String name) throws RdapDatabaseException {
 		try (Connection connection = DBConnection.getConnection()) {
 			return NameserverModel.findByName(name, connection);
