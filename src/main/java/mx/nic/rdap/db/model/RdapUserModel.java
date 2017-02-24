@@ -11,8 +11,8 @@ import java.util.logging.Logger;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
-import mx.nic.rdap.db.objects.RdapUserDAO;
-import mx.nic.rdap.db.objects.RdapUserRoleDAO;
+import mx.nic.rdap.db.objects.RdapUserDbObj;
+import mx.nic.rdap.db.objects.RdapUserRoleDbObj;
 
 /**
  * Model for RdapUserData
@@ -62,7 +62,7 @@ public class RdapUserModel {
 	 * Validate the required attributes for the rdapuser
 	 * 
 	 */
-	private static void isValidForStore(RdapUserDAO user) throws RequiredValueNotFoundException {
+	private static void isValidForStore(RdapUserDbObj user) throws RequiredValueNotFoundException {
 		if (user.getName() == null || user.getName().isEmpty())
 			throw new RequiredValueNotFoundException("name", "RdapUser");
 		if (user.getPass() == null || user.getPass().isEmpty())
@@ -71,7 +71,7 @@ public class RdapUserModel {
 			throw new RequiredValueNotFoundException("role", "RdapUser");
 	}
 
-	public static void storeToDatabase(RdapUserDAO user, Connection connection)
+	public static void storeToDatabase(RdapUserDbObj user, Connection connection)
 			throws SQLException, RequiredValueNotFoundException {
 		isValidForStore(user);
 		String query = queryGroup.getQuery(STORE_QUERY);
@@ -80,10 +80,10 @@ public class RdapUserModel {
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			statement.executeUpdate();
 		}
-		RdapUserRoleModel.storeRdapUserRoleToDatabase((RdapUserRoleDAO) user.getUserRole(), connection);
+		RdapUserRoleModel.storeRdapUserRoleToDatabase((RdapUserRoleDbObj) user.getUserRole(), connection);
 	}
 
-	public static RdapUserDAO getByName(String name, Connection connection)
+	public static RdapUserDbObj getByName(String name, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		String query = queryGroup.getQuery(GET_BY_NAME_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -93,7 +93,7 @@ public class RdapUserModel {
 				if (!resultSet.next()) {
 					throw new ObjectNotFoundException("Object not found.");
 				}
-				RdapUserDAO user = new RdapUserDAO(resultSet);
+				RdapUserDbObj user = new RdapUserDbObj(resultSet);
 				user.setUserRole(RdapUserRoleModel.getByUserName(user.getName(), connection));
 				return user;
 			}

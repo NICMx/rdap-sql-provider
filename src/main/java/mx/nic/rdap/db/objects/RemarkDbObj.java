@@ -10,12 +10,12 @@ import mx.nic.rdap.core.db.Remark;
  * Data access class for the {@link Remark} Object.
  * 
  */
-public class RemarkDAO extends Remark implements DatabaseObject {
+public class RemarkDbObj extends Remark implements DatabaseObject {
 
 	/**
 	 * Default constructor
 	 */
-	public RemarkDAO() {
+	public RemarkDbObj() {
 		super();
 	}
 
@@ -23,7 +23,7 @@ public class RemarkDAO extends Remark implements DatabaseObject {
 	 * Construct Remark using a {@link ResultSet}
 	 * 
 	 */
-	public RemarkDAO(ResultSet resultSet) throws SQLException {
+	public RemarkDbObj(ResultSet resultSet) throws SQLException {
 		super();
 		loadFromDatabase(resultSet);
 	}

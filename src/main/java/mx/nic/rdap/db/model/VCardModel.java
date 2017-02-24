@@ -15,7 +15,7 @@ import mx.nic.rdap.core.db.VCard;
 import mx.nic.rdap.core.db.VCardPostalInfo;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
-import mx.nic.rdap.db.objects.VCardDAO;
+import mx.nic.rdap.db.objects.VCardDbObj;
 
 /**
  * Model for the {@link VCard} object
@@ -47,7 +47,7 @@ public class VCardModel {
 
 		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(STORE_QUERY),
 				Statement.RETURN_GENERATED_KEYS);) {
-			((VCardDAO) vCard).storeToDatabase(statement);
+			((VCardDbObj) vCard).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			statement.executeUpdate();
 
@@ -144,7 +144,7 @@ public class VCardModel {
 		if (!resultSet.next()) {
 			throw new ObjectNotFoundException("Object not found");
 		}
-		VCardDAO vCard = new VCardDAO();
+		VCardDbObj vCard = new VCardDbObj();
 		vCard.loadFromDatabase(resultSet);
 
 		return vCard;
@@ -163,7 +163,7 @@ public class VCardModel {
 			throw new ObjectNotFoundException("Object not found");
 		}
 		do {
-			VCardDAO vCard = new VCardDAO();
+			VCardDbObj vCard = new VCardDbObj();
 			vCard.loadFromDatabase(resultSet);
 			result.add(vCard);
 		} while (resultSet.next());

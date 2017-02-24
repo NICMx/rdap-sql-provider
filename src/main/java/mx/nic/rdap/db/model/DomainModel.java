@@ -25,8 +25,8 @@ import mx.nic.rdap.db.Util;
 import mx.nic.rdap.db.exception.InvalidValueException;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
-import mx.nic.rdap.db.objects.DomainDAO;
-import mx.nic.rdap.db.objects.IpAddressDAO;
+import mx.nic.rdap.db.objects.DomainDbObj;
+import mx.nic.rdap.db.objects.IpAddressDbObj;
 import mx.nic.rdap.db.struct.SearchResultStruct;
 
 /**
@@ -79,9 +79,9 @@ public class DomainModel {
 			throws SQLException, RequiredValueNotFoundException, ObjectNotFoundException {
 		String query = queryGroup.getQuery(STORE_QUERY);
 		Long domainId;
-		isValidForStore((DomainDAO) domain);
+		isValidForStore((DomainDbObj) domain);
 		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-			((DomainDAO) domain).storeToDatabase(statement);
+			((DomainDbObj) domain).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			statement.executeUpdate();
 			ResultSet resultSet = statement.getGeneratedKeys();
@@ -152,7 +152,7 @@ public class DomainModel {
 
 	}
 
-	private static void isValidForStore(DomainDAO domain) throws RequiredValueNotFoundException {
+	private static void isValidForStore(DomainDbObj domain) throws RequiredValueNotFoundException {
 		if (domain.getHandle() == null || domain.getHandle().isEmpty())
 			throw new RequiredValueNotFoundException("handle", "Domain");
 		if (domain.getLdhName() == null || domain.getLdhName().isEmpty())
@@ -170,7 +170,7 @@ public class DomainModel {
 		}
 	}
 
-	public static DomainDAO findByLdhName(String name, Integer zoneId, boolean useNameserverAsDomainAttribute,
+	public static DomainDbObj findByLdhName(String name, Integer zoneId, boolean useNameserverAsDomainAttribute,
 			Connection connection) throws SQLException, ObjectNotFoundException {
 		String query = queryGroup.getQuery(GET_BY_LDH_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -182,7 +182,7 @@ public class DomainModel {
 				if (!resultSet.next()) {
 					throw new ObjectNotFoundException("Object not found.");
 				}
-				DomainDAO domain = new DomainDAO(resultSet);
+				DomainDbObj domain = new DomainDbObj(resultSet);
 				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
 				return domain;
 			}
@@ -215,14 +215,14 @@ public class DomainModel {
 				if (!resultSet.next()) {
 					throw new ObjectNotFoundException("Object not found.");
 				}
-				Domain domain = new DomainDAO(resultSet);
+				Domain domain = new DomainDbObj(resultSet);
 				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
 				return domain;
 			}
 		}
 	}
 
-	public static DomainDAO getByHandle(String handle, boolean useNameserverAsDomainAttribute, Connection connection)
+	public static DomainDbObj getByHandle(String handle, boolean useNameserverAsDomainAttribute, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(GET_BY_HANDLE_QUERY))) {
 			statement.setString(1, handle);
@@ -231,7 +231,7 @@ public class DomainModel {
 				if (!resultSet.next()) {
 					throw new ObjectNotFoundException("Object not found.");
 				}
-				DomainDAO domain = new DomainDAO(resultSet);
+				DomainDbObj domain = new DomainDbObj(resultSet);
 				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
 				return domain;
 			}
@@ -305,9 +305,9 @@ public class DomainModel {
 			if (!resultSet.next()) {
 				throw new ObjectNotFoundException("Object not found.");
 			}
-			List<DomainDAO> domains = new ArrayList<DomainDAO>();
+			List<DomainDbObj> domains = new ArrayList<DomainDbObj>();
 			do {
-				DomainDAO domain = new DomainDAO(resultSet);
+				DomainDbObj domain = new DomainDbObj(resultSet);
 				domains.add(domain);
 			} while (resultSet.next());
 			resultLimit = resultLimit - 1;// Back to the original limit
@@ -315,7 +315,7 @@ public class DomainModel {
 				result.setResultSetWasLimitedByUserConfiguration(true);
 				domains.remove(domains.size() - 1);
 			}
-			for (DomainDAO domain : domains) {
+			for (DomainDbObj domain : domains) {
 				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
 			}
 			result.setSearchResultsLimitForUser(resultLimit);
@@ -370,9 +370,9 @@ public class DomainModel {
 			if (!resultSet.next()) {
 				throw new ObjectNotFoundException("Object not found.");
 			}
-			List<DomainDAO> domains = new ArrayList<DomainDAO>();
+			List<DomainDbObj> domains = new ArrayList<DomainDbObj>();
 			do {
-				DomainDAO domain = new DomainDAO(resultSet);
+				DomainDbObj domain = new DomainDbObj(resultSet);
 				domains.add(domain);
 			} while (resultSet.next());
 			resultLimit = resultLimit - 1;// Back to the original limit
@@ -380,7 +380,7 @@ public class DomainModel {
 				result.setResultSetWasLimitedByUserConfiguration(true);
 				domains.remove(domains.size() - 1);
 			}
-			for (DomainDAO domain : domains) {
+			for (DomainDbObj domain : domains) {
 				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
 			}
 			result.setSearchResultsLimitForUser(resultLimit);
@@ -420,9 +420,9 @@ public class DomainModel {
 			if (!resultSet.next()) {
 				throw new ObjectNotFoundException("Object not found.");
 			}
-			List<DomainDAO> domains = new ArrayList<DomainDAO>();
+			List<DomainDbObj> domains = new ArrayList<DomainDbObj>();
 			do {
-				DomainDAO domain = new DomainDAO(resultSet);
+				DomainDbObj domain = new DomainDbObj(resultSet);
 				domains.add(domain);
 			} while (resultSet.next());
 			resultLimit = resultLimit - 1;// Back to the original limit
@@ -430,7 +430,7 @@ public class DomainModel {
 				result.setResultSetWasLimitedByUserConfiguration(true);
 				domains.remove(domains.size() - 1);
 			}
-			for (DomainDAO domain : domains) {
+			for (DomainDbObj domain : domains) {
 				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
 			}
 			result.setSearchResultsLimitForUser(resultLimit);
@@ -477,9 +477,9 @@ public class DomainModel {
 			if (!resultSet.next()) {
 				throw new ObjectNotFoundException("Object not found.");
 			}
-			List<DomainDAO> domains = new ArrayList<DomainDAO>();
+			List<DomainDbObj> domains = new ArrayList<DomainDbObj>();
 			do {
-				DomainDAO domain = new DomainDAO(resultSet);
+				DomainDbObj domain = new DomainDbObj(resultSet);
 				domains.add(domain);
 			} while (resultSet.next());
 			resultLimit = resultLimit - 1;// Back to the original limit
@@ -487,7 +487,7 @@ public class DomainModel {
 				result.setResultSetWasLimitedByUserConfiguration(true);
 				domains.remove(domains.size() - 1);
 			}
-			for (DomainDAO domain : domains) {
+			for (DomainDbObj domain : domains) {
 				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
 			}
 			result.setSearchResultsLimitForUser(resultLimit);
@@ -510,7 +510,7 @@ public class DomainModel {
 		// Hack to know is there is more domains that the limit, used for
 		// notices
 		resultLimit = resultLimit + 1;
-		IpAddressDAO ipAddress = new IpAddressDAO();
+		IpAddressDbObj ipAddress = new IpAddressDbObj();
 		InetAddress address = IpUtils.validateIpAddress(ip);
 		ipAddress.setAddress(address);
 		if (ipAddress.getAddress() instanceof Inet4Address) {
@@ -531,9 +531,9 @@ public class DomainModel {
 			if (!resultSet.next()) {
 				throw new ObjectNotFoundException("Object not found.");
 			}
-			List<DomainDAO> domains = new ArrayList<DomainDAO>();
+			List<DomainDbObj> domains = new ArrayList<DomainDbObj>();
 			do {
-				DomainDAO domain = new DomainDAO(resultSet);
+				DomainDbObj domain = new DomainDbObj(resultSet);
 				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
 				domains.add(domain);
 			} while (resultSet.next());
@@ -542,7 +542,7 @@ public class DomainModel {
 				result.setResultSetWasLimitedByUserConfiguration(true);
 				domains.remove(domains.size() - 1);
 			}
-			for (DomainDAO domain : domains) {
+			for (DomainDbObj domain : domains) {
 				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
 			}
 			result.setSearchResultsLimitForUser(resultLimit);

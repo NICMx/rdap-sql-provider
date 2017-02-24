@@ -5,7 +5,7 @@ import java.util.List;
 
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.model.IpAddressModel;
-import mx.nic.rdap.db.objects.IpAddressDAO;
+import mx.nic.rdap.db.objects.IpAddressDbObj;
 
 /**
  * Test for the class IpAddress
@@ -17,8 +17,8 @@ public class IpAddressTest extends DatabaseTest {
 	// @Test
 	public void getAll() {
 		try {
-			List<IpAddressDAO> addresses = IpAddressModel.getAll(connection);
-			for (IpAddressDAO ip : addresses) {
+			List<IpAddressDbObj> addresses = IpAddressModel.getAll(connection);
+			for (IpAddressDbObj ip : addresses) {
 				System.out.println(ip.toString());
 			}
 			assert true;

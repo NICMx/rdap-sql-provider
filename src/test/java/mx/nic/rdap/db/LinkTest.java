@@ -9,7 +9,7 @@ import org.junit.Test;
 import mx.nic.rdap.core.db.Link;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.LinkModel;
-import mx.nic.rdap.db.objects.LinkDAO;
+import mx.nic.rdap.db.objects.LinkDbObj;
 
 /**
  * Test for the class link
@@ -24,7 +24,7 @@ public class LinkTest extends DatabaseTest {
 	public void insert() {
 		try {
 
-			Link link = new LinkDAO();
+			Link link = new LinkDbObj();
 			link.setValue("spotify.com");
 			link.setHref("test");
 			LinkModel.storeToDatabase(link, connection);

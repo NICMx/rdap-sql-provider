@@ -11,8 +11,8 @@ import mx.nic.rdap.core.db.Event;
 import mx.nic.rdap.core.db.Link;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.EventModel;
-import mx.nic.rdap.db.objects.EventDAO;
-import mx.nic.rdap.db.objects.LinkDAO;
+import mx.nic.rdap.db.objects.EventDbObj;
+import mx.nic.rdap.db.objects.LinkDbObj;
 
 /**
  * Test for the class Event
@@ -26,11 +26,11 @@ public class EventTest extends DatabaseTest {
 	 */
 	public void insert() {
 		try {
-			Event event = new EventDAO();
+			Event event = new EventDbObj();
 			event.setEventAction(EventAction.DELETION);
 			event.setEventDate(new Date());
 			event.setEventActor("dalpuche");
-			Link link = new LinkDAO();
+			Link link = new LinkDbObj();
 			link.setValue("linkofevent.com");
 			link.setHref("lele");
 			event.getLinks().add(link);

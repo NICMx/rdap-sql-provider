@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 import mx.nic.rdap.core.db.DsData;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
-import mx.nic.rdap.db.objects.DsDataDAO;
+import mx.nic.rdap.db.objects.DsDataDbObj;
 
 /**
  * Model for the {@link DsData} Object
@@ -43,7 +43,7 @@ public class DsDataModel {
 			throws SQLException, RequiredValueNotFoundException {
 		String query = queryGroup.getQuery(STORE_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-			((DsDataDAO) dsData).storeToDatabase(statement);
+			((DsDataDbObj) dsData).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			statement.executeUpdate();
 			ResultSet resultSet = statement.getGeneratedKeys();
@@ -91,7 +91,7 @@ public class DsDataModel {
 			resultList = new ArrayList<>();
 
 			do {
-				DsDataDAO dsData = new DsDataDAO(resultSet);
+				DsDataDbObj dsData = new DsDataDbObj(resultSet);
 				dsData.setEvents(EventModel.getByDsDataId(dsData.getId(), connection));
 				dsData.getLinks().addAll(LinkModel.getByDsDataId(dsData.getId(), connection));
 				resultList.add(dsData);

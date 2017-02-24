@@ -10,7 +10,7 @@ import mx.nic.rdap.core.db.VCard;
  * Data access class for the {@link VCard} Object
  * 
  */
-public class VCardDAO extends VCard implements DatabaseObject {
+public class VCardDbObj extends VCard implements DatabaseObject {
 
 	/*
 	 * (non-Javadoc)

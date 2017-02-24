@@ -9,12 +9,12 @@ import mx.nic.rdap.core.db.PublicId;
 /**
  * Data access class for the {@link PublicId} object.
  */
-public class PublicIdDAO extends PublicId implements DatabaseObject {
+public class PublicIdDbObj extends PublicId implements DatabaseObject {
 
 	/**
 	 * Default Constructor
 	 */
-	public PublicIdDAO() {
+	public PublicIdDbObj() {
 		super();
 
 	}
@@ -22,7 +22,7 @@ public class PublicIdDAO extends PublicId implements DatabaseObject {
 	/**
 	 * Constructs PublicId using a {@link ResultSet}
 	 */
-	public PublicIdDAO(ResultSet resultSet) throws SQLException {
+	public PublicIdDbObj(ResultSet resultSet) throws SQLException {
 		super();
 		this.loadFromDatabase(resultSet);
 	}

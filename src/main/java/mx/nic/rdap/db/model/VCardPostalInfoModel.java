@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 import mx.nic.rdap.core.db.VCardPostalInfo;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
-import mx.nic.rdap.db.objects.VCardPostalInfoDAO;
+import mx.nic.rdap.db.objects.VCardPostalInfoDbObj;
 
 /**
  * Model for the {@link VCardPostalInfo}.
@@ -47,7 +47,7 @@ public class VCardPostalInfoModel {
 
 		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(STORE_QUERY),
 				Statement.RETURN_GENERATED_KEYS);) {
-			((VCardPostalInfoDAO) vCardPostalInfo).storeToDatabase(statement);
+			((VCardPostalInfoDbObj) vCardPostalInfo).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			statement.executeUpdate();
 
@@ -107,7 +107,7 @@ public class VCardPostalInfoModel {
 		if (!resultSet.next()) {
 			throw new ObjectNotFoundException("Object not found");
 		}
-		VCardPostalInfoDAO vCardPostalInfo = new VCardPostalInfoDAO();
+		VCardPostalInfoDbObj vCardPostalInfo = new VCardPostalInfoDbObj();
 		vCardPostalInfo.loadFromDatabase(resultSet);
 
 		return vCardPostalInfo;
@@ -128,7 +128,7 @@ public class VCardPostalInfoModel {
 			throw new ObjectNotFoundException("Object not found");
 		}
 		do {
-			VCardPostalInfoDAO vCardPostalInfo = new VCardPostalInfoDAO();
+			VCardPostalInfoDbObj vCardPostalInfo = new VCardPostalInfoDbObj();
 			vCardPostalInfo.loadFromDatabase(resultSet);
 			result.add(vCardPostalInfo);
 		} while (resultSet.next());

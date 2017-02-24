@@ -9,12 +9,12 @@ import mx.nic.rdap.core.db.RemarkDescription;
 /**
  * Data access class for the {@link RemarkDescription} object.
  */
-public class RemarkDescriptionDAO extends RemarkDescription implements DatabaseObject {
+public class RemarkDescriptionDbObj extends RemarkDescription implements DatabaseObject {
 
 	/**
 	 * Default constructor
 	 */
-	public RemarkDescriptionDAO() {
+	public RemarkDescriptionDbObj() {
 		super();
 	}
 
@@ -22,7 +22,7 @@ public class RemarkDescriptionDAO extends RemarkDescription implements DatabaseO
 	 * Constructs RemarkDescription using a {@link ResultSet}
 	 * 
 	 */
-	public RemarkDescriptionDAO(ResultSet resultSet) throws SQLException {
+	public RemarkDescriptionDbObj(ResultSet resultSet) throws SQLException {
 		super();
 		loadFromDatabase(resultSet);
 	}

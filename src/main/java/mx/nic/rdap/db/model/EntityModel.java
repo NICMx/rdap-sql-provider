@@ -22,7 +22,7 @@ import mx.nic.rdap.core.db.VCard;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
-import mx.nic.rdap.db.objects.EntityDAO;
+import mx.nic.rdap.db.objects.EntityDbObj;
 import mx.nic.rdap.db.struct.SearchResultStruct;
 
 /**
@@ -96,7 +96,7 @@ public class EntityModel {
 
 		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(STORE_QUERY),
 				Statement.RETURN_GENERATED_KEYS);) {
-			((EntityDAO) entity).storeToDatabase(statement);
+			((EntityDbObj) entity).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			statement.executeUpdate();
 
@@ -159,9 +159,9 @@ public class EntityModel {
 		return entResult;
 	}
 
-	public static EntityDAO getByHandle(String entityHandle, Connection connection)
+	public static EntityDbObj getByHandle(String entityHandle, Connection connection)
 			throws SQLException, ObjectNotFoundException {
-		EntityDAO entResult = null;
+		EntityDbObj entResult = null;
 		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(GET_BY_HANDLE_QUERY));) {
 			statement.setString(1, entityHandle);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
@@ -217,13 +217,13 @@ public class EntityModel {
 
 	}
 
-	private static EntityDAO processResultSet(ResultSet resultSet, Connection connection)
+	private static EntityDbObj processResultSet(ResultSet resultSet, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		if (!resultSet.next()) {
 			throw new ObjectNotFoundException("Object not found");
 		}
 
-		EntityDAO entity = new EntityDAO();
+		EntityDbObj entity = new EntityDbObj();
 		entity.loadFromDatabase(resultSet);
 
 		return entity;
@@ -288,7 +288,7 @@ public class EntityModel {
 			result = new ArrayList<>();
 
 			do {
-				EntityDAO dao = new EntityDAO();
+				EntityDbObj dao = new EntityDbObj();
 				dao.loadFromDatabase(rs);
 				result.add(dao);
 			} while (rs.next());
@@ -365,7 +365,7 @@ public class EntityModel {
 		// Hack to know is there is more domains that the limit, used for
 		// notices
 		resultLimit = resultLimit + 1;
-		List<EntityDAO> entities = new ArrayList<EntityDAO>();
+		List<EntityDbObj> entities = new ArrayList<EntityDbObj>();
 
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setString(1, criteria);
@@ -378,7 +378,7 @@ public class EntityModel {
 			}
 
 			do {
-				EntityDAO ent = new EntityDAO();
+				EntityDbObj ent = new EntityDbObj();
 				ent.loadFromDatabase(rs);
 				entities.add(ent);
 			} while (rs.next());
@@ -387,7 +387,7 @@ public class EntityModel {
 				result.setResultSetWasLimitedByUserConfiguration(true);
 				entities.remove(entities.size() - 1);
 			}
-			for (EntityDAO ent : entities) {
+			for (EntityDbObj ent : entities) {
 				loadNestedObjects(ent, connection);
 			}
 			result.setSearchResultsLimitForUser(resultLimit);

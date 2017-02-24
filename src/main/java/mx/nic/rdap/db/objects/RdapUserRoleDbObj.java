@@ -11,17 +11,17 @@ import mx.nic.rdap.db.RdapUserRole;
  * rdap user role information
  * 
  */
-public class RdapUserRoleDAO extends RdapUserRole implements DatabaseObject {
+public class RdapUserRoleDbObj extends RdapUserRole implements DatabaseObject {
 
 	/**
 	 * Construct a RdapUserRole using a {@link ResultSet}
 	 */
-	public RdapUserRoleDAO(ResultSet resultSet) throws SQLException {
+	public RdapUserRoleDbObj(ResultSet resultSet) throws SQLException {
 		super();
 		loadFromDatabase(resultSet);
 	}
 
-	public RdapUserRoleDAO() {
+	public RdapUserRoleDbObj() {
 		// TODO Auto-generated constructor stub
 	}
 

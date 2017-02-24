@@ -10,19 +10,19 @@ import mx.nic.rdap.core.db.DsData;
  * Data access class for the {@link DsData} Object.
  * 
  */
-public class DsDataDAO extends DsData implements DatabaseObject {
+public class DsDataDbObj extends DsData implements DatabaseObject {
 
 	/**
 	 * Default constructor
 	 */
-	public DsDataDAO() {
+	public DsDataDbObj() {
 		super();
 	}
 
 	/**
 	 * Construct DsData using a {@link ResultSet}
 	 */
-	public DsDataDAO(ResultSet resultSet) throws SQLException {
+	public DsDataDbObj(ResultSet resultSet) throws SQLException {
 		super();
 		loadFromDatabase(resultSet);
 	}

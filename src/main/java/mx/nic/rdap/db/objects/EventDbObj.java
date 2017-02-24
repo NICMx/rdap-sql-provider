@@ -12,19 +12,19 @@ import mx.nic.rdap.core.db.Event;
 /**
  * Data access class for the {@link Event} object
  */
-public class EventDAO extends Event implements DatabaseObject {
+public class EventDbObj extends Event implements DatabaseObject {
 
 	/**
 	 * Default Constructor
 	 */
-	public EventDAO() {
+	public EventDbObj() {
 		super();
 	}
 
 	/**
 	 * Constructs an Event using a {@link ResultSet}
 	 */
-	public EventDAO(ResultSet resultSet) throws SQLException {
+	public EventDbObj(ResultSet resultSet) throws SQLException {
 		super();
 		this.loadFromDatabase(resultSet);
 	}

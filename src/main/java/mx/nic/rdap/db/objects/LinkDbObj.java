@@ -10,19 +10,19 @@ import mx.nic.rdap.core.db.Link;
  * Data access class for the {@link Link} object.
  * 
  */
-public class LinkDAO extends Link implements DatabaseObject {
+public class LinkDbObj extends Link implements DatabaseObject {
 
 	/**
 	 * Default Constructor
 	 */
-	public LinkDAO() {
+	public LinkDbObj() {
 		super();
 	}
 
 	/**
 	 * Construct a Link using a {@link ResultSet}
 	 */
-	public LinkDAO(ResultSet resultSet) throws SQLException {
+	public LinkDbObj(ResultSet resultSet) throws SQLException {
 		super();
 		loadFromDatabase(resultSet);
 	}
@@ -31,7 +31,7 @@ public class LinkDAO extends Link implements DatabaseObject {
 	 * Construct a "self" Link
 	 * 
 	 */
-	public LinkDAO(String header, String contextPath, String objectClassName, String query) {
+	public LinkDbObj(String header, String contextPath, String objectClassName, String query) {
 		this.setValue(header + contextPath + "/" + objectClassName + "/" + query);
 		this.setRel("self");
 		this.setHref(header + contextPath + "/" + objectClassName + "/" + query);

@@ -31,15 +31,15 @@ import mx.nic.rdap.db.model.DomainModel;
 import mx.nic.rdap.db.model.EntityModel;
 import mx.nic.rdap.db.model.NameserverModel;
 import mx.nic.rdap.db.model.ZoneModel;
-import mx.nic.rdap.db.objects.DomainDAO;
-import mx.nic.rdap.db.objects.EntityDAO;
-import mx.nic.rdap.db.objects.EventDAO;
-import mx.nic.rdap.db.objects.IpAddressDAO;
-import mx.nic.rdap.db.objects.LinkDAO;
-import mx.nic.rdap.db.objects.NameserverDAO;
-import mx.nic.rdap.db.objects.PublicIdDAO;
-import mx.nic.rdap.db.objects.RemarkDAO;
-import mx.nic.rdap.db.objects.RemarkDescriptionDAO;
+import mx.nic.rdap.db.objects.DomainDbObj;
+import mx.nic.rdap.db.objects.EntityDbObj;
+import mx.nic.rdap.db.objects.EventDbObj;
+import mx.nic.rdap.db.objects.IpAddressDbObj;
+import mx.nic.rdap.db.objects.LinkDbObj;
+import mx.nic.rdap.db.objects.NameserverDbObj;
+import mx.nic.rdap.db.objects.PublicIdDbObj;
+import mx.nic.rdap.db.objects.RemarkDbObj;
+import mx.nic.rdap.db.objects.RemarkDescriptionDbObj;
 
 /**
  *
@@ -78,7 +78,7 @@ public class DummyDataTest extends DatabaseTest {
 	private static void createDomain(String name, String zone, String handle, boolean hasEntities,
 			boolean hasNameservers, boolean hasRemarks, boolean hasLinks, boolean hasEvents)
 			throws RequiredValueNotFoundException, IOException, SQLException, ObjectNotFoundException {
-		DomainDAO domain = new DomainDAO();
+		DomainDbObj domain = new DomainDbObj();
 		domain.setPunycodeName(name);
 		domain.setHandle(handle);
 		domain.setPort43("whois.mx");
@@ -114,7 +114,7 @@ public class DummyDataTest extends DatabaseTest {
 
 		int numberOfNameservers = ThreadLocalRandom.current().nextInt(1, 3);
 		for (int index = 0; index < numberOfNameservers; index++) {
-			Nameserver nameserver = new NameserverDAO();
+			Nameserver nameserver = new NameserverDbObj();
 			String nsName = ("NS-" + index + "-").concat(name);
 			nameserver.setPunycodeName(nsName + index);
 			nameserver.setHandle(nsName + "-handle");
@@ -130,7 +130,7 @@ public class DummyDataTest extends DatabaseTest {
 			NameserverIpAddressesStruct ipAddresses = new NameserverIpAddressesStruct();
 			int numberOfIp4 = ThreadLocalRandom.current().nextInt(0, 2);
 			for (int indexIP = 0; indexIP < numberOfIp4; indexIP++) {
-				IpAddress ipv41 = new IpAddressDAO();
+				IpAddress ipv41 = new IpAddressDbObj();
 				try {
 					ipv41.setAddress(InetAddress.getByName("192.0.2." + indexIP));
 				} catch (UnknownHostException e1) {
@@ -142,7 +142,7 @@ public class DummyDataTest extends DatabaseTest {
 
 			int numberOfIp6 = ThreadLocalRandom.current().nextInt(0, 2);
 			for (int indexIP = 0; indexIP < numberOfIp6; indexIP++) {
-				IpAddress ipv6 = new IpAddressDAO();
+				IpAddress ipv6 = new IpAddressDbObj();
 				try {
 					ipv6.setAddress(InetAddress.getByName("2001:db8::12" + indexIP));
 				} catch (UnknownHostException e1) {
@@ -177,7 +177,7 @@ public class DummyDataTest extends DatabaseTest {
 		List<Entity> entities = new ArrayList<Entity>();
 		int numberOfEntities = ThreadLocalRandom.current().nextInt(1, 3);
 		for (int index = 0; index < numberOfEntities; index++) {
-			Entity entity = new EntityDAO();
+			Entity entity = new EntityDbObj();
 			String entName = name.concat("-Ent-" + index);
 			entity.setHandle(entName + "-Handle");
 			entity.setPort43("whois.mx");
@@ -194,7 +194,7 @@ public class DummyDataTest extends DatabaseTest {
 				entity.getRoles().add(Rol.RESELLER);
 
 			if (getRandomBoolean()) {
-				PublicId pid = new PublicIdDAO();
+				PublicId pid = new PublicIdDbObj();
 				pid.setPublicId(entName + "-PId");
 				pid.setType("Type");
 				entity.getPublicIds().add(pid);
@@ -230,7 +230,7 @@ public class DummyDataTest extends DatabaseTest {
 		List<Remark> remarks = new ArrayList<Remark>();
 		int numberOfRemarks = ThreadLocalRandom.current().nextInt(1, 3);
 		for (int index = 0; index < numberOfRemarks; index++) {
-			Remark remark = new RemarkDAO();
+			Remark remark = new RemarkDbObj();
 			remark.setLanguage("EN");
 			String remTitle = title + "-Rem-" + index;
 			remark.setTitle(remTitle);
@@ -240,7 +240,7 @@ public class DummyDataTest extends DatabaseTest {
 			}
 			int numberOfRemarkDescriptions = ThreadLocalRandom.current().nextInt(1, 3);
 			for (int index2 = 0; index2 < numberOfRemarkDescriptions; index2++) {
-				RemarkDescription rd = new RemarkDescriptionDAO();
+				RemarkDescription rd = new RemarkDescriptionDbObj();
 				rd.setOrder(index2 + 1);
 				rd.setDescription(remark.getTitle() + "-Description-" + index2);
 				remark.getDescriptions().add(rd);
@@ -254,7 +254,7 @@ public class DummyDataTest extends DatabaseTest {
 		List<Link> links = new ArrayList<Link>();
 		int numberOfLinks = ThreadLocalRandom.current().nextInt(1, 3);
 		for (int index = 0; index < numberOfLinks; index++) {
-			Link link = new LinkDAO();
+			Link link = new LinkDbObj();
 			link.setValue("Link-" + index + ".com");
 			link.setHref("link" + index);
 			link.setRel("self");
@@ -267,7 +267,7 @@ public class DummyDataTest extends DatabaseTest {
 		List<Event> events = new ArrayList<Event>();
 		int numberOfEvents = ThreadLocalRandom.current().nextInt(1, 3);
 		for (int index = 0; index < numberOfEvents; index++) {
-			Event event = new EventDAO();
+			Event event = new EventDbObj();
 			if (getRandomBoolean())
 				event.setEventAction(EventAction.EXPIRATION);
 			else

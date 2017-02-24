@@ -16,7 +16,7 @@ import mx.nic.rdap.core.db.Link;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.Util;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
-import mx.nic.rdap.db.objects.LinkDAO;
+import mx.nic.rdap.db.objects.LinkDbObj;
 
 /**
  * Model for the {@link Link} Object
@@ -86,7 +86,7 @@ public class LinkModel {
 		isValidForStore(link);
 		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery("storeToDatabase"),
 				Statement.RETURN_GENERATED_KEYS)) {
-			((LinkDAO) link).storeToDatabase(statement);
+			((LinkDbObj) link).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			statement.executeUpdate();
 			ResultSet result = statement.getGeneratedKeys();
@@ -155,42 +155,42 @@ public class LinkModel {
 		}
 	}
 
-	public static List<LinkDAO> getByNameServerId(Long nameserverId, Connection connection) throws SQLException {
+	public static List<LinkDbObj> getByNameServerId(Long nameserverId, Connection connection) throws SQLException {
 		return getByRelationId(nameserverId, connection, NAMESERVER_GET_QUERY);
 	}
 
-	public static List<LinkDAO> getByDomainId(Long domainId, Connection connection) throws SQLException {
+	public static List<LinkDbObj> getByDomainId(Long domainId, Connection connection) throws SQLException {
 		return getByRelationId(domainId, connection, DOMAIN_GET_QUERY);
 	}
 
-	public static List<LinkDAO> getByEventId(Long eventId, Connection connection) throws SQLException {
+	public static List<LinkDbObj> getByEventId(Long eventId, Connection connection) throws SQLException {
 		return getByRelationId(eventId, connection, EVENT_GET_QUERY);
 	}
 
-	public static List<LinkDAO> getByRemarkId(Long remarkId, Connection connection) throws SQLException {
+	public static List<LinkDbObj> getByRemarkId(Long remarkId, Connection connection) throws SQLException {
 		return getByRelationId(remarkId, connection, REMARK_GET_QUERY);
 	}
 
-	public static List<LinkDAO> getByDsDataId(Long dsDataId, Connection connection) throws SQLException {
+	public static List<LinkDbObj> getByDsDataId(Long dsDataId, Connection connection) throws SQLException {
 		return getByRelationId(dsDataId, connection, DS_DATA_GET_QUERY);
 	}
 
-	public static List<LinkDAO> getByEntityId(Long entityId, Connection connection) throws SQLException {
+	public static List<LinkDbObj> getByEntityId(Long entityId, Connection connection) throws SQLException {
 		return getByRelationId(entityId, connection, ENTITY_GET_QUERY);
 	}
 
-	public static List<LinkDAO> getByAutnumId(Long autnumId, Connection connection) throws SQLException {
+	public static List<LinkDbObj> getByAutnumId(Long autnumId, Connection connection) throws SQLException {
 		return getByRelationId(autnumId, connection, AUTNUM_GET_QUERY);
 	}
 
-	public static List<LinkDAO> getByIpNetworkId(Long ipNetworkId, Connection connection) throws SQLException {
+	public static List<LinkDbObj> getByIpNetworkId(Long ipNetworkId, Connection connection) throws SQLException {
 		return getByRelationId(ipNetworkId, connection, IP_NETWORK_GET_QUERY);
 	}
 
-	private static List<LinkDAO> getByRelationId(Long id, Connection connection, String queryGetId)
+	private static List<LinkDbObj> getByRelationId(Long id, Connection connection, String queryGetId)
 			throws SQLException {
 		String query = queryGroup.getQuery(queryGetId);
-		List<LinkDAO> result = null;
+		List<LinkDbObj> result = null;
 
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setLong(1, id);
@@ -199,9 +199,9 @@ public class LinkModel {
 				if (!resultSet.next()) {
 					return Collections.emptyList(); // A Data can have no links
 				}
-				List<LinkDAO> links = new ArrayList<LinkDAO>();
+				List<LinkDbObj> links = new ArrayList<LinkDbObj>();
 				do {
-					LinkDAO link = new LinkDAO(resultSet);
+					LinkDbObj link = new LinkDbObj(resultSet);
 					links.add(link);
 				} while (resultSet.next());
 				result = links;
@@ -223,7 +223,7 @@ public class LinkModel {
 				}
 				List<Link> links = new ArrayList<Link>();
 				do {
-					LinkDAO link = new LinkDAO(resultSet);
+					LinkDbObj link = new LinkDbObj(resultSet);
 					links.add(link);
 				} while (resultSet.next());
 				result = links;

@@ -12,9 +12,9 @@ import mx.nic.rdap.core.db.RemarkDescription;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.RemarkModel;
-import mx.nic.rdap.db.objects.LinkDAO;
-import mx.nic.rdap.db.objects.RemarkDAO;
-import mx.nic.rdap.db.objects.RemarkDescriptionDAO;
+import mx.nic.rdap.db.objects.LinkDbObj;
+import mx.nic.rdap.db.objects.RemarkDbObj;
+import mx.nic.rdap.db.objects.RemarkDescriptionDbObj;
 
 /**
  * Test for the class Remark
@@ -28,17 +28,17 @@ public class RemarkTest extends DatabaseTest {
 	 */
 	public void insert() {
 		try {
-			RemarkDAO remark = new RemarkDAO();
+			RemarkDbObj remark = new RemarkDbObj();
 			Double testId = Math.random();
 			remark.setTitle("Test " + testId);
 			remark.setType("Test");
 
-			RemarkDescriptionDAO description1 = new RemarkDescriptionDAO();
+			RemarkDescriptionDbObj description1 = new RemarkDescriptionDbObj();
 			description1.setDescription("First description of the remark " + testId);
 			description1.setRemarkId(remark.getId());
 			description1.setOrder(1);
 
-			RemarkDescriptionDAO description2 = new RemarkDescriptionDAO();
+			RemarkDescriptionDbObj description2 = new RemarkDescriptionDbObj();
 			description2.setDescription("Second description of the remark" + testId);
 			description2.setRemarkId(remark.getId());
 			description2.setOrder(2);
@@ -49,11 +49,11 @@ public class RemarkTest extends DatabaseTest {
 			remark.setDescriptions(descriptions);
 
 			List<Link> links = new ArrayList<Link>();
-			Link link = new LinkDAO();
+			Link link = new LinkDbObj();
 			link.setHref("remarkLink1");
 			link.setValue("remarkLink1.com");
 
-			Link link2 = new LinkDAO();
+			Link link2 = new LinkDbObj();
 			link2.setValue("remarkLink2.com");
 			link2.setHref("remarkLink2");
 

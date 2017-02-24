@@ -14,7 +14,7 @@ import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
-import mx.nic.rdap.db.objects.AutnumDAO;
+import mx.nic.rdap.db.objects.AutnumDbObj;
 
 /**
  * Model for the {@link Autnum} Object
@@ -54,7 +54,7 @@ public class AutnumModel {
 		Long autnumId;
 		String query = queryGroup.getQuery(STORE_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-			((AutnumDAO) autnum).storeToDatabase(statement);
+			((AutnumDbObj) autnum).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing query:" + statement.toString());
 			statement.executeUpdate();
 			ResultSet resultSet = statement.getGeneratedKeys();
@@ -91,7 +91,7 @@ public class AutnumModel {
 		}
 	}
 
-	public static AutnumDAO getAutnumById(Long autnumId, Connection connection)
+	public static AutnumDbObj getAutnumById(Long autnumId, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(GET_BY_ID))) {
 			statement.setLong(1, autnumId);
@@ -100,14 +100,14 @@ public class AutnumModel {
 				if (!resultSet.next()) {
 					throw new ObjectNotFoundException("Object not found");
 				}
-				AutnumDAO autnum = new AutnumDAO(resultSet);
+				AutnumDbObj autnum = new AutnumDbObj(resultSet);
 				loadNestedObjects(autnum, connection);
 				return autnum;
 			}
 		}
 	}
 
-	public static AutnumDAO getByRange(Long autnumValue, Connection connection)
+	public static AutnumDbObj getByRange(Long autnumValue, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(GET_BY_RANGE))) {
 			statement.setLong(1, autnumValue);
@@ -117,7 +117,7 @@ public class AutnumModel {
 				if (!resultSet.next()) {
 					throw new ObjectNotFoundException("Object not found.");
 				}
-				AutnumDAO autnum = new AutnumDAO(resultSet);
+				AutnumDbObj autnum = new AutnumDbObj(resultSet);
 				loadNestedObjects(autnum, connection);
 				return autnum;
 			}
@@ -139,7 +139,7 @@ public class AutnumModel {
 		}
 	}
 
-	public static AutnumDAO getByHandle(String handle, Connection connection)
+	public static AutnumDbObj getByHandle(String handle, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(GET_BY_HANDLE))) {
 			statement.setString(1, handle);
@@ -148,7 +148,7 @@ public class AutnumModel {
 				if (!resultSet.next()) {
 					throw new ObjectNotFoundException("Object not found.");
 				}
-				AutnumDAO autnum = new AutnumDAO(resultSet);
+				AutnumDbObj autnum = new AutnumDbObj(resultSet);
 				loadNestedObjects(autnum, connection);
 				return autnum;
 			}

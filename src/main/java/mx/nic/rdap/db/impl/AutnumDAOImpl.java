@@ -4,28 +4,36 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import mx.nic.rdap.core.db.Autnum;
-import mx.nic.rdap.db.DBConnection;
-import mx.nic.rdap.db.exception.RdapDatabaseException;
+import mx.nic.rdap.db.DatabaseSession;
+import mx.nic.rdap.db.exception.RdapDataAccessException;
 import mx.nic.rdap.db.model.AutnumModel;
-import mx.nic.rdap.db.spi.AutnumSpi;
+import mx.nic.rdap.db.spi.AutnumDAO;
 
-public class AutnumDAOImpl implements AutnumSpi {
+public class AutnumDAOImpl implements AutnumDAO {
 
-	@Override
-	public Autnum getByRange(Long autnumValue) throws RdapDatabaseException {
-		try (Connection connection = DBConnection.getConnection()) {
-			return AutnumModel.getByRange(autnumValue, connection);
+	public Long storeToDatabase(Autnum autnum) throws RdapDataAccessException {
+		try (Connection connection = DatabaseSession.getRdapConnection()) {
+			return AutnumModel.storeToDatabase(autnum, connection);
 		} catch (SQLException e) {
-			throw new RdapDatabaseException(e);
+			throw new RdapDataAccessException(e);
 		}
 	}
 
 	@Override
-	public boolean existByRange(Long autnumValue) throws RdapDatabaseException {
-		try (Connection connection = DBConnection.getConnection()) {
+	public Autnum getByRange(Long autnumValue) throws RdapDataAccessException {
+		try (Connection connection = DatabaseSession.getRdapConnection()) {
+			return AutnumModel.getByRange(autnumValue, connection);
+		} catch (SQLException e) {
+			throw new RdapDataAccessException(e);
+		}
+	}
+
+	@Override
+	public boolean existByRange(Long autnumValue) throws RdapDataAccessException {
+		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			AutnumModel.existByRange(autnumValue, connection);
 		} catch (SQLException e) {
-			throw new RdapDatabaseException(e);
+			throw new RdapDataAccessException(e);
 		}
 
 		return true;

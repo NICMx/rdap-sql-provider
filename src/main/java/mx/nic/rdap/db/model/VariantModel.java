@@ -17,7 +17,7 @@ import mx.nic.rdap.core.db.Variant;
 import mx.nic.rdap.core.db.VariantName;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
-import mx.nic.rdap.db.objects.VariantDAO;
+import mx.nic.rdap.db.objects.VariantDbObj;
 
 /**
  * Model for the {@link Variant} Object
@@ -58,7 +58,7 @@ public class VariantModel {
 		Long variantInsertedId = null;
 		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(STORE_QUERY),
 				Statement.RETURN_GENERATED_KEYS)) {
-			((VariantDAO) variant).storeToDatabase(statement);
+			((VariantDbObj) variant).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			statement.executeUpdate();
 			ResultSet resultSet = statement.getGeneratedKeys();
@@ -87,7 +87,7 @@ public class VariantModel {
 
 			variants = new ArrayList<>();
 			do {
-				VariantDAO variant = new VariantDAO(resultSet);
+				VariantDbObj variant = new VariantDbObj(resultSet);
 				variants.add(variant);
 			} while (resultSet.next());
 		}
@@ -111,7 +111,7 @@ public class VariantModel {
 				throw new ObjectNotFoundException("Object Not found");
 			}
 
-			result = new VariantDAO(resultSet);
+			result = new VariantDbObj(resultSet);
 		}
 
 		setVariantNames(result, connection);

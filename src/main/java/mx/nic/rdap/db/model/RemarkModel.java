@@ -16,7 +16,7 @@ import mx.nic.rdap.core.db.Remark;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
-import mx.nic.rdap.db.objects.RemarkDAO;
+import mx.nic.rdap.db.objects.RemarkDbObj;
 
 /**
  * Model for the {@link Remark} Object
@@ -57,7 +57,7 @@ public class RemarkModel {
 		// give us the id generated for the object stored
 		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery("storeToDatabase"),
 				Statement.RETURN_GENERATED_KEYS)) {
-			((RemarkDAO) remark).storeToDatabase(statement);
+			((RemarkDbObj) remark).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			statement.executeUpdate();
 			ResultSet result = statement.getGeneratedKeys();
@@ -164,7 +164,7 @@ public class RemarkModel {
 		}
 		List<Remark> remarks = new ArrayList<Remark>();
 		do {
-			RemarkDAO remark = new RemarkDAO(resultSet);
+			RemarkDbObj remark = new RemarkDbObj(resultSet);
 			// load the remark descriptions of the remark
 			remark.setDescriptions(RemarkDescriptionModel.findByRemarkId(remark.getId(), connection));
 			// Load the remark's links

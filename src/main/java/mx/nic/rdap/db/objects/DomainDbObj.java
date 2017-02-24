@@ -13,19 +13,19 @@ import mx.nic.rdap.db.model.ZoneModel;
  * Data access class for the {@link Domain} object.
  * 
  */
-public class DomainDAO extends Domain implements DatabaseObject {
+public class DomainDbObj extends Domain implements DatabaseObject {
 
 	/**
 	 * Default Constructor
 	 */
-	public DomainDAO() {
+	public DomainDbObj() {
 		super();
 	}
 
 	/**
 	 * Construct Domain using a {@link ResultSet}
 	 */
-	public DomainDAO(ResultSet resultSet) throws SQLException {
+	public DomainDbObj(ResultSet resultSet) throws SQLException {
 		super();
 		loadFromDatabase(resultSet);
 	}

@@ -14,7 +14,7 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.PublicId;
 import mx.nic.rdap.db.QueryGroup;
-import mx.nic.rdap.db.objects.PublicIdDAO;
+import mx.nic.rdap.db.objects.PublicIdDbObj;
 
 /**
  * Model for the {@link PublicId} Object
@@ -52,7 +52,7 @@ public class PublicIdModel {
 	public static Long storeToDatabase(PublicId publicId, Connection connection) throws SQLException {
 		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(STORE_QUERY),
 				Statement.RETURN_GENERATED_KEYS);) {
-			((PublicIdDAO) publicId).storeToDatabase(statement);
+			((PublicIdDbObj) publicId).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			statement.executeUpdate();
 			ResultSet result = statement.getGeneratedKeys();
@@ -124,7 +124,7 @@ public class PublicIdModel {
 		}
 		List<PublicId> publicIds = new ArrayList<PublicId>();
 		do {
-			PublicIdDAO publicId = new PublicIdDAO(resultSet);
+			PublicIdDbObj publicId = new PublicIdDbObj(resultSet);
 			publicIds.add(publicId);
 		} while (resultSet.next());
 		return publicIds;

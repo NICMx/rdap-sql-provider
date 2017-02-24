@@ -24,7 +24,7 @@ import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.InvalidValueException;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
-import mx.nic.rdap.db.objects.NameserverDAO;
+import mx.nic.rdap.db.objects.NameserverDbObj;
 import mx.nic.rdap.db.struct.SearchResultStruct;
 
 /**
@@ -88,7 +88,7 @@ public class NameserverModel {
 		String query = queryGroup.getQuery(STORE_QUERY);
 		Long nameserverId = null;
 		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-			((NameserverDAO) nameserver).storeToDatabase(statement);
+			((NameserverDbObj) nameserver).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			statement.executeUpdate();
 			ResultSet result = statement.getGeneratedKeys();
@@ -142,7 +142,7 @@ public class NameserverModel {
 		}
 	}
 
-	public static NameserverDAO findByName(String name, Connection connection)
+	public static NameserverDbObj findByName(String name, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		String query = queryGroup.getQuery(FIND_BY_NAME_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -153,7 +153,7 @@ public class NameserverModel {
 				if (!resultSet.next()) {
 					throw new ObjectNotFoundException("Object not found.");
 				}
-				NameserverDAO nameserver = new NameserverDAO(resultSet);
+				NameserverDbObj nameserver = new NameserverDbObj(resultSet);
 				NameserverModel.loadNestedObjects(nameserver, connection);
 				return nameserver;
 			}
@@ -184,7 +184,7 @@ public class NameserverModel {
 		// notices
 		resultLimit = resultLimit + 1;
 		String criteria = namePattern;
-		List<NameserverDAO> nameservers = new ArrayList<NameserverDAO>();
+		List<NameserverDbObj> nameservers = new ArrayList<NameserverDbObj>();
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, criteria);
 			statement.setString(2, criteria);
@@ -196,7 +196,7 @@ public class NameserverModel {
 					throw new ObjectNotFoundException("Object not found");
 				}
 				do {
-					NameserverDAO nameserver = new NameserverDAO(resultSet);
+					NameserverDbObj nameserver = new NameserverDbObj(resultSet);
 					nameservers.add(nameserver);
 				} while (resultSet.next());
 
@@ -205,7 +205,7 @@ public class NameserverModel {
 					result.setResultSetWasLimitedByUserConfiguration(true);
 					nameservers.remove(nameservers.size() - 1);
 				}
-				for (NameserverDAO nameserver : nameservers) {
+				for (NameserverDbObj nameserver : nameservers) {
 					loadNestedObjects(nameserver, connection);
 				}
 				result.setSearchResultsLimitForUser(resultLimit);
@@ -222,7 +222,7 @@ public class NameserverModel {
 		// notices
 		resultLimit = resultLimit + 1;
 		String query = "";
-		List<NameserverDAO> nameservers = new ArrayList<NameserverDAO>();
+		List<NameserverDbObj> nameservers = new ArrayList<NameserverDbObj>();
 		try {
 			InetAddress address = InetAddress.getByName(ipaddressPattern);
 			if (address instanceof Inet6Address) {
@@ -243,7 +243,7 @@ public class NameserverModel {
 					throw new ObjectNotFoundException("Object not found");
 				}
 				do {
-					NameserverDAO nameserver = new NameserverDAO(resultSet);
+					NameserverDbObj nameserver = new NameserverDbObj(resultSet);
 					nameservers.add(nameserver);
 				} while (resultSet.next());
 
@@ -252,7 +252,7 @@ public class NameserverModel {
 					result.setResultSetWasLimitedByUserConfiguration(true);
 					nameservers.remove(nameservers.size() - 1);
 				}
-				for (NameserverDAO nameserver : nameservers) {
+				for (NameserverDbObj nameserver : nameservers) {
 					loadNestedObjects(nameserver, connection);
 				}
 				result.setSearchResultsLimitForUser(resultLimit);
@@ -281,7 +281,7 @@ public class NameserverModel {
 				}
 				List<Nameserver> nameservers = new ArrayList<Nameserver>();
 				do {
-					Nameserver nameserver = new NameserverDAO(resultSet);
+					Nameserver nameserver = new NameserverDbObj(resultSet);
 					if (!useNameserverAsDomainAttribute)
 						NameserverModel.loadNestedObjects(nameserver, connection);
 					nameservers.add(nameserver);
@@ -332,7 +332,7 @@ public class NameserverModel {
 				}
 				List<Nameserver> nameservers = new ArrayList<Nameserver>();
 				do {
-					Nameserver nameserver = new NameserverDAO(resultSet);
+					Nameserver nameserver = new NameserverDbObj(resultSet);
 					NameserverModel.loadNestedObjects(nameserver, connection);
 					nameservers.add(nameserver);
 				} while (resultSet.next());
@@ -341,7 +341,7 @@ public class NameserverModel {
 		}
 	}
 
-	public static NameserverDAO getByHandle(String handle, Connection rdapConnection)
+	public static NameserverDbObj getByHandle(String handle, Connection rdapConnection)
 			throws SQLException, RequiredValueNotFoundException, ObjectNotFoundException {
 		if (handle == null || handle.isEmpty()) {
 			throw new RequiredValueNotFoundException("handle", "Nameserver");
@@ -354,7 +354,7 @@ public class NameserverModel {
 				if (!resultSet.next()) {
 					throw new ObjectNotFoundException("Object not found.");
 				}
-				NameserverDAO nameserver = new NameserverDAO(resultSet);
+				NameserverDbObj nameserver = new NameserverDbObj(resultSet);
 				loadNestedObjects(nameserver, rdapConnection);
 				return nameserver;
 			}

@@ -10,12 +10,12 @@ import mx.nic.rdap.core.db.Entity;
  * Data access class for the {@link Entity} Object
  * 
  */
-public class EntityDAO extends Entity implements DatabaseObject {
+public class EntityDbObj extends Entity implements DatabaseObject {
 
 	/**
 	 * Default Constructor
 	 */
-	public EntityDAO() {
+	public EntityDbObj() {
 		super();
 	}
 
@@ -23,7 +23,7 @@ public class EntityDAO extends Entity implements DatabaseObject {
 	 * Construct Entity using a {@link ResultSet}
 	 * 
 	 */
-	public EntityDAO(ResultSet resultSet) throws SQLException {
+	public EntityDbObj(ResultSet resultSet) throws SQLException {
 		super();
 		loadFromDatabase(resultSet);
 	}

@@ -24,12 +24,12 @@ import mx.nic.rdap.db.model.DomainModel;
 import mx.nic.rdap.db.model.EntityModel;
 import mx.nic.rdap.db.model.SecureDNSModel;
 import mx.nic.rdap.db.model.ZoneModel;
-import mx.nic.rdap.db.objects.DomainDAO;
-import mx.nic.rdap.db.objects.DsDataDAO;
-import mx.nic.rdap.db.objects.EntityDAO;
-import mx.nic.rdap.db.objects.EventDAO;
-import mx.nic.rdap.db.objects.LinkDAO;
-import mx.nic.rdap.db.objects.SecureDNSDAO;
+import mx.nic.rdap.db.objects.DomainDbObj;
+import mx.nic.rdap.db.objects.DsDataDbObj;
+import mx.nic.rdap.db.objects.EntityDbObj;
+import mx.nic.rdap.db.objects.EventDbObj;
+import mx.nic.rdap.db.objects.LinkDbObj;
+import mx.nic.rdap.db.objects.SecureDNSDbObj;
 
 /**
  * Test for the class SecureDNS
@@ -70,7 +70,7 @@ public class SecureDnsTest extends DatabaseTest {
 
 		// Links data
 		List<Link> links = new ArrayList<Link>();
-		Link link = new LinkDAO();
+		Link link = new LinkDbObj();
 		link.setValue("http://example.net/nameserver/xxxx");
 		link.setRel("self");
 		link.setHref("http://example.net/nameserver/xxxx");
@@ -79,18 +79,18 @@ public class SecureDnsTest extends DatabaseTest {
 
 		// Events Data
 		List<Event> events = new ArrayList<Event>();
-		Event event1 = new EventDAO();
+		Event event1 = new EventDbObj();
 		event1.setEventAction(EventAction.REGISTRATION);
 		event1.setEventDate(new Date());
 
-		Event event2 = new EventDAO();
+		Event event2 = new EventDbObj();
 		event2.setEventAction(EventAction.LAST_CHANGED);
 		event2.setEventDate(new Date());
 		event2.setEventActor("joe@example.com");
 
 		// event links data
 		List<Link> eventLinks = new ArrayList<Link>();
-		Link eventLink = new LinkDAO();
+		Link eventLink = new LinkDbObj();
 		eventLink.setValue("eventLink1");
 		eventLink.setRel("eventlink");
 		eventLink.setHref("http://example.net/eventlink/xxxx");
@@ -127,9 +127,9 @@ public class SecureDnsTest extends DatabaseTest {
 
 	}
 
-	public static SecureDNSDAO getSecureDns(Long id, Long domainId, boolean zoneSigned, boolean delegationSigned,
+	public static SecureDNSDbObj getSecureDns(Long id, Long domainId, boolean zoneSigned, boolean delegationSigned,
 			List<DsData> dsData) {
-		SecureDNSDAO sDns = new SecureDNSDAO();
+		SecureDNSDbObj sDns = new SecureDNSDbObj();
 		sDns.setId(id);
 		sDns.setZoneSigned(zoneSigned);
 		sDns.setDelegationSigned(delegationSigned);
@@ -140,9 +140,9 @@ public class SecureDnsTest extends DatabaseTest {
 		return sDns;
 	}
 
-	public static DsDataDAO getDsData(Long id, Long secureDNSId, Integer keytag, Integer algorithm, String digest,
+	public static DsDataDbObj getDsData(Long id, Long secureDNSId, Integer keytag, Integer algorithm, String digest,
 			Integer digestType, List<Link> links, List<Event> events) {
-		DsDataDAO ds = new DsDataDAO();
+		DsDataDbObj ds = new DsDataDbObj();
 
 		ds.setId(id);
 		ds.setSecureDNSId(secureDNSId);
@@ -158,12 +158,12 @@ public class SecureDnsTest extends DatabaseTest {
 		return ds;
 	}
 
-	public static SecureDNSDAO createDefaultSDNS() {
+	public static SecureDNSDbObj createDefaultSDNS() {
 		List<DsData> dsDataList = new ArrayList<>();
 
 		// Links data
 		List<Link> links = new ArrayList<Link>();
-		Link link = new LinkDAO();
+		Link link = new LinkDbObj();
 		link.setValue("http://example.net/nameserver/xxxx");
 		link.setRel("self");
 		link.setHref("http://example.net/nameserver/xxxx");
@@ -172,18 +172,18 @@ public class SecureDnsTest extends DatabaseTest {
 
 		// Events Data
 		List<Event> events = new ArrayList<Event>();
-		Event event1 = new EventDAO();
+		Event event1 = new EventDbObj();
 		event1.setEventAction(EventAction.REGISTRATION);
 		event1.setEventDate(new Date());
 
-		Event event2 = new EventDAO();
+		Event event2 = new EventDbObj();
 		event2.setEventAction(EventAction.LAST_CHANGED);
 		event2.setEventDate(new Date());
 		event2.setEventActor("joe@example.com");
 
 		// event links data
 		List<Link> eventLinks = new ArrayList<Link>();
-		Link eventLink = new LinkDAO();
+		Link eventLink = new LinkDbObj();
 		eventLink.setValue("eventLink1");
 		eventLink.setRel("eventlink");
 		eventLink.setHref("http://example.net/eventlink/xxxx");
@@ -200,17 +200,17 @@ public class SecureDnsTest extends DatabaseTest {
 		dsDataList.add(dsData2);
 
 		SecureDNS secureDns = getSecureDns(null, null, true, true, dsDataList);
-		return (SecureDNSDAO) secureDns;
+		return (SecureDNSDbObj) secureDns;
 	}
 
 	private static Domain createSimpleDomain() {
 
-		Entity registrar = new EntityDAO();
+		Entity registrar = new EntityDbObj();
 		registrar.setHandle("whois");
 		registrar.setPort43("whois.mx");
 		registrar.getRoles().add(Rol.SPONSOR);
 
-		Entity ent = new EntityDAO();
+		Entity ent = new EntityDbObj();
 		ent.setHandle("usr_evaldez");
 		ent.getRoles().add(Rol.REGISTRANT);
 		ent.getRoles().add(Rol.ADMINISTRATIVE);
@@ -232,7 +232,7 @@ public class SecureDnsTest extends DatabaseTest {
 			fail();
 		}
 
-		Domain dom = new DomainDAO();
+		Domain dom = new DomainDbObj();
 		dom.getEntities().add(ent);
 		dom.getEntities().add(registrar);
 		dom.setHandle("domcommx");

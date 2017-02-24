@@ -14,8 +14,8 @@ import mx.nic.rdap.core.db.VCard;
 import mx.nic.rdap.core.db.VCardPostalInfo;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.model.VCardModel;
-import mx.nic.rdap.db.objects.VCardDAO;
-import mx.nic.rdap.db.objects.VCardPostalInfoDAO;
+import mx.nic.rdap.db.objects.VCardDbObj;
+import mx.nic.rdap.db.objects.VCardPostalInfoDbObj;
 
 /**
  * Tests for the {@link VCardModel}
@@ -99,7 +99,7 @@ public class VCardTest extends DatabaseTest {
 	}
 
 	/**
-	 * Creates a new instance of {@link VCardDAO} with the incoming attributes.
+	 * Creates a new instance of {@link VCardDbObj} with the incoming attributes.
 	 * 
 	 * @param id
 	 * @param name
@@ -112,9 +112,9 @@ public class VCardTest extends DatabaseTest {
 	 * @param jobTitle
 	 * @return
 	 */
-	public static VCardDAO createVCardDao(Long id, String name, String companyName, String companyURL, String email,
+	public static VCardDbObj createVCardDao(Long id, String name, String companyName, String companyURL, String email,
 			String voice, String cellphone, String fax, String jobTitle) {
-		VCardDAO vCard = new VCardDAO();
+		VCardDbObj vCard = new VCardDbObj();
 		vCard.setId(id);
 		vCard.setName(name);
 		vCard.setCompanyName(companyName);
@@ -128,7 +128,7 @@ public class VCardTest extends DatabaseTest {
 	}
 
 	/**
-	 * Creates a new instance of {@link VCardPostalInfoDAO} with the incoming
+	 * Creates a new instance of {@link VCardPostalInfoDbObj} with the incoming
 	 * attributes.
 	 * 
 	 * @param id
@@ -145,7 +145,7 @@ public class VCardTest extends DatabaseTest {
 	 */
 	public static VCardPostalInfo createVCardPostalInfo(Long id, Long vCardId, String type, String country, String city,
 			String street1, String street2, String street3, String state, String postalCode) {
-		VCardPostalInfoDAO postalInfo = new VCardPostalInfoDAO();
+		VCardPostalInfoDbObj postalInfo = new VCardPostalInfoDbObj();
 		postalInfo.setId(id);
 		postalInfo.setVCardId(vCardId);
 		postalInfo.setType(type);

@@ -24,9 +24,9 @@ import mx.nic.rdap.core.db.IpNetwork;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.InvalidValueException;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
-import mx.nic.rdap.db.exception.RdapDatabaseException;
+import mx.nic.rdap.db.exception.RdapDataAccessException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
-import mx.nic.rdap.db.objects.IpNetworkDAO;
+import mx.nic.rdap.db.objects.IpNetworkDbObj;
 
 /**
  * Model for the {@link IpNetworkModel} Object
@@ -58,7 +58,7 @@ public class IpNetworkModel {
 		}
 	}
 
-	private static void isValidForStore(IpNetwork ipNetwork) throws RdapDatabaseException {
+	private static void isValidForStore(IpNetwork ipNetwork) throws RdapDataAccessException {
 		if (ipNetwork.getHandle() == null)
 			throw new RequiredValueNotFoundException("handle", "IpNetwork");
 
@@ -92,13 +92,13 @@ public class IpNetworkModel {
 	}
 
 	public static Long storeToDatabase(IpNetwork ipNetwork, Connection connection)
-			throws RdapDatabaseException, SQLException {
+			throws RdapDataAccessException, SQLException {
 		isValidForStore(ipNetwork);
 		String query = queryGroup.getQuery(STORE_TO_DATABASE);
 
 		Long resultId = null;
 		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);) {
-			((IpNetworkDAO) ipNetwork).storeToDatabase(statement);
+			((IpNetworkDbObj) ipNetwork).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			statement.executeUpdate();
 
@@ -169,7 +169,7 @@ public class IpNetworkModel {
 		BigInteger end = IpUtils.addressToNumber((Inet4Address) lastAddressFromNetwork);
 
 		String query = queryGroup.getQuery(GET_BY_IPV4);
-		IpNetworkDAO ipDao = null;
+		IpNetworkDbObj ipDao = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setInt(1, cidr);
 			statement.setString(2, start.toString());
@@ -180,7 +180,7 @@ public class IpNetworkModel {
 				throw new ObjectNotFoundException("Object not found");
 			}
 
-			ipDao = new IpNetworkDAO();
+			ipDao = new IpNetworkDbObj();
 			ipDao.loadFromDatabase(rs);
 		}
 
@@ -198,7 +198,7 @@ public class IpNetworkModel {
 		BigInteger endLowerPart = IpUtils.inet6AddressToLowerPart((Inet6Address) lastAddressFromNetwork);
 
 		String query = queryGroup.getQuery(GET_BY_IPV6);
-		IpNetworkDAO ipDao = null;
+		IpNetworkDbObj ipDao = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setInt(1, cidr);
 			statement.setString(2, startUpperPart.toString());
@@ -214,7 +214,7 @@ public class IpNetworkModel {
 				throw new ObjectNotFoundException("Object not found");
 			}
 
-			ipDao = new IpNetworkDAO();
+			ipDao = new IpNetworkDbObj();
 			ipDao.loadFromDatabase(rs);
 		}
 
@@ -269,7 +269,7 @@ public class IpNetworkModel {
 	public static IpNetwork getByDomainId(long domainId, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		String query = queryGroup.getQuery(GET_BY_DOMAIN_ID);
-		IpNetworkDAO result = null;
+		IpNetworkDbObj result = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setLong(1, domainId);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
@@ -278,7 +278,7 @@ public class IpNetworkModel {
 				throw new ObjectNotFoundException("Object not found");
 			}
 
-			result = new IpNetworkDAO();
+			result = new IpNetworkDbObj();
 			result.loadFromDatabase(rs);
 			loadSimpleNestedObjects(result, connection);
 		}
@@ -305,7 +305,7 @@ public class IpNetworkModel {
 			results = new ArrayList<IpNetwork>();
 
 			do {
-				IpNetworkDAO ipNetwork = new IpNetworkDAO();
+				IpNetworkDbObj ipNetwork = new IpNetworkDbObj();
 				ipNetwork.loadFromDatabase(rs);
 				results.add(ipNetwork);
 			} while (rs.next());
@@ -318,10 +318,10 @@ public class IpNetworkModel {
 		return results;
 	}
 
-	public static IpNetworkDAO getByHandle(String handle, Connection connection)
+	public static IpNetworkDbObj getByHandle(String handle, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		String query = queryGroup.getQuery(GET_BY_HANDLE);
-		IpNetworkDAO result = null;
+		IpNetworkDbObj result = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setString(1, handle);
 			logger.log(Level.INFO, "Executing QUERY : " + statement.toString());
@@ -330,7 +330,7 @@ public class IpNetworkModel {
 				throw new ObjectNotFoundException("Object not found");
 			}
 
-			result = new IpNetworkDAO();
+			result = new IpNetworkDbObj();
 			result.loadFromDatabase(rs);
 		}
 

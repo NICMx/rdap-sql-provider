@@ -16,12 +16,12 @@ import mx.nic.rdap.core.db.IpNetwork;
  * different to {@link IpNetwork}
  * 
  */
-public class IpAddressDAO extends IpAddress implements DatabaseObject {
+public class IpAddressDbObj extends IpAddress implements DatabaseObject {
 
 	/**
 	 * Default Constructor
 	 */
-	public IpAddressDAO() {
+	public IpAddressDbObj() {
 		super();
 	}
 
@@ -29,7 +29,7 @@ public class IpAddressDAO extends IpAddress implements DatabaseObject {
 	 * Construct an IpAddressDAO using a {@link ResultSet}
 	 * 
 	 */
-	public IpAddressDAO(ResultSet resultSet) throws SQLException {
+	public IpAddressDbObj(ResultSet resultSet) throws SQLException {
 		super();
 		loadFromDatabase(resultSet);
 	}

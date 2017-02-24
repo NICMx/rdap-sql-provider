@@ -11,18 +11,18 @@ import mx.nic.rdap.db.RdapUser;
  * user information
  * 
  */
-public class RdapUserDAO extends RdapUser implements DatabaseObject {
+public class RdapUserDbObj extends RdapUser implements DatabaseObject {
 
 	/**
 	 * Construct a RdapUser from a resultSet
 	 */
-	public RdapUserDAO(ResultSet resultSet) throws SQLException {
+	public RdapUserDbObj(ResultSet resultSet) throws SQLException {
 		super();
 		loadFromDatabase(resultSet);
-		setUserRole(new RdapUserRoleDAO());
+		setUserRole(new RdapUserRoleDbObj());
 	}
 
-	public RdapUserDAO() {
+	public RdapUserDbObj() {
 		// TODO Auto-generated constructor stub
 	}
 

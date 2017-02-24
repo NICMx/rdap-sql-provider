@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
-import mx.nic.rdap.db.objects.RdapUserRoleDAO;
+import mx.nic.rdap.db.objects.RdapUserRoleDbObj;
 
 /**
  * Model for RdapUserRole Data
@@ -36,14 +36,14 @@ public class RdapUserRoleModel {
 	/**
 	 * Validate the required attributes for the rdapUserRole
 	 */
-	private static void isValidForStore(RdapUserRoleDAO userRole) throws RequiredValueNotFoundException {
+	private static void isValidForStore(RdapUserRoleDbObj userRole) throws RequiredValueNotFoundException {
 		if (userRole.getUserName() == null || userRole.getUserName().isEmpty())
 			throw new RequiredValueNotFoundException("userName", "RdapUserRole");
 		if (userRole.getRoleName() == null || userRole.getRoleName().isEmpty())
 			throw new RequiredValueNotFoundException("roleName", "RdapUserRole");
 	}
 
-	public static void storeRdapUserRoleToDatabase(RdapUserRoleDAO userRole, Connection connection)
+	public static void storeRdapUserRoleToDatabase(RdapUserRoleDbObj userRole, Connection connection)
 			throws RequiredValueNotFoundException, SQLException {
 		isValidForStore(userRole);
 		String query = queryGroup.getQuery(STORE_QUERY);
@@ -54,7 +54,7 @@ public class RdapUserRoleModel {
 		}
 	}
 
-	public static RdapUserRoleDAO getByUserName(String userName, Connection connection)
+	public static RdapUserRoleDbObj getByUserName(String userName, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		String query = queryGroup.getQuery(GET_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -64,7 +64,7 @@ public class RdapUserRoleModel {
 				if (!resultSet.next()) {
 					throw new ObjectNotFoundException("Object not found.");
 				}
-				RdapUserRoleDAO userRole = new RdapUserRoleDAO(resultSet);
+				RdapUserRoleDbObj userRole = new RdapUserRoleDbObj(resultSet);
 				return userRole;
 			}
 		}

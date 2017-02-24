@@ -15,7 +15,7 @@ import mx.nic.rdap.core.db.IpAddress;
 import mx.nic.rdap.core.db.struct.NameserverIpAddressesStruct;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
-import mx.nic.rdap.db.objects.IpAddressDAO;
+import mx.nic.rdap.db.objects.IpAddressDbObj;
 
 /**
  * Model for the {@link IpAddress} Object
@@ -46,7 +46,7 @@ public class IpAddressModel {
 				Statement.RETURN_GENERATED_KEYS)) {
 			for (IpAddress addressV4 : struct.getIpv4Adresses()) {
 				addressV4.setNameserverId(nameserverId);
-				((IpAddressDAO) addressV4).storeToDatabase(statement);
+				((IpAddressDbObj) addressV4).storeToDatabase(statement);
 				logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 				statement.executeUpdate();
 				ResultSet generatedKeys = statement.getGeneratedKeys();
@@ -56,7 +56,7 @@ public class IpAddressModel {
 			}
 			for (IpAddress addressV6 : struct.getIpv6Adresses()) {
 				addressV6.setNameserverId(nameserverId);
-				((IpAddressDAO) addressV6).storeToDatabase(statement);
+				((IpAddressDbObj) addressV6).storeToDatabase(statement);
 				logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 				statement.executeUpdate();
 				ResultSet generatedKeys = statement.getGeneratedKeys();
@@ -81,7 +81,7 @@ public class IpAddressModel {
 			// Process the resulset to construct the struct
 			NameserverIpAddressesStruct struct = new NameserverIpAddressesStruct();
 			do {
-				IpAddressDAO ipAddressDAO = new IpAddressDAO(resultSet);
+				IpAddressDbObj ipAddressDAO = new IpAddressDbObj(resultSet);
 				if (ipAddressDAO.getType() == 4) {
 					struct.getIpv4Adresses().add(ipAddressDAO);
 				} else if (ipAddressDAO.getType() == 6) {
@@ -97,7 +97,7 @@ public class IpAddressModel {
 	 * 
 	 * @throws ObjectNotFoundException
 	 */
-	public static List<IpAddressDAO> getAll(Connection connection) throws SQLException, ObjectNotFoundException {
+	public static List<IpAddressDbObj> getAll(Connection connection) throws SQLException, ObjectNotFoundException {
 		String query = queryGroup.getQuery(GET_ALL_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
@@ -107,9 +107,9 @@ public class IpAddressModel {
 			}
 
 			// Process the resulset to construct the struct
-			List<IpAddressDAO> addresses = new ArrayList<IpAddressDAO>();
+			List<IpAddressDbObj> addresses = new ArrayList<IpAddressDbObj>();
 			do {
-				IpAddressDAO ipAddressDAO = new IpAddressDAO(resultSet);
+				IpAddressDbObj ipAddressDAO = new IpAddressDbObj(resultSet);
 				addresses.add(ipAddressDAO);
 			} while (resultSet.next());
 			return addresses;

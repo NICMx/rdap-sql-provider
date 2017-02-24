@@ -3,29 +3,29 @@ package mx.nic.rdap.db.impl;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import mx.nic.rdap.db.DBConnection;
+import mx.nic.rdap.db.DatabaseSession;
 import mx.nic.rdap.db.RdapUser;
-import mx.nic.rdap.db.exception.RdapDatabaseException;
+import mx.nic.rdap.db.exception.RdapDataAccessException;
 import mx.nic.rdap.db.model.RdapUserModel;
-import mx.nic.rdap.db.spi.RdapUserSpi;
+import mx.nic.rdap.db.spi.RdapUserDAO;
 
-public class RdapUserDAOImpl implements RdapUserSpi {
+public class RdapUserDAOImpl implements RdapUserDAO {
 
 	@Override
-	public Integer getMaxSearchResults(String username) throws RdapDatabaseException {
-		try (Connection connection = DBConnection.getConnection()) {
+	public Integer getMaxSearchResults(String username) throws RdapDataAccessException {
+		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return RdapUserModel.getMaxSearchResultsForAuthenticatedUser(username, connection);
 		} catch (SQLException e) {
-			throw new RdapDatabaseException(e);
+			throw new RdapDataAccessException(e);
 		}
 	}
 
 	@Override
-	public RdapUser getByUsername(String username) throws RdapDatabaseException {
-		try (Connection connection = DBConnection.getConnection()) {
+	public RdapUser getByUsername(String username) throws RdapDataAccessException {
+		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return RdapUserModel.getByName(username, connection);
 		} catch (SQLException e) {
-			throw new RdapDatabaseException(e);
+			throw new RdapDataAccessException(e);
 		}
 	}
 

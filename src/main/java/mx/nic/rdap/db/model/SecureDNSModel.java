@@ -13,7 +13,7 @@ import mx.nic.rdap.core.db.SecureDNS;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
-import mx.nic.rdap.db.objects.SecureDNSDAO;
+import mx.nic.rdap.db.objects.SecureDNSDbObj;
 
 /**
  * Model for the {@link SecureDNS} object
@@ -41,7 +41,7 @@ public class SecureDNSModel {
 			throws SQLException, RequiredValueNotFoundException {
 		String query = queryGroup.getQuery(STORE_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-			((SecureDNSDAO) secureDns).storeToDatabase(statement);
+			((SecureDNSDbObj) secureDns).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			statement.executeUpdate();
 			ResultSet resultSet = statement.getGeneratedKeys();
@@ -67,7 +67,7 @@ public class SecureDNSModel {
 				throw new ObjectNotFoundException("Object Not Found");
 			}
 
-			SecureDNSDAO secureDns = new SecureDNSDAO(resultSet);
+			SecureDNSDbObj secureDns = new SecureDNSDbObj(resultSet);
 			secureDns.setDsData(DsDataModel.getBySecureDnsId(secureDns.getId(), connection));
 			return secureDns;
 		}

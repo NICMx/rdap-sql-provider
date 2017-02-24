@@ -11,19 +11,19 @@ import mx.nic.rdap.db.model.CountryCodeModel;
  * Data access class for the {@link Autnum} object.
  *
  */
-public class AutnumDAO extends Autnum implements DatabaseObject {
+public class AutnumDbObj extends Autnum implements DatabaseObject {
 
 	/**
 	 * Default constructor
 	 */
-	public AutnumDAO() {
+	public AutnumDbObj() {
 		super();
 	}
 
 	/**
 	 * Constructs an Autonomous System Number using a {@link ResultSet}
 	 */
-	public AutnumDAO(ResultSet resultSet) throws SQLException {
+	public AutnumDbObj(ResultSet resultSet) throws SQLException {
 		super();
 		loadFromDatabase(resultSet);
 	}

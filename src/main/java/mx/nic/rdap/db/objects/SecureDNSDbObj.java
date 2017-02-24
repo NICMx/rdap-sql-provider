@@ -11,19 +11,19 @@ import mx.nic.rdap.core.db.SecureDNS;
  * Data access class for the {@link SecureDNS} object.
  * 
  */
-public class SecureDNSDAO extends SecureDNS implements DatabaseObject {
+public class SecureDNSDbObj extends SecureDNS implements DatabaseObject {
 
 	/**
 	 * Default constructor
 	 */
-	public SecureDNSDAO() {
+	public SecureDNSDbObj() {
 		super();
 	}
 
 	/**
 	 * Construct the object SecurDNS using a {@link ResultSet}
 	 */
-	public SecureDNSDAO(ResultSet resultSet) throws SQLException {
+	public SecureDNSDbObj(ResultSet resultSet) throws SQLException {
 		super();
 		loadFromDatabase(resultSet);
 	}

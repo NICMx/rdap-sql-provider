@@ -19,10 +19,10 @@ import mx.nic.rdap.db.model.DomainModel;
 import mx.nic.rdap.db.model.EntityModel;
 import mx.nic.rdap.db.model.PublicIdModel;
 import mx.nic.rdap.db.model.ZoneModel;
-import mx.nic.rdap.db.objects.DomainDAO;
-import mx.nic.rdap.db.objects.EntityDAO;
-import mx.nic.rdap.db.objects.PublicIdDAO;
-import mx.nic.rdap.db.objects.SecureDNSDAO;
+import mx.nic.rdap.db.objects.DomainDbObj;
+import mx.nic.rdap.db.objects.EntityDbObj;
+import mx.nic.rdap.db.objects.PublicIdDbObj;
+import mx.nic.rdap.db.objects.SecureDNSDbObj;
 
 /**
  * Test for the PublicId object
@@ -37,7 +37,7 @@ public class PublicIdTest extends DatabaseTest {
 		Random random = new Random();
 		Long rndPublicId = random.nextLong();
 		List<PublicId> publicIds = new ArrayList<PublicId>();
-		PublicIdDAO publicId = createPublicId("dummy" + rndPublicId, "dummy IETF");
+		PublicIdDbObj publicId = createPublicId("dummy" + rndPublicId, "dummy IETF");
 		publicIds.add(publicId);
 		try {
 			PublicIdModel.storePublicIdByDomain(publicIds, domainId, connection);
@@ -55,8 +55,8 @@ public class PublicIdTest extends DatabaseTest {
 		publicId.equals(byDomainId.get(byDomainId.size() - 1));
 	}
 
-	public static PublicIdDAO createPublicId(String publicId, String type) {
-		PublicIdDAO pi = new PublicIdDAO();
+	public static PublicIdDbObj createPublicId(String publicId, String type) {
+		PublicIdDbObj pi = new PublicIdDbObj();
 		pi.setPublicId(publicId);
 		pi.setType(type);
 		return pi;
@@ -64,12 +64,12 @@ public class PublicIdTest extends DatabaseTest {
 
 	private static Domain createSimpleDomain() {
 
-		Entity registrar = new EntityDAO();
+		Entity registrar = new EntityDbObj();
 		registrar.setHandle("whois");
 		registrar.setPort43("whois.mx");
 		registrar.getRoles().add(Rol.SPONSOR);
 
-		Entity ent = new EntityDAO();
+		Entity ent = new EntityDbObj();
 		ent.setHandle("usr_evaldez");
 		ent.getRoles().add(Rol.REGISTRANT);
 		ent.getRoles().add(Rol.ADMINISTRATIVE);
@@ -91,7 +91,7 @@ public class PublicIdTest extends DatabaseTest {
 			fail();
 		}
 
-		Domain dom = new DomainDAO();
+		Domain dom = new DomainDbObj();
 		dom.getEntities().add(ent);
 		dom.getEntities().add(registrar);
 		dom.setHandle("domcommx");
@@ -106,7 +106,7 @@ public class PublicIdTest extends DatabaseTest {
 		}
 		dom.setZone(zoneName);
 
-		SecureDNSDAO secureDNS = SecureDnsTest.getSecureDns(null, null, false, false, null);
+		SecureDNSDbObj secureDNS = SecureDnsTest.getSecureDns(null, null, false, false, null);
 		dom.setSecureDNS(secureDNS);
 
 		try {

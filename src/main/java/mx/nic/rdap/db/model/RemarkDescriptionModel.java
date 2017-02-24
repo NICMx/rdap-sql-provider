@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 import mx.nic.rdap.core.db.RemarkDescription;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
-import mx.nic.rdap.db.objects.RemarkDescriptionDAO;
+import mx.nic.rdap.db.objects.RemarkDescriptionDbObj;
 
 /**
  * Model for the {@link RemarkDescription} object
@@ -48,7 +48,7 @@ public class RemarkDescriptionModel {
 
 	public static void storeToDatabase(RemarkDescription remarkDescription, Connection connection) throws SQLException {
 		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(INSERT_QUERY))) {
-			((RemarkDescriptionDAO) remarkDescription).storeToDatabase(statement);
+			((RemarkDescriptionDbObj) remarkDescription).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			statement.executeUpdate();
 		}
@@ -65,7 +65,7 @@ public class RemarkDescriptionModel {
 				}
 				List<RemarkDescription> remarks = new ArrayList<RemarkDescription>();
 				do {
-					RemarkDescriptionDAO remarkDescription = new RemarkDescriptionDAO(resultSet);
+					RemarkDescriptionDbObj remarkDescription = new RemarkDescriptionDbObj(resultSet);
 					remarks.add(remarkDescription);
 				} while (resultSet.next());
 				return remarks;

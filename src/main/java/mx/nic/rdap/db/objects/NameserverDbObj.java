@@ -12,12 +12,12 @@ import mx.nic.rdap.core.db.Nameserver;
  * Data access class for the {@link Nameserver} object.
  * 
  */
-public class NameserverDAO extends Nameserver implements DatabaseObject {
+public class NameserverDbObj extends Nameserver implements DatabaseObject {
 
 	/**
 	 * Constructor default
 	 */
-	public NameserverDAO() {
+	public NameserverDbObj() {
 		super();
 	}
 
@@ -25,7 +25,7 @@ public class NameserverDAO extends Nameserver implements DatabaseObject {
 	 * Contruct a NameserverDAO using a {@link ResultSet}
 	 * 
 	 */
-	public NameserverDAO(ResultSet resultSet) throws SQLException {
+	public NameserverDbObj(ResultSet resultSet) throws SQLException {
 		super();
 		loadFromDatabase(resultSet);
 	}

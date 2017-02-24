@@ -16,19 +16,19 @@ import mx.nic.rdap.db.model.CountryCodeModel;
 /**
  * Data access class for the {@link IpNetwork} object
  */
-public class IpNetworkDAO extends IpNetwork implements DatabaseObject {
+public class IpNetworkDbObj extends IpNetwork implements DatabaseObject {
 
 	/**
 	 * Default Constructor
 	 */
-	public IpNetworkDAO() {
+	public IpNetworkDbObj() {
 		super();
 	}
 
 	/**
 	 * Constructs an IpNetwork using a {@link ResultSet}
 	 */
-	public IpNetworkDAO(ResultSet resultSet) throws SQLException {
+	public IpNetworkDbObj(ResultSet resultSet) throws SQLException {
 		super();
 		loadFromDatabase(resultSet);
 	}

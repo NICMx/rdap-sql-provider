@@ -10,12 +10,12 @@ import mx.nic.rdap.core.db.Variant;
  * Data access class for the {@link Variant} object.
  * 
  */
-public class VariantDAO extends Variant implements DatabaseObject {
+public class VariantDbObj extends Variant implements DatabaseObject {
 
 	/**
 	 * Default constructor
 	 */
-	public VariantDAO() {
+	public VariantDbObj() {
 		super();
 	}
 
@@ -23,7 +23,7 @@ public class VariantDAO extends Variant implements DatabaseObject {
 	 * Construcs Variant using a {@link ResultSet}
 	 * 
 	 */
-	public VariantDAO(ResultSet resultSet) throws SQLException {
+	public VariantDbObj(ResultSet resultSet) throws SQLException {
 		super();
 		loadFromDatabase(resultSet);
 	}

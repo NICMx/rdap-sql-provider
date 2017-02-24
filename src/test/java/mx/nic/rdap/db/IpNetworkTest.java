@@ -24,11 +24,11 @@ import mx.nic.rdap.db.exception.InvalidValueException;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.model.EntityModel;
 import mx.nic.rdap.db.model.IpNetworkModel;
-import mx.nic.rdap.db.objects.EventDAO;
-import mx.nic.rdap.db.objects.IpNetworkDAO;
-import mx.nic.rdap.db.objects.LinkDAO;
-import mx.nic.rdap.db.objects.RemarkDAO;
-import mx.nic.rdap.db.objects.RemarkDescriptionDAO;
+import mx.nic.rdap.db.objects.EventDbObj;
+import mx.nic.rdap.db.objects.IpNetworkDbObj;
+import mx.nic.rdap.db.objects.LinkDbObj;
+import mx.nic.rdap.db.objects.RemarkDbObj;
+import mx.nic.rdap.db.objects.RemarkDescriptionDbObj;
 
 /**
  * Tests for the {@link EntityModel}
@@ -148,17 +148,17 @@ public class IpNetworkTest extends DatabaseTest {
 
 		// Remarks data
 		List<Remark> remarks = new ArrayList<Remark>();
-		Remark remark = new RemarkDAO();
+		Remark remark = new RemarkDbObj();
 		remark.setLanguage("ES");
 		remark.setTitle("Prueba");
 		remark.setType("PruebaType");
 
 		List<RemarkDescription> descriptions = new ArrayList<RemarkDescription>();
-		RemarkDescription description1 = new RemarkDescriptionDAO();
+		RemarkDescription description1 = new RemarkDescriptionDbObj();
 		description1.setOrder(1);
 		description1.setDescription("She sells sea shells down by the sea shore.");
 
-		RemarkDescription description2 = new RemarkDescriptionDAO();
+		RemarkDescription description2 = new RemarkDescriptionDbObj();
 		description2.setOrder(2);
 		description2.setDescription("Originally written by Terry Sullivan.");
 
@@ -170,7 +170,7 @@ public class IpNetworkTest extends DatabaseTest {
 
 		// Links data
 		List<Link> links = new ArrayList<Link>();
-		Link link = new LinkDAO();
+		Link link = new LinkDbObj();
 		link.setValue("http://example.net/ip/192.168.1.0/24");
 		link.setRel("self");
 		link.setHref("http://example.net/ip/192.168.1.0/24");
@@ -180,18 +180,18 @@ public class IpNetworkTest extends DatabaseTest {
 
 		// Events Data
 		List<Event> events = new ArrayList<Event>();
-		Event event1 = new EventDAO();
+		Event event1 = new EventDbObj();
 		event1.setEventAction(EventAction.REGISTRATION);
 		event1.setEventDate(new Date());
 
-		Event event2 = new EventDAO();
+		Event event2 = new EventDbObj();
 		event2.setEventAction(EventAction.LAST_CHANGED);
 		event2.setEventDate(new Date());
 		event2.setEventActor("joe@example.com");
 
 		// event links data
 		List<Link> eventLinks = new ArrayList<Link>();
-		Link eventLink = new LinkDAO();
+		Link eventLink = new LinkDbObj();
 		eventLink.setValue("eventLink1");
 		eventLink.setRel("eventlink");
 		eventLink.setHref("http://example.net/eventlink/xxxx");
@@ -244,17 +244,17 @@ public class IpNetworkTest extends DatabaseTest {
 
 		// Remarks data
 		List<Remark> remarks = new ArrayList<Remark>();
-		Remark remark = new RemarkDAO();
+		Remark remark = new RemarkDbObj();
 		remark.setLanguage("ES");
 		remark.setTitle("Prueba");
 		remark.setType("PruebaType");
 
 		List<RemarkDescription> descriptions = new ArrayList<RemarkDescription>();
-		RemarkDescription description1 = new RemarkDescriptionDAO();
+		RemarkDescription description1 = new RemarkDescriptionDbObj();
 		description1.setOrder(1);
 		description1.setDescription("She sells sea shells down by the sea shore.");
 
-		RemarkDescription description2 = new RemarkDescriptionDAO();
+		RemarkDescription description2 = new RemarkDescriptionDbObj();
 		description2.setOrder(2);
 		description2.setDescription("Originally written by Terry Sullivan.");
 
@@ -266,7 +266,7 @@ public class IpNetworkTest extends DatabaseTest {
 
 		// Links data
 		List<Link> links = new ArrayList<Link>();
-		Link link = new LinkDAO();
+		Link link = new LinkDbObj();
 		link.setValue("http://example.net/ip/192.168.1.0/24");
 		link.setRel("self");
 		link.setHref("http://example.net/ip/192.168.1.0/24");
@@ -276,18 +276,18 @@ public class IpNetworkTest extends DatabaseTest {
 
 		// Events Data
 		List<Event> events = new ArrayList<Event>();
-		Event event1 = new EventDAO();
+		Event event1 = new EventDbObj();
 		event1.setEventAction(EventAction.REGISTRATION);
 		event1.setEventDate(new Date());
 
-		Event event2 = new EventDAO();
+		Event event2 = new EventDbObj();
 		event2.setEventAction(EventAction.LAST_CHANGED);
 		event2.setEventDate(new Date());
 		event2.setEventActor("joe@example.com");
 
 		// event links data
 		List<Link> eventLinks = new ArrayList<Link>();
-		Link eventLink = new LinkDAO();
+		Link eventLink = new LinkDbObj();
 		eventLink.setValue("eventLink1");
 		eventLink.setRel("eventlink");
 		eventLink.setHref("http://example.net/eventlink/xxxx");
@@ -323,7 +323,7 @@ public class IpNetworkTest extends DatabaseTest {
 	public static IpNetwork createInstance(IpVersion ipVersion, String startAddress, String endAddress, String name,
 			String type, String country, String parentHandle, Integer cidr, String handle)
 			throws InvalidValueException {
-		IpNetwork ipNetwork = new IpNetworkDAO();
+		IpNetwork ipNetwork = new IpNetworkDbObj();
 
 		ipNetwork.setHandle(handle);
 		ipNetwork.setIpVersion(ipVersion);

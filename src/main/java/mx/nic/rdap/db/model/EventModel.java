@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 import mx.nic.rdap.core.db.Event;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
-import mx.nic.rdap.db.objects.EventDAO;
+import mx.nic.rdap.db.objects.EventDbObj;
 
 /**
  * The model for {@link Event} Object
@@ -64,7 +64,7 @@ public class EventModel {
 		isValidForStore(event);
 		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery("storeToDatabase"),
 				Statement.RETURN_GENERATED_KEYS)) {
-			((EventDAO) event).storeToDatabase(statement);
+			((EventDbObj) event).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			statement.executeUpdate();
 			ResultSet result = statement.getGeneratedKeys();
@@ -160,7 +160,7 @@ public class EventModel {
 				}
 				List<Event> events = new ArrayList<Event>();
 				do {
-					EventDAO event = new EventDAO(resultSet);
+					EventDbObj event = new EventDbObj(resultSet);
 					event.getLinks().addAll(LinkModel.getByEventId(event.getId(), connection));
 					events.add(event);
 				} while (resultSet.next());
@@ -182,7 +182,7 @@ public class EventModel {
 				}
 				List<Event> events = new ArrayList<Event>();
 				do {
-					EventDAO event = new EventDAO(resultSet);
+					EventDbObj event = new EventDbObj(resultSet);
 					event.getLinks().addAll(LinkModel.getByEventId(event.getId(), connection));
 					events.add(event);
 				} while (resultSet.next());

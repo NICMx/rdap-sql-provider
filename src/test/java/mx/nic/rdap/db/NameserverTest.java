@@ -23,12 +23,12 @@ import mx.nic.rdap.core.db.struct.NameserverIpAddressesStruct;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.NameserverModel;
-import mx.nic.rdap.db.objects.EventDAO;
-import mx.nic.rdap.db.objects.IpAddressDAO;
-import mx.nic.rdap.db.objects.LinkDAO;
-import mx.nic.rdap.db.objects.NameserverDAO;
-import mx.nic.rdap.db.objects.RemarkDAO;
-import mx.nic.rdap.db.objects.RemarkDescriptionDAO;
+import mx.nic.rdap.db.objects.EventDbObj;
+import mx.nic.rdap.db.objects.IpAddressDbObj;
+import mx.nic.rdap.db.objects.LinkDbObj;
+import mx.nic.rdap.db.objects.NameserverDbObj;
+import mx.nic.rdap.db.objects.RemarkDbObj;
+import mx.nic.rdap.db.objects.RemarkDescriptionDbObj;
 
 /**
  * Test for the Nameserver object
@@ -41,7 +41,7 @@ public class NameserverTest extends DatabaseTest {
 
 		try {
 			// Nameserver base data
-			Nameserver nameserver = new NameserverDAO();
+			Nameserver nameserver = new NameserverDbObj();
 			nameserver.setHandle("xx1");
 			nameserver.setPunycodeName("ns.xn--test-minumun.example");
 			NameserverModel.storeToDatabase(nameserver, connection);
@@ -64,7 +64,7 @@ public class NameserverTest extends DatabaseTest {
 	public void insert() {
 
 		// Nameserver base data
-		Nameserver nameserver = new NameserverDAO();
+		Nameserver nameserver = new NameserverDbObj();
 		nameserver.setHandle("XXX13");
 		nameserver.setPunycodeName("ns1.xn--fo-5ja.example");
 		nameserver.setPort43("whois.example.net");
@@ -72,7 +72,7 @@ public class NameserverTest extends DatabaseTest {
 		// IpAddressStruct data
 		NameserverIpAddressesStruct ipAddresses = new NameserverIpAddressesStruct();
 
-		IpAddress ipv41 = new IpAddressDAO();
+		IpAddress ipv41 = new IpAddressDbObj();
 		try {
 			ipv41.setAddress(InetAddress.getByName("192.0.2.1"));
 		} catch (UnknownHostException e1) {
@@ -81,7 +81,7 @@ public class NameserverTest extends DatabaseTest {
 		ipv41.setType(4);
 		ipAddresses.getIpv4Adresses().add(ipv41);
 
-		IpAddress ipv42 = new IpAddressDAO();
+		IpAddress ipv42 = new IpAddressDbObj();
 		try {
 			ipv42.setAddress(InetAddress.getByName("192.0.2.2"));
 		} catch (UnknownHostException e1) {
@@ -90,7 +90,7 @@ public class NameserverTest extends DatabaseTest {
 		ipv42.setType(4);
 		ipAddresses.getIpv4Adresses().add(ipv42);
 
-		IpAddress ipv6 = new IpAddressDAO();
+		IpAddress ipv6 = new IpAddressDbObj();
 		try {
 			ipv6.setAddress(InetAddress.getByName("2001:db8::123"));
 		} catch (UnknownHostException e1) {
@@ -108,17 +108,17 @@ public class NameserverTest extends DatabaseTest {
 
 		// Remarks data
 		List<Remark> remarks = new ArrayList<Remark>();
-		Remark remark = new RemarkDAO();
+		Remark remark = new RemarkDbObj();
 		remark.setLanguage("ES");
 		remark.setTitle("Prueba");
 		remark.setType("PruebaType");
 
 		List<RemarkDescription> descriptions = new ArrayList<RemarkDescription>();
-		RemarkDescription description1 = new RemarkDescriptionDAO();
+		RemarkDescription description1 = new RemarkDescriptionDbObj();
 		description1.setOrder(1);
 		description1.setDescription("She sells sea shells down by the sea shore.");
 
-		RemarkDescription description2 = new RemarkDescriptionDAO();
+		RemarkDescription description2 = new RemarkDescriptionDbObj();
 		description2.setOrder(2);
 		description2.setDescription("Originally written by Terry Sullivan.");
 
@@ -130,7 +130,7 @@ public class NameserverTest extends DatabaseTest {
 
 		// Links data
 		List<Link> links = new ArrayList<Link>();
-		Link link = new LinkDAO();
+		Link link = new LinkDbObj();
 		link.setValue("http://example.net/nameserver/xxxx");
 		link.setRel("self");
 		link.setHref("http://example.net/nameserver/xxxx");
@@ -140,18 +140,18 @@ public class NameserverTest extends DatabaseTest {
 
 		// Events Data
 		List<Event> events = new ArrayList<Event>();
-		Event event1 = new EventDAO();
+		Event event1 = new EventDbObj();
 		event1.setEventAction(EventAction.REGISTRATION);
 		event1.setEventDate(new Date());
 
-		Event event2 = new EventDAO();
+		Event event2 = new EventDbObj();
 		event2.setEventAction(EventAction.LAST_CHANGED);
 		event2.setEventDate(new Date());
 		event2.setEventActor("joe@example.com");
 
 		// event links data
 		List<Link> eventLinks = new ArrayList<Link>();
-		Link eventLink = new LinkDAO();
+		Link eventLink = new LinkDbObj();
 		eventLink.setValue("eventLink1");
 		eventLink.setRel("eventlink");
 		eventLink.setHref("http://example.net/eventlink/xxxx");

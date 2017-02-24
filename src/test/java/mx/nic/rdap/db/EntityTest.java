@@ -25,12 +25,12 @@ import mx.nic.rdap.core.db.VCard;
 import mx.nic.rdap.core.db.VCardPostalInfo;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.model.EntityModel;
-import mx.nic.rdap.db.objects.EntityDAO;
-import mx.nic.rdap.db.objects.EventDAO;
-import mx.nic.rdap.db.objects.LinkDAO;
-import mx.nic.rdap.db.objects.PublicIdDAO;
-import mx.nic.rdap.db.objects.RemarkDAO;
-import mx.nic.rdap.db.objects.RemarkDescriptionDAO;
+import mx.nic.rdap.db.objects.EntityDbObj;
+import mx.nic.rdap.db.objects.EventDbObj;
+import mx.nic.rdap.db.objects.LinkDbObj;
+import mx.nic.rdap.db.objects.PublicIdDbObj;
+import mx.nic.rdap.db.objects.RemarkDbObj;
+import mx.nic.rdap.db.objects.RemarkDescriptionDbObj;
 
 /**
  * Tests for the {@link EntityModel}
@@ -77,17 +77,17 @@ public class EntityTest extends DatabaseTest {
 
 		// Remarks data
 		List<Remark> remarks = new ArrayList<Remark>();
-		Remark remark = new RemarkDAO();
+		Remark remark = new RemarkDbObj();
 		remark.setLanguage("ES");
 		remark.setTitle("Prueba");
 		remark.setType("PruebaType");
 
 		List<RemarkDescription> descriptions = new ArrayList<RemarkDescription>();
-		RemarkDescription description1 = new RemarkDescriptionDAO();
+		RemarkDescription description1 = new RemarkDescriptionDbObj();
 		description1.setOrder(1);
 		description1.setDescription("She sells sea shells down by the sea shore.");
 
-		RemarkDescription description2 = new RemarkDescriptionDAO();
+		RemarkDescription description2 = new RemarkDescriptionDbObj();
 		description2.setOrder(2);
 		description2.setDescription("Originally written by Terry Sullivan.");
 
@@ -99,7 +99,7 @@ public class EntityTest extends DatabaseTest {
 
 		// Links data
 		List<Link> links = new ArrayList<Link>();
-		Link link = new LinkDAO();
+		Link link = new LinkDbObj();
 		link.setValue("http://example.net/nameserver/xxxx");
 		link.setRel("self");
 		link.setHref("http://example.net/nameserver/xxxx");
@@ -109,18 +109,18 @@ public class EntityTest extends DatabaseTest {
 
 		// Events Data
 		List<Event> events = new ArrayList<Event>();
-		Event event1 = new EventDAO();
+		Event event1 = new EventDbObj();
 		event1.setEventAction(EventAction.REGISTRATION);
 		event1.setEventDate(new Date());
 
-		Event event2 = new EventDAO();
+		Event event2 = new EventDbObj();
 		event2.setEventAction(EventAction.LAST_CHANGED);
 		event2.setEventDate(new Date());
 		event2.setEventActor("joe@example.com");
 
 		// event links data
 		List<Link> eventLinks = new ArrayList<Link>();
-		Link eventLink = new LinkDAO();
+		Link eventLink = new LinkDbObj();
 		eventLink.setValue("eventLink1");
 		eventLink.setRel("eventlink");
 		eventLink.setHref("http://example.net/eventlink/xxxx");
@@ -134,10 +134,10 @@ public class EntityTest extends DatabaseTest {
 
 		// PublicId data
 		List<PublicId> listPids = new ArrayList<>();
-		PublicId pid = new PublicIdDAO();
+		PublicId pid = new PublicIdDbObj();
 		pid.setPublicId("dumy pid 1");
 		pid.setType("dummy iana");
-		PublicId pid2 = new PublicIdDAO();
+		PublicId pid2 = new PublicIdDbObj();
 		pid.setPublicId("dumy pid 2");
 		pid.setType("dummy IETF");
 		listPids.add(pid);
@@ -195,7 +195,7 @@ public class EntityTest extends DatabaseTest {
 
 		// ----- START OF REGISTRAR -----
 		// first we create a RAR
-		Entity ent = new EntityDAO();
+		Entity ent = new EntityDbObj();
 
 		ent.setHandle("rar_dhfelix");
 		ent.setPort43("whois.dhfelixrar.mx");
@@ -205,7 +205,7 @@ public class EntityTest extends DatabaseTest {
 
 		ent.getRoles().add(Rol.SPONSOR);
 
-		PublicId pid = new PublicIdDAO();
+		PublicId pid = new PublicIdDbObj();
 		pid.setPublicId("Dhfelix_rar_from_mx");
 		pid.setType("DUMMY REGISTRARS PUBLIC IDS");
 		ent.getPublicIds().add(pid);
@@ -234,17 +234,17 @@ public class EntityTest extends DatabaseTest {
 
 		// Remarks data
 		List<Remark> remarks = new ArrayList<Remark>();
-		Remark remark = new RemarkDAO();
+		Remark remark = new RemarkDbObj();
 		remark.setLanguage("ES");
 		remark.setTitle("Prueba");
 		remark.setType("PruebaType");
 
 		List<RemarkDescription> descriptions = new ArrayList<RemarkDescription>();
-		RemarkDescription description1 = new RemarkDescriptionDAO();
+		RemarkDescription description1 = new RemarkDescriptionDbObj();
 		description1.setOrder(1);
 		description1.setDescription("She sells sea shells down by the sea shore.");
 
-		RemarkDescription description2 = new RemarkDescriptionDAO();
+		RemarkDescription description2 = new RemarkDescriptionDbObj();
 		description2.setOrder(2);
 		description2.setDescription("Originally written by Terry Sullivan.");
 
@@ -256,7 +256,7 @@ public class EntityTest extends DatabaseTest {
 
 		// Links data
 		List<Link> links = new ArrayList<Link>();
-		Link link = new LinkDAO();
+		Link link = new LinkDbObj();
 		link.setValue("http://example.net/nameserver/xxxx");
 		link.setRel("self");
 		link.setHref("http://example.net/nameserver/xxxx");
@@ -266,18 +266,18 @@ public class EntityTest extends DatabaseTest {
 
 		// Events Data
 		List<Event> events = new ArrayList<Event>();
-		Event event1 = new EventDAO();
+		Event event1 = new EventDbObj();
 		event1.setEventAction(EventAction.REGISTRATION);
 		event1.setEventDate(new Date());
 
-		Event event2 = new EventDAO();
+		Event event2 = new EventDbObj();
 		event2.setEventAction(EventAction.LAST_CHANGED);
 		event2.setEventDate(new Date());
 		event2.setEventActor("joe@example.com");
 
 		// event links data
 		List<Link> eventLinks = new ArrayList<Link>();
-		Link eventLink = new LinkDAO();
+		Link eventLink = new LinkDbObj();
 		eventLink.setValue("eventLink1");
 		eventLink.setRel("eventlink");
 		eventLink.setHref("http://example.net/eventlink/xxxx");
@@ -315,17 +315,17 @@ public class EntityTest extends DatabaseTest {
 
 		// Remarks data
 		List<Remark> remList = new ArrayList<Remark>();
-		Remark rem = new RemarkDAO();
+		Remark rem = new RemarkDbObj();
 		rem.setLanguage("ES");
 		rem.setTitle("Prueba");
 		rem.setType("PruebaType");
 
 		List<RemarkDescription> descList2 = new ArrayList<RemarkDescription>();
-		RemarkDescription desc1 = new RemarkDescriptionDAO();
+		RemarkDescription desc1 = new RemarkDescriptionDbObj();
 		desc1.setOrder(1);
 		desc1.setDescription("She sells sea shells down by the sea shore.");
 
-		RemarkDescription desc2 = new RemarkDescriptionDAO();
+		RemarkDescription desc2 = new RemarkDescriptionDbObj();
 		desc2.setOrder(2);
 		desc2.setDescription("Originally written by Terry Sullivan.");
 
@@ -337,7 +337,7 @@ public class EntityTest extends DatabaseTest {
 
 		// Links data
 		List<Link> linksList = new ArrayList<Link>();
-		Link link2 = new LinkDAO();
+		Link link2 = new LinkDbObj();
 		link2.setValue("http://example.net/nameserver/xxxx");
 		link2.setRel("self");
 		link2.setHref("http://example.net/nameserver/xxxx");
@@ -347,18 +347,18 @@ public class EntityTest extends DatabaseTest {
 
 		// Events Data
 		List<Event> eventList = new ArrayList<Event>();
-		Event eve1 = new EventDAO();
+		Event eve1 = new EventDbObj();
 		eve1.setEventAction(EventAction.REGISTRATION);
 		eve1.setEventDate(new Date());
 
-		Event eve2 = new EventDAO();
+		Event eve2 = new EventDbObj();
 		eve2.setEventAction(EventAction.LAST_CHANGED);
 		eve2.setEventDate(new Date());
 		eve2.setEventActor("joe@example.com");
 
 		// event links data
 		List<Link> eventLinksList = new ArrayList<Link>();
-		Link eventLink2 = new LinkDAO();
+		Link eventLink2 = new LinkDbObj();
 		eventLink2.setValue("eventLink1");
 		eventLink2.setRel("eventlink");
 		eventLink2.setHref("http://example.net/eventlink/xxxx");
@@ -483,8 +483,8 @@ public class EntityTest extends DatabaseTest {
 	 * @param vCardId
 	 * @return
 	 */
-	public static EntityDAO createEntity(Long id, String handle, String port43) {
-		EntityDAO e = new EntityDAO();
+	public static EntityDbObj createEntity(Long id, String handle, String port43) {
+		EntityDbObj e = new EntityDbObj();
 		e.setId(id);
 		e.setHandle(handle);
 		e.setPort43(port43);
@@ -530,17 +530,17 @@ public class EntityTest extends DatabaseTest {
 
 		// Remarks data
 		List<Remark> remarks = new ArrayList<Remark>();
-		Remark remark = new RemarkDAO();
+		Remark remark = new RemarkDbObj();
 		remark.setLanguage("ES");
 		remark.setTitle("Prueba");
 		remark.setType("PruebaType");
 
 		List<RemarkDescription> descriptions = new ArrayList<RemarkDescription>();
-		RemarkDescription description1 = new RemarkDescriptionDAO();
+		RemarkDescription description1 = new RemarkDescriptionDbObj();
 		description1.setOrder(1);
 		description1.setDescription("She sells sea shells down by the sea shore.");
 
-		RemarkDescription description2 = new RemarkDescriptionDAO();
+		RemarkDescription description2 = new RemarkDescriptionDbObj();
 		description2.setOrder(2);
 		description2.setDescription("Originally written by Terry Sullivan.");
 
@@ -552,7 +552,7 @@ public class EntityTest extends DatabaseTest {
 
 		// Links data
 		List<Link> links = new ArrayList<Link>();
-		Link link = new LinkDAO();
+		Link link = new LinkDbObj();
 		link.setValue("http://example.net/nameserver/xxxx");
 		link.setRel("self");
 		link.setHref("http://example.net/nameserver/xxxx");
@@ -562,18 +562,18 @@ public class EntityTest extends DatabaseTest {
 
 		// Events Data
 		List<Event> events = new ArrayList<Event>();
-		Event event1 = new EventDAO();
+		Event event1 = new EventDbObj();
 		event1.setEventAction(EventAction.REGISTRATION);
 		event1.setEventDate(new Date());
 
-		Event event2 = new EventDAO();
+		Event event2 = new EventDbObj();
 		event2.setEventAction(EventAction.LAST_CHANGED);
 		event2.setEventDate(new Date());
 		event2.setEventActor("joe@example.com");
 
 		// event links data
 		List<Link> eventLinks = new ArrayList<Link>();
-		Link eventLink = new LinkDAO();
+		Link eventLink = new LinkDbObj();
 		eventLink.setValue("eventLink1");
 		eventLink.setRel("eventlink");
 		eventLink.setHref("http://example.net/eventlink/xxxx");
@@ -587,10 +587,10 @@ public class EntityTest extends DatabaseTest {
 
 		// PublicId data
 		List<PublicId> listPids = new ArrayList<>();
-		PublicId pid = new PublicIdDAO();
+		PublicId pid = new PublicIdDbObj();
 		pid.setPublicId("dumy pid 1");
 		pid.setType("dummy iana");
-		PublicId pid2 = new PublicIdDAO();
+		PublicId pid2 = new PublicIdDbObj();
 		pid.setPublicId("dumy pid 2");
 		pid.setType("dummy IETF");
 		listPids.add(pid);

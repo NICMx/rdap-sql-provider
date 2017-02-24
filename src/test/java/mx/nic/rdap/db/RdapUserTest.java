@@ -8,8 +8,8 @@ import org.junit.Test;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.RdapUserModel;
-import mx.nic.rdap.db.objects.RdapUserDAO;
-import mx.nic.rdap.db.objects.RdapUserRoleDAO;
+import mx.nic.rdap.db.objects.RdapUserDbObj;
+import mx.nic.rdap.db.objects.RdapUserRoleDbObj;
 
 /**
  * Test for the rdapuserDAO class
@@ -25,11 +25,11 @@ public class RdapUserTest extends DatabaseTest {
 	@Test
 	public void storeToDatabase() {
 		try {
-			RdapUserDAO user = new RdapUserDAO();
+			RdapUserDbObj user = new RdapUserDbObj();
 			user.setName(userName);
 			user.setPass(pass);
 			user.setMaxSearchResults(maxSearchResult);
-			RdapUserRoleDAO role = new RdapUserRoleDAO();
+			RdapUserRoleDbObj role = new RdapUserRoleDbObj();
 			role.setRoleName(roleName);
 			user.setUserRole(role);
 			RdapUserModel.storeToDatabase(user, connection);
@@ -43,11 +43,11 @@ public class RdapUserTest extends DatabaseTest {
 	@Test
 	public void getByName() {
 		try {
-			RdapUserDAO user = new RdapUserDAO();
+			RdapUserDbObj user = new RdapUserDbObj();
 			user.setName(userName);
 			user.setPass(pass);
 			user.setMaxSearchResults(maxSearchResult);
-			RdapUserRoleDAO role = new RdapUserRoleDAO();
+			RdapUserRoleDbObj role = new RdapUserRoleDbObj();
 			role.setRoleName(roleName);
 			user.setUserRole(role);
 			RdapUserModel.storeToDatabase(user, connection);
