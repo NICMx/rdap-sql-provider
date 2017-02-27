@@ -9,6 +9,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 
+import mx.nic.rdap.db.exception.InitializationException;
 import mx.nic.rdap.db.model.CountryCodeModel;
 import mx.nic.rdap.db.model.ZoneModel;
 
@@ -36,7 +37,7 @@ public class DatabaseTest {
 	}
 
 	@BeforeClass
-	public static void init() throws SQLException, IOException {
+	public static void init() throws SQLException, IOException, InitializationException {
 		DatabaseSession.initRdapConnection(TestUtil.loadProperties(rdapDatabaseConfigurationFile));
 		try (Connection con = DatabaseSession.getRdapConnection();) {
 			ZoneModel.loadAllFromDatabase(con);

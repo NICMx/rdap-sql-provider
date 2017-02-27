@@ -5,13 +5,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
-import javax.naming.NameClassPair;
-import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
@@ -99,8 +96,8 @@ public class DatabaseSession {
 		}
 
 		BasicDataSource dataSource = new BasicDataSource();
-		dataSource.setDriverClassName(config.getProperty("driverClassName"));
-		dataSource.setUrl(config.getProperty("url"));
+		dataSource.setDriverClassName(driverClassName);
+		dataSource.setUrl(url);
 		dataSource.setUsername(config.getProperty("userName"));
 		dataSource.setPassword(config.getProperty("password"));
 		dataSource.setDefaultAutoCommit(false);
