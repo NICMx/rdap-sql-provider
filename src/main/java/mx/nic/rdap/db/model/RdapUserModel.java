@@ -23,7 +23,6 @@ public class RdapUserModel {
 	private final static Logger logger = Logger.getLogger(RdapUserModel.class.getName());
 
 	private final static String QUERY_GROUP = "RdapUser";
-	private final static String GET_MAX_RESULTS_QUERY = "getMaxSearchResults";
 	private final static String STORE_QUERY = "storeToDatabase";
 	private final static String GET_BY_NAME_QUERY = "getByName";
 	private final static String DELETE_ROLES_QUERY = "deleteAllRdapUserRoles";
@@ -36,25 +35,6 @@ public class RdapUserModel {
 			queryGroup = new QueryGroup(QUERY_GROUP);
 		} catch (IOException e) {
 			throw new RuntimeException("Error loading query group");
-		}
-	}
-
-	/**
-	 * Find the max search results for the autheticatedUser
-	 * 
-	 */
-	public static Integer getMaxSearchResultsForAuthenticatedUser(String username, Connection connection)
-			throws SQLException {
-		String query = queryGroup.getQuery(GET_MAX_RESULTS_QUERY);
-		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, username);
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			try (ResultSet resultSet = statement.executeQuery()) {
-				if (!resultSet.next()) {
-					return null;
-				}
-				return resultSet.getInt(1);
-			}
 		}
 	}
 

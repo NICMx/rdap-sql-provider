@@ -65,7 +65,6 @@ public class DomainModel {
 
 	private static final String SEARCH_BY_REGEX_NAME_WITH_ZONE = "searchByRegexNameWithZone";
 	private static final String SEARCH_BY_REGEX_NAME_WITHOUT_ZONE = "searchByRegexNameWithOutZone";
-	private static final String SEARCH_BY_REGEX_NAMESERVER_LDH_QUERY = "searchByRegexNsLdhName";
 
 	static {
 		try {
@@ -437,13 +436,6 @@ public class DomainModel {
 			result.getResults().addAll(domains);
 			return result;
 		}
-	}
-
-	public static SearchResultStruct<Domain> searchByRegexNsLdhName(String name, Integer resultLimit,
-			boolean useNameserverAsDomainAttribute, Connection connection)
-			throws SQLException, ObjectNotFoundException {
-		String query = queryGroup.getQuery(SEARCH_BY_REGEX_NAMESERVER_LDH_QUERY);
-		return searchByNsLdhName(name, resultLimit, useNameserverAsDomainAttribute, connection, query);
 	}
 
 	public static SearchResultStruct<Domain> searchByNsLdhName(String name, Integer resultLimit,

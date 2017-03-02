@@ -76,6 +76,3 @@ SELECT DISTINCT(d.dom_id), d.dom_handle, d.dom_ldh_name, d.dom_port43, d.zone_id
 
 #searchByRegexNameWithOutZone
 SELECT DISTINCT(d.dom_id), d.dom_handle, d.dom_ldh_name, d.dom_port43, d.zone_id, d.dom_unicode_name FROM rdap.domain d WHERE d.zone_id IN (?) AND (d.dom_ldh_name REGEXP ? OR d.dom_unicode_name REGEXP ?) ORDER BY 1 LIMIT ?;
-
-#searchByRegexNsLdhName
-SELECT DISTINCT (dom.dom_id), dom.dom_ldh_name, dom.dom_handle, dom.dom_port43, dom.zone_id, dom.dom_unicode_name FROM rdap.domain dom JOIN rdap.domain_nameservers dom_ns ON dom_ns.dom_id = dom.dom_id JOIN rdap.nameserver ns ON ns.nse_id = dom_ns.nse_id WHERE  (ns.nse_ldh_name REGEXP ? OR ns.nse_unicode_name REGEXP ?) ORDER BY 1 LIMIT ?;

@@ -12,15 +12,6 @@ import mx.nic.rdap.db.spi.RdapUserDAO;
 public class RdapUserDAOImpl implements RdapUserDAO {
 
 	@Override
-	public Integer getMaxSearchResults(String username) throws RdapDataAccessException {
-		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			return RdapUserModel.getMaxSearchResultsForAuthenticatedUser(username, connection);
-		} catch (SQLException e) {
-			throw new RdapDataAccessException(e);
-		}
-	}
-
-	@Override
 	public RdapUser getByUsername(String username) throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return RdapUserModel.getByName(username, connection);
