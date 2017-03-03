@@ -98,19 +98,7 @@ public class DomainTest extends DatabaseTest {
 		Assert.assertTrue("findByLdhName fails", dom.equals(findByLdhName));
 
 		try {
-			// Creates and inserts a zone
-			boolean result = DomainModel.existByLdhName(dom.getLdhName(), zoneId, connection);
-			if (!result) {
-				fail();
-			}
-			result = DomainModel.existByName(dom.getPunycodeName(), zoneName, connection);
-			if (!result) {
-				fail();
-			}
-			result = DomainModel.existByName(dom.getPunycodeName(), connection);
-			if (!result) {
-				fail();
-			}
+			DomainModel.findByLdhName(dom.getLdhName(), zoneId, false, connection);
 		} catch (SQLException | ObjectNotFoundException s) {
 			s.printStackTrace();
 			fail();

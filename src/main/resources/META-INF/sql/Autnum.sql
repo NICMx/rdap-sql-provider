@@ -10,9 +10,5 @@ SELECT * FROM rdap.autonomous_system_number asn WHERE asn.asn_id = ?;
 #getByRange
 SELECT * FROM rdap.autonomous_system_number asn WHERE asn.asn_start_autnum <= ? AND asn.asn_end_autnum >= ?;
 
-#existByRange
-SELECT EXISTS(SELECT 1 FROM rdap.autonomous_system_number asn WHERE asn.asn_start_autnum <= ? AND asn.asn_end_autnum >= ?);
-
-
 #getAutnumByHandle
 SELECT * FROM rdap.autonomous_system_number asn WHERE asn.asn_handle = ?;

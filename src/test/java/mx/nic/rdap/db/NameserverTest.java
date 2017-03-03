@@ -20,6 +20,7 @@ import mx.nic.rdap.core.db.Nameserver;
 import mx.nic.rdap.core.db.Remark;
 import mx.nic.rdap.core.db.RemarkDescription;
 import mx.nic.rdap.core.db.struct.NameserverIpAddressesStruct;
+import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.NameserverModel;
 import mx.nic.rdap.db.objects.EventDbObj;
@@ -53,11 +54,8 @@ public class NameserverTest extends DatabaseTest {
 		}
 
 		try {
-			boolean result = NameserverModel.existByName("ns.xn--test-minumun.example", connection);
-			if (!result) {
-				fail("existByName returned false.");
-			}
-		} catch (SQLException s) {
+			NameserverModel.findByName("ns.xn--test-minumun.example", connection);
+		} catch (SQLException | ObjectNotFoundException s) {
 			fail("fail existByName");
 		}
 	}

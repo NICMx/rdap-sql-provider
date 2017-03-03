@@ -35,18 +35,6 @@ import mx.nic.rdap.db.objects.RemarkDescriptionDbObj;
  */
 public class AutnumTest extends DatabaseTest {
 
-	// @Test
-	public void existByRange() {
-		try {
-			boolean result = AutnumModel.existByRange(10l, connection);
-			if (!result) {
-				fail();
-			}
-		} catch (SQLException s) {
-			fail();
-		}
-	}
-
 	@Test
 	public void insertAndGetAutnum() {
 		Entity registrant = new EntityDbObj();
@@ -130,10 +118,8 @@ public class AutnumTest extends DatabaseTest {
 		autnum.equals(getById);
 
 		try {
-			boolean result = AutnumModel.existByRange(101L, connection);
-			if (!result)
-				fail();
-		} catch (SQLException s) {
+			AutnumModel.getByRange(101L, connection);
+		} catch (SQLException | ObjectNotFoundException s) {
 			fail();
 		}
 	}

@@ -37,22 +37,4 @@ public class IpNetworkDAOImpl implements IpNetworkDAO {
 		}
 	}
 
-	@Override
-	public boolean existByInetAddress(String ipAddress, Integer cidr) throws RdapDataAccessException {
-		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			return IpNetworkModel.existByInetAddress(ipAddress, cidr, connection);
-		} catch (SQLException e) {
-			throw new RdapDataAccessException(e);
-		}
-	}
-
-	@Override
-	public boolean existByInetAddress(String ipAddress) throws RdapDataAccessException {
-		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			return IpNetworkModel.existByInetAddress(ipAddress, connection);
-		} catch (SQLException e) {
-			throw new RdapDataAccessException(e);
-		}
-	}
-
 }

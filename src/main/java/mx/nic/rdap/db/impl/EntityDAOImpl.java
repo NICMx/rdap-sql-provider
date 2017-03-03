@@ -74,13 +74,4 @@ public class EntityDAOImpl implements EntityDAO {
 		}
 	}
 
-	@Override
-	public boolean existByHandle(String entityHandle) throws RdapDataAccessException {
-		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			return EntityModel.existByHandle(entityHandle, connection);
-		} catch (SQLException e) {
-			throw new RdapDataAccessException(e);
-		}
-	}
-
 }

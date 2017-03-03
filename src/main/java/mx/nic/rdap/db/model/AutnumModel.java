@@ -30,7 +30,6 @@ public class AutnumModel {
 
 	private static final String STORE_QUERY = "storeToDatabase";
 	private static final String GET_BY_RANGE = "getByRange";
-	private static final String EXIST_BY_RANGE = "existByRange";
 	private static final String GET_BY_ID = "getAutnumById";
 	private static final String GET_BY_HANDLE = "getAutnumByHandle";
 
@@ -120,18 +119,6 @@ public class AutnumModel {
 				AutnumDbObj autnum = new AutnumDbObj(resultSet);
 				loadNestedObjects(autnum, connection);
 				return autnum;
-			}
-		}
-	}
-
-	public static boolean existByRange(Long autnumValue, Connection connection) throws SQLException {
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(EXIST_BY_RANGE))) {
-			statement.setLong(1, autnumValue);
-			statement.setLong(2, autnumValue);
-			logger.log(Level.INFO, "Executing query: " + statement.toString());
-			try (ResultSet resultSet = statement.executeQuery()) {
-				resultSet.next();
-				return resultSet.getInt(1) == 1;
 			}
 		}
 	}

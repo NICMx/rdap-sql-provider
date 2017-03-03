@@ -54,11 +54,6 @@ public class NameserverModel {
 	private static final String DOMAIN_GET_QUERY = "getByDomainId";
 	private static final String DOMAIN_STORE_QUERY = "storeDomainNameserversToDatabase";
 
-	private static final String EXIST_BY_PARTIAL_NAME_QUERY = "existByPartialName";
-	private static final String EXIST_BY_NAME_QUERY = "existByName";
-	private static final String EXIST_BY_IP6_QUERY = "existByIp6";
-	private static final String EXIST_BY_IP4_QUERY = "existByIp4";
-
 	private static final String SEARCH_BY_NAME_REGEX_QUERY = "searchByRegexName";
 	static {
 		try {
@@ -357,50 +352,6 @@ public class NameserverModel {
 				NameserverDbObj nameserver = new NameserverDbObj(resultSet);
 				loadNestedObjects(nameserver, rdapConnection);
 				return nameserver;
-			}
-		}
-	}
-
-	public static boolean existByName(String namePattern, Connection connection) throws SQLException {
-		String query = "";
-		String criteria = "";
-		if (namePattern.contains("*")) {// check if is a partial search
-			query = queryGroup.getQuery(EXIST_BY_PARTIAL_NAME_QUERY);
-			criteria = namePattern.replace('*', '%');
-		} else {
-			query = queryGroup.getQuery(EXIST_BY_NAME_QUERY);
-			criteria = namePattern;
-		}
-		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, IDN.toASCII(criteria));
-			statement.setString(2, IDN.toASCII(criteria));
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			try (ResultSet resultSet = statement.executeQuery()) {
-				resultSet.next();
-				return resultSet.getInt(1) == 1;
-			}
-		}
-	}
-
-	public static boolean existByIp(String ipaddressPattern, Connection connection)
-			throws InvalidValueException, SQLException {
-		String query = "";
-		try {
-			InetAddress address = InetAddress.getByName(ipaddressPattern);
-			if (address instanceof Inet6Address) {
-				query = queryGroup.getQuery(EXIST_BY_IP6_QUERY);
-			} else if (address instanceof Inet4Address) {
-				query = queryGroup.getQuery(EXIST_BY_IP4_QUERY);
-			}
-		} catch (UnknownHostException e) {
-			throw new InvalidValueException("Requested ip is invalid.", "Ip", "Nameserver");
-		}
-		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, ipaddressPattern);
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			try (ResultSet resultSet = statement.executeQuery()) {
-				resultSet.next();
-				return resultSet.getInt(1) == 1;
 			}
 		}
 	}

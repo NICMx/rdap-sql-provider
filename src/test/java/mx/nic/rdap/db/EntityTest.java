@@ -50,11 +50,8 @@ public class EntityTest extends DatabaseTest {
 
 		// check if exists
 		try {
-			boolean result = EntityModel.existByHandle("minimunEntity", connection);
-			if (!result) {
-				fail();
-			}
-		} catch (SQLException s) {
+			EntityModel.getByHandle("minimunEntity", connection);
+		} catch (SQLException | ObjectNotFoundException s) {
 			fail();
 		}
 	}

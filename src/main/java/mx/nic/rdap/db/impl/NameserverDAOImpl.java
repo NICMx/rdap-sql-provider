@@ -71,13 +71,4 @@ public class NameserverDAOImpl implements NameserverDAO {
 		throw new NotImplementedException();
 	}
 
-	@Override
-	public boolean existByName(String name) throws RdapDataAccessException {
-		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			return NameserverModel.existByName(name, connection);
-		} catch (SQLException e) {
-			throw new RdapDataAccessException(e);
-		}
-	}
-
 }

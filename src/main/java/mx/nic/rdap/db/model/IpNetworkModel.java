@@ -47,9 +47,6 @@ public class IpNetworkModel {
 	private static final String GET_BY_DOMAIN_ID = "getByDomainId";
 	private static final String GET_BY_HANDLE = "getByHandle";
 
-	private static final String EXIST_BY_IPV4 = "existByIPv4";
-	private static final String EXIST_BY_IPV6 = "existByIPv6";
-
 	static {
 		try {
 			queryGroup = new QueryGroup(QUERY_GROUP);
@@ -339,92 +336,4 @@ public class IpNetworkModel {
 		return result;
 	}
 
-	public static boolean existByInetAddress(String ipAddress, Integer cidr, Connection connection)
-			throws SQLException, InvalidValueException {
-		InetAddress inetAddress;
-		inetAddress = IpUtils.validateIpAddress(ipAddress);
-		return existByInetAddress(inetAddress, cidr, connection);
-	}
-
-	public static boolean existByInetAddress(String ipAddress, Connection connection)
-			throws SQLException, InvalidValueException {
-		InetAddress inetAddress;
-		inetAddress = IpUtils.validateIpAddress(ipAddress);
-		return existByInetAddress(inetAddress, connection);
-
-	}
-
-	private static boolean existByInetAddress(InetAddress inetAddress, Connection connection)
-			throws SQLException, InvalidValueException {
-		return existByInetAddress(inetAddress, IpUtils.getMaxValidCidr(inetAddress), connection);
-	}
-
-	private static boolean existByInetAddress(InetAddress inetAddress, Integer cidr, Connection connection)
-			throws SQLException, InvalidValueException {
-		if (inetAddress instanceof Inet4Address) {
-			IpUtils.validateIpv4Cidr(cidr);
-			try {
-				return existByInet4Address((Inet4Address) inetAddress, cidr, connection);
-			} catch (UnknownHostException e) {
-				throw new InvalidValueException(e.getMessage(), e);
-			}
-		} else if (inetAddress instanceof Inet6Address) {
-			IpUtils.validateIpv6Cidr(cidr);
-			try {
-				return existByInet6Address((Inet6Address) inetAddress, cidr, connection);
-			} catch (UnknownHostException e) {
-				throw new InvalidValueException(e.getMessage(), e);
-			}
-		} else {
-			throw new UnsupportedOperationException("Unsupported class:" + inetAddress.getClass().getName());
-		}
-	}
-
-	private static boolean existByInet4Address(Inet4Address inetAddress, Integer cidr, Connection connection)
-			throws UnknownHostException, SQLException, InvalidValueException {
-		InetAddress lastAddressFromNetwork = IpUtils.getLastAddressFromNetwork(inetAddress, cidr);
-
-		BigInteger start = IpUtils.addressToNumber(inetAddress);
-		BigInteger end = IpUtils.addressToNumber((Inet4Address) lastAddressFromNetwork);
-
-		String query = queryGroup.getQuery(EXIST_BY_IPV4);
-		try (PreparedStatement statement = connection.prepareStatement(query);) {
-			statement.setInt(1, cidr);
-			statement.setString(2, start.toString());
-			statement.setString(3, end.toString());
-			ResultSet rs = statement.executeQuery();
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			rs.next();
-			return rs.getInt(1) == 1;
-		}
-
-	}
-
-	private static boolean existByInet6Address(Inet6Address inetAddress, Integer cidr, Connection connection)
-			throws UnknownHostException, SQLException, InvalidValueException {
-		InetAddress lastAddressFromNetwork = IpUtils.getLastAddressFromNetwork(inetAddress, cidr);
-
-		BigInteger startUpperPart = IpUtils.inet6AddressToUpperPart(inetAddress);
-		BigInteger startLowerPart = IpUtils.inet6AddressToLowerPart(inetAddress);
-
-		BigInteger endUpperPart = IpUtils.inet6AddressToUpperPart((Inet6Address) lastAddressFromNetwork);
-		BigInteger endLowerPart = IpUtils.inet6AddressToLowerPart((Inet6Address) lastAddressFromNetwork);
-
-		String query = queryGroup.getQuery(EXIST_BY_IPV6);
-		try (PreparedStatement statement = connection.prepareStatement(query);) {
-			statement.setInt(1, cidr);
-			statement.setString(2, startUpperPart.toString());
-			statement.setString(3, startLowerPart.toString());
-
-			statement.setString(4, endUpperPart.toString());
-			statement.setString(5, endLowerPart.toString());
-
-			ResultSet rs = statement.executeQuery();
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-
-			rs.next();
-			return rs.getInt(1) == 1;
-		}
-
-	}
 }

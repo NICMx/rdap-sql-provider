@@ -34,17 +34,5 @@ SELECT * FROM rdap.nameserver nse;
 #deleteDomainNameserversRelation
 DELETE FROM rdap.domain_nameservers WHERE dom_id=?;
 
-#existByName
-SELECT EXISTS(SELECT 1 FROM rdap.nameserver nse WHERE nse.nse_ldh_name=? OR nse.nse_unicode_name=?);
-
-#existByPartialName
-SELECT EXISTS(SELECT 1  FROM rdap.nameserver nse WHERE nse.nse_ldh_name LIKE ? OR nse.nse_unicode_name LIKE ?);
-
-#existByIp4
-SELECT EXISTS(SELECT 1 FROM rdap.nameserver nse join rdap.ip_address ipa on ipa.nse_id=nse.nse_id WHERE ipa.iad_value=INET_ATON(?));
-
-#existByIp6
-SELECT EXISTS(SELECT 1 FROM rdap.nameserver nse join rdap.ip_address ipa on ipa.nse_id=nse.nse_id WHERE ipa.iad_value=INET6_ATON(?));
-
 #searchByRegexName
 SELECT DISTINCT(nse.nse_id), nse.nse_handle,nse.nse_ldh_name, nse.nse_port43, nse.nse_unicode_name FROM rdap.nameserver nse WHERE nse.nse_ldh_name REGEXP ? OR nse.nse_unicode_name REGEXP ? ORDER BY 1 LIMIT ?;

@@ -44,7 +44,6 @@ public class DomainModel {
 
 	private static final String STORE_IP_NETWORK_RELATION_QUERY = "storeDomainIpNetworkRelation";
 	private static final String GET_BY_LDH_QUERY = "getByLdhName";
-	private static final String EXIST_BY_LDH_QUERY = "existByLdhName";
 	private static final String GET_BY_ID_QUERY = "getDomainById";
 	private static final String GET_BY_HANDLE_QUERY = "getByHandle";
 	private static final String SEARCH_BY_PARTIAL_NAME_WITH_PARTIAL_ZONE_QUERY = "searchByPartialNameWPartialZone";
@@ -55,13 +54,6 @@ public class DomainModel {
 	private static final String SEARCH_BY_NAME_WITHOUT_ZONE_QUERY = "searchByNameWOutZone";
 	private static final String SEARCH_BY_NAMESERVER_LDH_QUERY = "searchByNsLdhName";
 	private static final String SEARCH_BY_NAMESERVER_IP_QUERY = "searchByNsIp";
-
-	private static final String EXIST_BY_PARTIAL_NAME_WITHOUT_ZONE_QUERY = "existByPartialNameWOutZone";
-	private static final String EXIST_BY_NAME_WITHOUT_ZONE_QUERY = "existByNameWOutZone";
-	private static final String EXIST_BY_NAME_WITH_ZONE_QUERY = "existByNameWZone";
-	private static final String EXIST_BY_PARTIAL_NAME_WITH_ZONE_QUERY = "existByPartialNameWZone";
-	private static final String EXIST_BY_NAME_WITH_PARTIAL_ZONE_QUERY = "existByNameWPartialZone";
-	private static final String EXIST_BY_PARTIAL_NAME_WITH_PARTIAL_ZONE_QUERY = "existByPartialNameWPartialZone";
 
 	private static final String SEARCH_BY_REGEX_NAME_WITH_ZONE = "searchByRegexNameWithZone";
 	private static final String SEARCH_BY_REGEX_NAME_WITHOUT_ZONE = "searchByRegexNameWithOutZone";
@@ -184,20 +176,6 @@ public class DomainModel {
 				DomainDbObj domain = new DomainDbObj(resultSet);
 				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
 				return domain;
-			}
-		}
-	}
-
-	public static boolean existByLdhName(String name, Integer zoneId, Connection connection) throws SQLException {
-		String query = queryGroup.getQuery(EXIST_BY_LDH_QUERY);
-		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, IDN.toASCII(name));
-			statement.setString(2, name);
-			statement.setInt(3, zoneId);
-			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
-			try (ResultSet resultSet = statement.executeQuery()) {
-				resultSet.next();
-				return resultSet.getInt(1) == 1;
 			}
 		}
 	}
@@ -622,91 +600,6 @@ public class DomainModel {
 
 		if (!ZoneModel.existsZone(domainZone)) {
 			throw new ObjectNotFoundException("Zone not found.");
-		}
-	}
-
-	public static boolean existByName(String name, String zone, Connection connection)
-			throws SQLException, ObjectNotFoundException {
-		boolean isPartialZone = zone.contains("*");
-		boolean isPartialName = name.contains("*");
-		String query = null;
-		List<Integer> zoneIds = null;
-
-		if (isPartialZone) {
-			zoneIds = ZoneModel.getValidZoneIds();
-
-			zone = zone.replaceAll("\\*", "%");
-			if (isPartialName) {
-				name = name.replaceAll("\\*", "%");
-				query = queryGroup.getQuery(EXIST_BY_PARTIAL_NAME_WITH_PARTIAL_ZONE_QUERY);
-				query = Util.createDynamicQueryWithInClause(zoneIds.size(), query);
-			} else {
-				query = queryGroup.getQuery(EXIST_BY_NAME_WITH_PARTIAL_ZONE_QUERY);
-				query = Util.createDynamicQueryWithInClause(zoneIds.size(), query);
-			}
-		} else {
-
-			if (!ZoneModel.existsZone(zone)) {
-				throw new ObjectNotFoundException("Zone not found.");
-			}
-
-			if (isPartialName) {
-				name = name.replaceAll("\\*", "%");
-				query = queryGroup.getQuery(EXIST_BY_PARTIAL_NAME_WITH_ZONE_QUERY);
-			} else {
-				query = queryGroup.getQuery(EXIST_BY_NAME_WITH_ZONE_QUERY);
-			}
-		}
-
-		try (PreparedStatement statement = connection.prepareStatement(query);) {
-
-			if (isPartialZone) {
-				for (int i = 1; i <= zoneIds.size(); i++) {
-					statement.setInt(i, zoneIds.get(i - 1));
-				}
-				statement.setString(zoneIds.size() + 1, name);
-				statement.setString(zoneIds.size() + 2, name);
-				statement.setString(zoneIds.size() + 3, zone);
-			} else {
-				statement.setString(1, name);
-				statement.setString(2, name);
-				Integer zoneId = ZoneModel.getIdByZoneName(zone);
-				statement.setInt(3, zoneId);
-			}
-
-			logger.log(Level.INFO, "Executing query" + statement.toString());
-			ResultSet resultSet = statement.executeQuery();
-			resultSet.next();
-			return resultSet.getInt(1) == 1;
-		}
-
-	}
-
-	public static boolean existByName(String domainName, Connection connection)
-			throws SQLException, ObjectNotFoundException {
-		String query = null;
-		if (domainName.contains("*")) {
-			domainName = domainName.replaceAll("\\*", "%");
-			query = queryGroup.getQuery(EXIST_BY_PARTIAL_NAME_WITHOUT_ZONE_QUERY);
-		} else {
-			query = queryGroup.getQuery(EXIST_BY_NAME_WITHOUT_ZONE_QUERY);
-		}
-
-		List<Integer> zoneIds = ZoneModel.getValidZoneIds();
-		query = Util.createDynamicQueryWithInClause(zoneIds.size(), query);
-
-		try (PreparedStatement statement = connection.prepareStatement(query);) {
-
-			for (int i = 1; i <= zoneIds.size(); i++) {
-				statement.setInt(i, zoneIds.get(i - 1));
-			}
-
-			statement.setString(zoneIds.size() + 1, domainName);
-			statement.setString(zoneIds.size() + 2, domainName);
-			logger.log(Level.INFO, "Executing query" + statement.toString());
-			ResultSet resultSet = statement.executeQuery();
-			resultSet.next();
-			return resultSet.getInt(1) == 1;
 		}
 	}
 

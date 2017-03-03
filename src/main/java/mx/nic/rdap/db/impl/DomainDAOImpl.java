@@ -140,20 +140,4 @@ public class DomainDAOImpl implements DomainDAO {
 		throw new NotImplementedException();
 	}
 
-	@Override
-	public boolean existByName(String domainName) throws RdapDataAccessException {
-		if (!domainName.contains("."))
-			throw new RdapDataAccessException("Invalid fqdn");
-		String name = domainName.substring(0, domainName.indexOf('.'));
-		String zone = domainName.substring(domainName.indexOf('.') + 1);
-		if (!ZoneModel.existsZone(zone))
-			throw new RdapDataAccessException("Zone not found");
-
-		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			return DomainModel.existByLdhName(name, ZoneModel.getIdByZoneName(zone), connection);
-		} catch (SQLException e) {
-			throw new RdapDataAccessException();
-		}
-	}
-
 }

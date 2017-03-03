@@ -53,9 +53,6 @@ public class EntityModel {
 	private final static String GET_AUTNUM_ENTITY_QUERY = "getAutnumEntitiesQuery";
 	private final static String GET_IP_NETWORK_ENTITY_QUERY = "getIpNetworkEntitiesQuery";
 
-	private final static String EXIST_BY_HANDLE_QUERY = "existByHandle";
-	private final static String EXIST_BY_PARTIAL_HANDLE_QUERY = "existByPartialHandle";
-
 	private final static String SEARCH_BY_HANDLE_REGEX_QUERY = "searchByRegexHandle";
 	private final static String SEARCH_BY_NAME_REGEX_QUERY = "searchByRegexName";
 
@@ -408,30 +405,4 @@ public class EntityModel {
 		}
 	}
 
-	public static boolean existByHandle(String entityHandle, Connection connection) throws SQLException {
-		return existBy(entityHandle, connection, queryGroup.getQuery(EXIST_BY_PARTIAL_HANDLE_QUERY),
-				queryGroup.getQuery(EXIST_BY_HANDLE_QUERY));
-	}
-
-	private static boolean existBy(String pattern, Connection connection, String searchByPartialQuery,
-			String getByQuery) throws SQLException {
-
-		String query;
-		String criteria;
-		if (pattern.contains("*")) {
-			query = searchByPartialQuery;
-			criteria = pattern.replace('*', '%');
-		} else {
-			query = getByQuery;
-			criteria = pattern;
-		}
-
-		try (PreparedStatement statement = connection.prepareStatement(query);) {
-			statement.setString(1, criteria);
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			ResultSet rs = statement.executeQuery();
-			rs.next();
-			return rs.getInt(1) == 1;
-		}
-	}
 }

@@ -18,10 +18,3 @@ SELECT ipn.* FROM rdap.ip_network ipn JOIN rdap.domain_networks dom ON dom.ine_i
 
 #getByHandle
 SELECT * FROM rdap.ip_network ipn WHERE ipn.ine_handle = ?;
-
-
-#existByIPv4
-SELECT EXISTS(SELECT 1 FROM rdap.ip_network WHERE ip_version_id = 4 AND ine_cidr <= ? AND ine_start_address_down <= ? AND ine_end_address_down >= ?);
-
-#existByIPv6
-SELECT EXISTS(SELECT 1  FROM rdap.ip_network WHERE ip_version_id = 6 AND ine_cidr <= ? AND ine_start_address_up <= ? AND ine_start_address_down <= ? AND ine_end_address_up >= ? AND ine_end_address_down >= ? );
