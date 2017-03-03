@@ -150,11 +150,10 @@ public class DomainDAOImpl implements DomainDAO {
 			throw new RdapDataAccessException("Zone not found");
 
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			DomainModel.existByLdhName(name, ZoneModel.getIdByZoneName(zone), connection);
+			return DomainModel.existByLdhName(name, ZoneModel.getIdByZoneName(zone), connection);
 		} catch (SQLException e) {
 			throw new RdapDataAccessException();
 		}
-		return true;
 	}
 
 }

@@ -339,40 +339,39 @@ public class IpNetworkModel {
 		return result;
 	}
 
-	public static void existByInetAddress(String ipAddress, Integer cidr, Connection connection)
-			throws SQLException, InvalidValueException, ObjectNotFoundException {
+	public static boolean existByInetAddress(String ipAddress, Integer cidr, Connection connection)
+			throws SQLException, InvalidValueException {
 		InetAddress inetAddress;
 		inetAddress = IpUtils.validateIpAddress(ipAddress);
-		existByInetAddress(inetAddress, cidr, connection);
-
+		return existByInetAddress(inetAddress, cidr, connection);
 	}
 
-	public static void existByInetAddress(String ipAddress, Connection connection)
-			throws SQLException, InvalidValueException, ObjectNotFoundException {
+	public static boolean existByInetAddress(String ipAddress, Connection connection)
+			throws SQLException, InvalidValueException {
 		InetAddress inetAddress;
 		inetAddress = IpUtils.validateIpAddress(ipAddress);
-		existByInetAddress(inetAddress, connection);
+		return existByInetAddress(inetAddress, connection);
 
 	}
 
-	private static void existByInetAddress(InetAddress inetAddress, Connection connection)
-			throws SQLException, InvalidValueException, ObjectNotFoundException {
-		existByInetAddress(inetAddress, IpUtils.getMaxValidCidr(inetAddress), connection);
+	private static boolean existByInetAddress(InetAddress inetAddress, Connection connection)
+			throws SQLException, InvalidValueException {
+		return existByInetAddress(inetAddress, IpUtils.getMaxValidCidr(inetAddress), connection);
 	}
 
-	private static void existByInetAddress(InetAddress inetAddress, Integer cidr, Connection connection)
-			throws SQLException, InvalidValueException, ObjectNotFoundException {
+	private static boolean existByInetAddress(InetAddress inetAddress, Integer cidr, Connection connection)
+			throws SQLException, InvalidValueException {
 		if (inetAddress instanceof Inet4Address) {
 			IpUtils.validateIpv4Cidr(cidr);
 			try {
-				existByInet4Address((Inet4Address) inetAddress, cidr, connection);
+				return existByInet4Address((Inet4Address) inetAddress, cidr, connection);
 			} catch (UnknownHostException e) {
 				throw new InvalidValueException(e.getMessage(), e);
 			}
 		} else if (inetAddress instanceof Inet6Address) {
 			IpUtils.validateIpv6Cidr(cidr);
 			try {
-				existByInet6Address((Inet6Address) inetAddress, cidr, connection);
+				return existByInet6Address((Inet6Address) inetAddress, cidr, connection);
 			} catch (UnknownHostException e) {
 				throw new InvalidValueException(e.getMessage(), e);
 			}
@@ -381,8 +380,8 @@ public class IpNetworkModel {
 		}
 	}
 
-	private static void existByInet4Address(Inet4Address inetAddress, Integer cidr, Connection connection)
-			throws UnknownHostException, SQLException, InvalidValueException, ObjectNotFoundException {
+	private static boolean existByInet4Address(Inet4Address inetAddress, Integer cidr, Connection connection)
+			throws UnknownHostException, SQLException, InvalidValueException {
 		InetAddress lastAddressFromNetwork = IpUtils.getLastAddressFromNetwork(inetAddress, cidr);
 
 		BigInteger start = IpUtils.addressToNumber(inetAddress);
@@ -396,16 +395,13 @@ public class IpNetworkModel {
 			ResultSet rs = statement.executeQuery();
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			rs.next();
-			if (rs.getInt(1) == 0) {
-				throw new ObjectNotFoundException("Object not found.");
-			}
-
+			return rs.getInt(1) == 1;
 		}
 
 	}
 
-	private static void existByInet6Address(Inet6Address inetAddress, Integer cidr, Connection connection)
-			throws UnknownHostException, SQLException, InvalidValueException, ObjectNotFoundException {
+	private static boolean existByInet6Address(Inet6Address inetAddress, Integer cidr, Connection connection)
+			throws UnknownHostException, SQLException, InvalidValueException {
 		InetAddress lastAddressFromNetwork = IpUtils.getLastAddressFromNetwork(inetAddress, cidr);
 
 		BigInteger startUpperPart = IpUtils.inet6AddressToUpperPart(inetAddress);
@@ -427,10 +423,7 @@ public class IpNetworkModel {
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 
 			rs.next();
-			if (rs.getInt(1) == 0) {
-				throw new ObjectNotFoundException("Object not found.");
-			}
-
+			return rs.getInt(1) == 1;
 		}
 
 	}

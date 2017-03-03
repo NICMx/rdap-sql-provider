@@ -74,11 +74,10 @@ public class NameserverDAOImpl implements NameserverDAO {
 	@Override
 	public boolean existByName(String name) throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			NameserverModel.existByName(name, connection);
+			return NameserverModel.existByName(name, connection);
 		} catch (SQLException e) {
 			throw new RdapDataAccessException(e);
 		}
-		return true;
 	}
 
 }

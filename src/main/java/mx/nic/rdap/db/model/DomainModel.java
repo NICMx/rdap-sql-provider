@@ -188,8 +188,7 @@ public class DomainModel {
 		}
 	}
 
-	public static void existByLdhName(String name, Integer zoneId, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	public static boolean existByLdhName(String name, Integer zoneId, Connection connection) throws SQLException {
 		String query = queryGroup.getQuery(EXIST_BY_LDH_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, IDN.toASCII(name));
@@ -198,9 +197,7 @@ public class DomainModel {
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				resultSet.next();
-				if (resultSet.getInt(1) == 0) {
-					throw new ObjectNotFoundException("Object not found.");
-				}
+				return resultSet.getInt(1) == 1;
 			}
 		}
 	}
@@ -628,7 +625,7 @@ public class DomainModel {
 		}
 	}
 
-	public static void existByName(String name, String zone, Connection connection)
+	public static boolean existByName(String name, String zone, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		boolean isPartialZone = zone.contains("*");
 		boolean isPartialName = name.contains("*");
@@ -680,14 +677,12 @@ public class DomainModel {
 			logger.log(Level.INFO, "Executing query" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();
 			resultSet.next();
-			if (resultSet.getInt(1) == 0) {
-				throw new ObjectNotFoundException("Object not found.");
-			}
+			return resultSet.getInt(1) == 1;
 		}
 
 	}
 
-	public static void existByName(String domainName, Connection connection)
+	public static boolean existByName(String domainName, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		String query = null;
 		if (domainName.contains("*")) {
@@ -711,12 +706,7 @@ public class DomainModel {
 			logger.log(Level.INFO, "Executing query" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();
 			resultSet.next();
-			if (resultSet.getInt(1) == 0) {
-				{
-					throw new ObjectNotFoundException("Object not found.");
-				}
-			}
-
+			return resultSet.getInt(1) == 1;
 		}
 	}
 

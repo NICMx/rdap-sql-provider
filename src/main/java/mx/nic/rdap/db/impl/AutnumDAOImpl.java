@@ -31,12 +31,10 @@ public class AutnumDAOImpl implements AutnumDAO {
 	@Override
 	public boolean existByRange(Long autnumValue) throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			AutnumModel.existByRange(autnumValue, connection);
+			return AutnumModel.existByRange(autnumValue, connection);
 		} catch (SQLException e) {
 			throw new RdapDataAccessException(e);
 		}
-
-		return true;
 	}
 
 }

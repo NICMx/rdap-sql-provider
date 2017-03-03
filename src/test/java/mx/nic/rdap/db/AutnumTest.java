@@ -38,8 +38,11 @@ public class AutnumTest extends DatabaseTest {
 	// @Test
 	public void existByRange() {
 		try {
-			AutnumModel.existByRange(10l, connection);
-		} catch (SQLException | ObjectNotFoundException s) {
+			boolean result = AutnumModel.existByRange(10l, connection);
+			if (!result) {
+				fail();
+			}
+		} catch (SQLException s) {
 			fail();
 		}
 	}
@@ -127,8 +130,10 @@ public class AutnumTest extends DatabaseTest {
 		autnum.equals(getById);
 
 		try {
-			AutnumModel.existByRange(101L, connection);
-		} catch (SQLException | ObjectNotFoundException s) {
+			boolean result = AutnumModel.existByRange(101L, connection);
+			if (!result)
+				fail();
+		} catch (SQLException s) {
 			fail();
 		}
 	}

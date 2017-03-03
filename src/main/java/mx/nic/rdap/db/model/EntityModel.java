@@ -408,14 +408,13 @@ public class EntityModel {
 		}
 	}
 
-	public static void existByHandle(String entityHandle, Connection connection)
-			throws SQLException, ObjectNotFoundException {
-		existBy(entityHandle, connection, queryGroup.getQuery(EXIST_BY_PARTIAL_HANDLE_QUERY),
+	public static boolean existByHandle(String entityHandle, Connection connection) throws SQLException {
+		return existBy(entityHandle, connection, queryGroup.getQuery(EXIST_BY_PARTIAL_HANDLE_QUERY),
 				queryGroup.getQuery(EXIST_BY_HANDLE_QUERY));
 	}
 
-	private static void existBy(String pattern, Connection connection, String searchByPartialQuery, String getByQuery)
-			throws SQLException, ObjectNotFoundException {
+	private static boolean existBy(String pattern, Connection connection, String searchByPartialQuery,
+			String getByQuery) throws SQLException {
 
 		String query;
 		String criteria;
@@ -432,9 +431,7 @@ public class EntityModel {
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			ResultSet rs = statement.executeQuery();
 			rs.next();
-			if (rs.getInt(1) == 0) {
-				throw new ObjectNotFoundException("Object not found.");
-			}
+			return rs.getInt(1) == 1;
 		}
 	}
 }

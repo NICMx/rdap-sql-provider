@@ -361,8 +361,7 @@ public class NameserverModel {
 		}
 	}
 
-	public static void existByName(String namePattern, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	public static boolean existByName(String namePattern, Connection connection) throws SQLException {
 		String query = "";
 		String criteria = "";
 		if (namePattern.contains("*")) {// check if is a partial search
@@ -378,15 +377,13 @@ public class NameserverModel {
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				resultSet.next();
-				if (resultSet.getInt(1) == 0) {
-					throw new ObjectNotFoundException("Object not found.");
-				}
+				return resultSet.getInt(1) == 1;
 			}
 		}
 	}
 
-	public static void existByIp(String ipaddressPattern, Connection connection)
-			throws InvalidValueException, SQLException, ObjectNotFoundException {
+	public static boolean existByIp(String ipaddressPattern, Connection connection)
+			throws InvalidValueException, SQLException {
 		String query = "";
 		try {
 			InetAddress address = InetAddress.getByName(ipaddressPattern);
@@ -403,11 +400,8 @@ public class NameserverModel {
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				resultSet.next();
-				if (resultSet.getInt(1) == 0) {
-					throw new ObjectNotFoundException("Object not found.");
-				}
+				return resultSet.getInt(1) == 1;
 			}
-
 		}
 	}
 

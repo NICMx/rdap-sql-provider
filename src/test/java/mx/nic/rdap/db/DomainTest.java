@@ -99,9 +99,18 @@ public class DomainTest extends DatabaseTest {
 
 		try {
 			// Creates and inserts a zone
-			DomainModel.existByLdhName(dom.getLdhName(), zoneId, connection);
-			DomainModel.existByName(dom.getPunycodeName(), zoneName, connection);
-			DomainModel.existByName(dom.getPunycodeName(), connection);
+			boolean result = DomainModel.existByLdhName(dom.getLdhName(), zoneId, connection);
+			if (!result) {
+				fail();
+			}
+			result = DomainModel.existByName(dom.getPunycodeName(), zoneName, connection);
+			if (!result) {
+				fail();
+			}
+			result = DomainModel.existByName(dom.getPunycodeName(), connection);
+			if (!result) {
+				fail();
+			}
 		} catch (SQLException | ObjectNotFoundException s) {
 			s.printStackTrace();
 			fail();

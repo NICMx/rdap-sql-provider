@@ -21,7 +21,6 @@ import mx.nic.rdap.core.db.Link;
 import mx.nic.rdap.core.db.Remark;
 import mx.nic.rdap.core.db.RemarkDescription;
 import mx.nic.rdap.db.exception.InvalidValueException;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.model.EntityModel;
 import mx.nic.rdap.db.model.IpNetworkModel;
 import mx.nic.rdap.db.objects.EventDbObj;
@@ -73,8 +72,11 @@ public class IpNetworkTest extends DatabaseTest {
 
 		// check if exists
 		try {
-			IpNetworkModel.existByInetAddress("192.168.1.0", connection);
-		} catch (SQLException | ObjectNotFoundException | InvalidValueException e) {
+			boolean result = IpNetworkModel.existByInetAddress("192.168.1.0", connection);
+			if (!result) {
+				fail("existByInetAddress returned false.");
+			}
+		} catch (SQLException | InvalidValueException e) {
 			fail("fail existByInetAddress");
 		}
 	}
@@ -118,8 +120,11 @@ public class IpNetworkTest extends DatabaseTest {
 
 		// check if exists
 		try {
-			IpNetworkModel.existByInetAddress("2001:BABA:CAFE:0003::", connection);
-		} catch (SQLException | ObjectNotFoundException | InvalidValueException e) {
+			boolean result = IpNetworkModel.existByInetAddress("2001:BABA:CAFE:0003::", connection);
+			if (!result) {
+				fail("existByInetAddress returned false.");
+			}
+		} catch (SQLException | InvalidValueException e) {
 			fail("fail existByInetAddress");
 		}
 	}
