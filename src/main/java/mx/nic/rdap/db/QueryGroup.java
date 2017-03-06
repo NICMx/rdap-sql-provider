@@ -4,11 +4,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 /**
  * A bunch of queries read from a .sql file.
  */
 public class QueryGroup {
+
+	private static final String SCHEMA_KEY = "{schema}";
+
+	private static Pattern SCHEMA_PATTERN = Pattern.compile(Pattern.quote(SCHEMA_KEY));
 
 	/** The queries, indexed by means of their names. */
 	private HashMap<String, String> queries = new HashMap<>();
@@ -24,11 +29,15 @@ public class QueryGroup {
 	 *             Problems reading the <code>file</code> file.
 	 */
 	public QueryGroup(String file) throws IOException {
+		this(file, null);
+	}
+
+	public QueryGroup(String file, String schema) throws IOException {
 		file = "META-INF/sql/" + file + ".sql";
 		try (BufferedReader reader = new BufferedReader(
 				new InputStreamReader(QueryGroup.class.getClassLoader().getResourceAsStream(file)))) {
 
-			StringBuilder queryString = new StringBuilder();
+			StringBuilder querySB = new StringBuilder();
 			String queryName = null;
 			String currentLine;
 
@@ -36,16 +45,20 @@ public class QueryGroup {
 				if (currentLine.startsWith("#")) {
 					queryName = currentLine.substring(1).trim();
 				} else {
-					queryString.append(currentLine);
+					querySB.append(currentLine);
 					if (currentLine.trim().endsWith(";")) {
 						// If the query has no name, it will be ignored.
 						if (queryName != null) {
-							String oldQuery = queries.put(queryName, queryString.toString());
+							String queryString = querySB.toString();
+							if (schema != null) {
+								queryString = SCHEMA_PATTERN.matcher(queryString).replaceAll(schema);
+							}
+							String oldQuery = queries.put(queryName, queryString);
 							if (oldQuery != null) {
 								throw new IllegalArgumentException("There is more than one '" + queryName + "' query.");
 							}
 						}
-						queryString.setLength(0);
+						querySB.setLength(0);
 					}
 				}
 			}
@@ -71,5 +84,4 @@ public class QueryGroup {
 		return queries;
 	}
 
-	
 }

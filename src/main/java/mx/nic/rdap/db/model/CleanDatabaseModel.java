@@ -22,12 +22,21 @@ public class CleanDatabaseModel {
 
 	private static QueryGroup queryGroup = null;
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
 			throw new RuntimeException("Error loading query group");
 		}
+	}
+
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
 	}
 
 	public static void cleanServerDatabase(Boolean migrateUser, Connection rdapConnection) throws SQLException {
@@ -36,7 +45,7 @@ public class CleanDatabaseModel {
 		// the
 		// querys
 		for (String queryName : keys) {
-			try (PreparedStatement statement = rdapConnection.prepareStatement(queryGroup.getQuery(queryName));) {
+			try (PreparedStatement statement = rdapConnection.prepareStatement(getQueryGroup().getQuery(queryName));) {
 				logger.log(Level.INFO, "Excuting QUERY" + queryName);
 				statement.executeUpdate();
 			}

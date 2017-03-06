@@ -57,18 +57,28 @@ public class DomainModel {
 
 	private static final String SEARCH_BY_REGEX_NAME_WITH_ZONE = "searchByRegexNameWithZone";
 	private static final String SEARCH_BY_REGEX_NAME_WITHOUT_ZONE = "searchByRegexNameWithOutZone";
+	private static final String SEARCH_BY_REGEX_NAMESERVER_LDH_QUERY = "searchByRegexNsLdhName";
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
 			throw new RuntimeException("Error loading query group");
 		}
 	}
 
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
+	}
+
 	public static Long storeToDatabase(Domain domain, boolean useNameserverAsAttribute, Connection connection)
 			throws SQLException, RequiredValueNotFoundException, ObjectNotFoundException {
-		String query = queryGroup.getQuery(STORE_QUERY);
+		String query = getQueryGroup().getQuery(STORE_QUERY);
 		Long domainId;
 		isValidForStore((DomainDbObj) domain);
 		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
@@ -152,7 +162,7 @@ public class DomainModel {
 
 	private static void storeDomainIpNetworkRelationToDatabase(Long domainId, Long ipNetworkId, Connection connection)
 			throws SQLException {
-		String query = queryGroup.getQuery(STORE_IP_NETWORK_RELATION_QUERY);
+		String query = getQueryGroup().getQuery(STORE_IP_NETWORK_RELATION_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setLong(1, domainId);
 			statement.setLong(2, ipNetworkId);
@@ -163,7 +173,7 @@ public class DomainModel {
 
 	public static DomainDbObj findByLdhName(String name, Integer zoneId, boolean useNameserverAsDomainAttribute,
 			Connection connection) throws SQLException, ObjectNotFoundException {
-		String query = queryGroup.getQuery(GET_BY_LDH_QUERY);
+		String query = getQueryGroup().getQuery(GET_BY_LDH_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, IDN.toASCII(name));
 			statement.setString(2, IDN.toUnicode(name));
@@ -182,7 +192,7 @@ public class DomainModel {
 
 	public static Domain getDomainById(Long domainId, boolean useNameserverAsDomainAttribute, Connection connection)
 			throws SQLException, ObjectNotFoundException {
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(GET_BY_ID_QUERY))) {
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_ID_QUERY))) {
 			statement.setLong(1, domainId);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
@@ -198,7 +208,7 @@ public class DomainModel {
 
 	public static DomainDbObj getByHandle(String handle, boolean useNameserverAsDomainAttribute, Connection connection)
 			throws SQLException, ObjectNotFoundException {
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(GET_BY_HANDLE_QUERY))) {
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_HANDLE_QUERY))) {
 			statement.setString(1, handle);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
@@ -236,10 +246,10 @@ public class DomainModel {
 			zone = zone.replaceAll("\\*", "%");
 			if (isPartialName) {
 				name = name.replaceAll("\\*", "%");
-				query = queryGroup.getQuery(SEARCH_BY_PARTIAL_NAME_WITH_PARTIAL_ZONE_QUERY);
+				query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_NAME_WITH_PARTIAL_ZONE_QUERY);
 				query = Util.createDynamicQueryWithInClause(zoneIds.size(), query);
 			} else {
-				query = queryGroup.getQuery(SEARCH_BY_NAME_WITH_PARTIAL_ZONE_QUERY);
+				query = getQueryGroup().getQuery(SEARCH_BY_NAME_WITH_PARTIAL_ZONE_QUERY);
 				query = Util.createDynamicQueryWithInClause(zoneIds.size(), query);
 			}
 		} else {
@@ -250,9 +260,9 @@ public class DomainModel {
 
 			if (isPartialName) {
 				name = name.replaceAll("\\*", "%");
-				query = queryGroup.getQuery(SEARCH_BY_PARTIAL_NAME_WITH_ZONE_QUERY);
+				query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_NAME_WITH_ZONE_QUERY);
 			} else {
-				query = queryGroup.getQuery(SEARCH_BY_NAME_WITH_ZONE_QUERY);
+				query = getQueryGroup().getQuery(SEARCH_BY_NAME_WITH_ZONE_QUERY);
 			}
 		}
 
@@ -304,9 +314,9 @@ public class DomainModel {
 		String query;
 		if (domainName.contains("*")) {
 			domainName = domainName.replaceAll("\\*", "%");
-			query = queryGroup.getQuery(SEARCH_BY_PARTIAL_NAME_WITHOUT_ZONE_QUERY);
+			query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_NAME_WITHOUT_ZONE_QUERY);
 		} else {
-			query = queryGroup.getQuery(SEARCH_BY_NAME_WITHOUT_ZONE_QUERY);
+			query = getQueryGroup().getQuery(SEARCH_BY_NAME_WITHOUT_ZONE_QUERY);
 		}
 		return searchByName(domainName, resultLimit, useNameserverAsDomainAttribute, connection, query);
 	}
@@ -314,7 +324,7 @@ public class DomainModel {
 	public static SearchResultStruct<Domain> searchByRegexName(String regexName, Integer resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
 			throws SQLException, ObjectNotFoundException {
-		String query = queryGroup.getQuery(SEARCH_BY_REGEX_NAME_WITHOUT_ZONE);
+		String query = getQueryGroup().getQuery(SEARCH_BY_REGEX_NAME_WITHOUT_ZONE);
 		return searchByName(regexName, resultLimit, useNameserverAsDomainAttribute, connection, query);
 	}
 
@@ -325,7 +335,7 @@ public class DomainModel {
 		// Hack to know is there is more domains that the limit, used for
 		// notices
 		resultLimit = resultLimit + 1;
-		String query = queryGroup.getQuery(SEARCH_BY_REGEX_NAME_WITH_ZONE);
+		String query = getQueryGroup().getQuery(SEARCH_BY_REGEX_NAME_WITH_ZONE);
 		List<Integer> zoneIds = ZoneModel.getValidZoneIds();
 		query = Util.createDynamicQueryWithInClause(zoneIds.size(), query);
 
@@ -416,8 +426,15 @@ public class DomainModel {
 	public static SearchResultStruct<Domain> searchByNsLdhName(String name, Integer resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
 			throws SQLException, ObjectNotFoundException {
-		String query = queryGroup.getQuery(SEARCH_BY_NAMESERVER_LDH_QUERY);
+		String query = getQueryGroup().getQuery(SEARCH_BY_NAMESERVER_LDH_QUERY);
 		name = name.replace("*", "%");
+		return searchByNsLdhName(name, resultLimit, useNameserverAsDomainAttribute, connection, query);
+	}
+
+	public static SearchResultStruct<Domain> searchByRegexNsLdhName(String name, Integer resultLimit,
+			boolean useNameserverAsDomainAttribute, Connection connection)
+			throws SQLException, ObjectNotFoundException {
+		String query = getQueryGroup().getQuery(SEARCH_BY_REGEX_NAMESERVER_LDH_QUERY);
 		return searchByNsLdhName(name, resultLimit, useNameserverAsDomainAttribute, connection, query);
 	}
 
@@ -487,7 +504,7 @@ public class DomainModel {
 			ipAddress.setType(6);
 		}
 		try (PreparedStatement statement = connection
-				.prepareStatement(queryGroup.getQuery(SEARCH_BY_NAMESERVER_IP_QUERY))) {
+				.prepareStatement(getQueryGroup().getQuery(SEARCH_BY_NAMESERVER_IP_QUERY))) {
 			statement.setInt(1, ipAddress.getType());
 			statement.setString(2, ipAddress.getAddress().getHostAddress());
 			statement.setString(3, ipAddress.getAddress().getHostAddress());

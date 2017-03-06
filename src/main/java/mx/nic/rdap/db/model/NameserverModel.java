@@ -55,12 +55,22 @@ public class NameserverModel {
 	private static final String DOMAIN_STORE_QUERY = "storeDomainNameserversToDatabase";
 
 	private static final String SEARCH_BY_NAME_REGEX_QUERY = "searchByRegexName";
-	static {
+
+	public static void loadQueryGroup(String schema) {
 		try {
-			queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
 			throw new RuntimeException("Error loading query group");
 		}
+	}
+
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
 	}
 
 	private static void isValidForStore(Nameserver nameserver, boolean useNameserverAsAttribute)
@@ -80,7 +90,7 @@ public class NameserverModel {
 	public static void storeToDatabase(Nameserver nameserver, boolean useNameserverAsAttribute, Connection connection)
 			throws SQLException, RequiredValueNotFoundException {
 		isValidForStore(nameserver, useNameserverAsAttribute);
-		String query = queryGroup.getQuery(STORE_QUERY);
+		String query = getQueryGroup().getQuery(STORE_QUERY);
 		Long nameserverId = null;
 		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 			((NameserverDbObj) nameserver).storeToDatabase(statement);
@@ -124,7 +134,7 @@ public class NameserverModel {
 			return;
 		}
 
-		String query = queryGroup.getQuery(DOMAIN_STORE_QUERY);
+		String query = getQueryGroup().getQuery(DOMAIN_STORE_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			Long nameserverId;
 			for (Nameserver nameserver : nameservers) {
@@ -139,7 +149,7 @@ public class NameserverModel {
 
 	public static NameserverDbObj findByName(String name, Connection connection)
 			throws SQLException, ObjectNotFoundException {
-		String query = queryGroup.getQuery(FIND_BY_NAME_QUERY);
+		String query = getQueryGroup().getQuery(FIND_BY_NAME_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, IDN.toASCII(name));
 			statement.setString(2, IDN.toUnicode(name));
@@ -159,17 +169,17 @@ public class NameserverModel {
 			Connection connection) throws SQLException, ObjectNotFoundException {
 		String query = null;
 		if (namePattern.contains("*")) {// check if is a partial search
-			query = queryGroup.getQuery(SEARCH_BY_PARTIAL_NAME_QUERY);
+			query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_NAME_QUERY);
 			namePattern = namePattern.replace('*', '%');
 		} else {
-			query = queryGroup.getQuery(SEARCH_BY_NAME_QUERY);
+			query = getQueryGroup().getQuery(SEARCH_BY_NAME_QUERY);
 		}
 		return searchByName(namePattern, resultLimit, connection, query);
 	}
 
 	public static SearchResultStruct<Nameserver> searchByRegexName(String namePattern, Integer resultLimit,
 			Connection connection) throws SQLException, ObjectNotFoundException {
-		return searchByName(namePattern, resultLimit, connection, queryGroup.getQuery(SEARCH_BY_NAME_REGEX_QUERY));
+		return searchByName(namePattern, resultLimit, connection, getQueryGroup().getQuery(SEARCH_BY_NAME_REGEX_QUERY));
 	}
 
 	private static SearchResultStruct<Nameserver> searchByName(String namePattern, Integer resultLimit,
@@ -221,9 +231,9 @@ public class NameserverModel {
 		try {
 			InetAddress address = InetAddress.getByName(ipaddressPattern);
 			if (address instanceof Inet6Address) {
-				query = queryGroup.getQuery(SEARCH_BY_IP6_QUERY);
+				query = getQueryGroup().getQuery(SEARCH_BY_IP6_QUERY);
 			} else if (address instanceof Inet4Address) {
-				query = queryGroup.getQuery(SEARCH_BY_IP4_QUERY);
+				query = getQueryGroup().getQuery(SEARCH_BY_IP4_QUERY);
 			}
 		} catch (UnknownHostException e) {
 			throw new InvalidValueException("Requested ip is invalid.", "Ip", "Nameserver");
@@ -266,7 +276,7 @@ public class NameserverModel {
 	 */
 	public static List<Nameserver> getByDomainId(Long domainId, boolean useNameserverAsDomainAttribute,
 			Connection connection) throws SQLException {
-		String query = queryGroup.getQuery(DOMAIN_GET_QUERY);
+		String query = getQueryGroup().getQuery(DOMAIN_GET_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setLong(1, domainId);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
@@ -318,7 +328,7 @@ public class NameserverModel {
 	}
 
 	public static List<Nameserver> getAll(Connection connection) throws SQLException {
-		String query = queryGroup.getQuery(GET_ALL_QUERY);
+		String query = getQueryGroup().getQuery(GET_ALL_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
@@ -341,7 +351,7 @@ public class NameserverModel {
 		if (handle == null || handle.isEmpty()) {
 			throw new RequiredValueNotFoundException("handle", "Nameserver");
 		}
-		String query = queryGroup.getQuery(GET_BY_HANDLE_QUERY);
+		String query = getQueryGroup().getQuery(GET_BY_HANDLE_QUERY);
 		try (PreparedStatement statement = rdapConnection.prepareStatement(query)) {
 			statement.setString(1, handle);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());

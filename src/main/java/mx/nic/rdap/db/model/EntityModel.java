@@ -56,16 +56,25 @@ public class EntityModel {
 	private final static String SEARCH_BY_HANDLE_REGEX_QUERY = "searchByRegexHandle";
 	private final static String SEARCH_BY_NAME_REGEX_QUERY = "searchByRegexName";
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
-			throw new RuntimeException("Error while loading query group on " + EntityModel.class.getName(), e);
+			throw new RuntimeException("Error loading query group");
 		}
 	}
 
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
+	}
+
 	public static Long getIdByHandle(String entityHandle, Connection connection) throws SQLException {
-		String query = queryGroup.getQuery(GET_ID_BY_HANDLE_QUERY);
+		String query = getQueryGroup().getQuery(GET_ID_BY_HANDLE_QUERY);
 		Long entId = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setString(1, entityHandle);
@@ -91,7 +100,7 @@ public class EntityModel {
 			return entityId;
 		}
 
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(STORE_QUERY),
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_QUERY),
 				Statement.RETURN_GENERATED_KEYS);) {
 			((EntityDbObj) entity).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
@@ -145,7 +154,7 @@ public class EntityModel {
 
 	public static Entity getById(Long entityId, Connection connection) throws SQLException, ObjectNotFoundException {
 		Entity entResult = null;
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(GET_BY_ID_QUERY));) {
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_ID_QUERY));) {
 			statement.setLong(1, entityId);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();
@@ -159,7 +168,8 @@ public class EntityModel {
 	public static EntityDbObj getByHandle(String entityHandle, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		EntityDbObj entResult = null;
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(GET_BY_HANDLE_QUERY));) {
+		try (PreparedStatement statement = connection
+				.prepareStatement(getQueryGroup().getQuery(GET_BY_HANDLE_QUERY));) {
 			statement.setString(1, entityHandle);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();
@@ -273,7 +283,7 @@ public class EntityModel {
 	}
 
 	private static List<Entity> getEntitiesById(Long id, Connection connection, String getQueryId) throws SQLException {
-		String query = queryGroup.getQuery(getQueryId);
+		String query = getQueryGroup().getQuery(getQueryId);
 		List<Entity> result = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setLong(1, id);
@@ -324,10 +334,10 @@ public class EntityModel {
 			throws SQLException, ObjectNotFoundException {
 		String query = null;
 		if (handle.contains("*")) {
-			query = queryGroup.getQuery(SEARCH_BY_PARTIAL_HANDLE_QUERY);
+			query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_HANDLE_QUERY);
 			handle = handle.replace("*", "%");
 		} else {
-			query = queryGroup.getQuery(SEARCH_BY_HANDLE_QUERY);
+			query = getQueryGroup().getQuery(SEARCH_BY_HANDLE_QUERY);
 		}
 
 		return searchBy(handle, resultLimit, connection, query);
@@ -338,9 +348,9 @@ public class EntityModel {
 		String query = null;
 		if (vcardName.contains("*")) {
 			vcardName = vcardName.replace("*", "%");
-			query = queryGroup.getQuery(SEARCH_BY_PARTIAL_NAME_QUERY);
+			query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_NAME_QUERY);
 		} else {
-			query = queryGroup.getQuery(SEARCH_BY_NAME_QUERY);
+			query = getQueryGroup().getQuery(SEARCH_BY_NAME_QUERY);
 		}
 
 		return searchBy(vcardName, resultLimit, connection, query);
@@ -348,12 +358,12 @@ public class EntityModel {
 
 	public static SearchResultStruct<Entity> searchByRegexHandle(String regexHandle, Integer resultLimit,
 			Connection connection) throws SQLException, ObjectNotFoundException {
-		return searchBy(regexHandle, resultLimit, connection, queryGroup.getQuery(SEARCH_BY_HANDLE_REGEX_QUERY));
+		return searchBy(regexHandle, resultLimit, connection, getQueryGroup().getQuery(SEARCH_BY_HANDLE_REGEX_QUERY));
 	}
 
 	public static SearchResultStruct<Entity> searchByRegexName(String regexName, Integer resultLimit,
 			Connection connection) throws SQLException, ObjectNotFoundException {
-		return searchBy(regexName, resultLimit, connection, queryGroup.getQuery(SEARCH_BY_NAME_REGEX_QUERY));
+		return searchBy(regexName, resultLimit, connection, getQueryGroup().getQuery(SEARCH_BY_NAME_REGEX_QUERY));
 	}
 
 	private static SearchResultStruct<Entity> searchBy(String criteria, Integer resultLimit, Connection connection,

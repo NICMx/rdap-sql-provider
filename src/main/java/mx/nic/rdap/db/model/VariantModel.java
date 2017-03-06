@@ -38,12 +38,21 @@ public class VariantModel {
 
 	protected static QueryGroup queryGroup = null;
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
 			throw new RuntimeException("Error loading query group");
 		}
+	}
+
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
 	}
 
 	public static void storeAllToDatabase(List<Variant> variants, Long domainId, Connection connection)
@@ -56,7 +65,7 @@ public class VariantModel {
 
 	public static Long storeToDatabase(Variant variant, Connection connection) throws SQLException {
 		Long variantInsertedId = null;
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(STORE_QUERY),
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_QUERY),
 				Statement.RETURN_GENERATED_KEYS)) {
 			((VariantDbObj) variant).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
@@ -76,7 +85,7 @@ public class VariantModel {
 	public static List<Variant> getByDomainId(Long domainId, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		List<Variant> variants = null;
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(GET_BY_DOMAIN_QUERY))) {
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_DOMAIN_QUERY))) {
 			statement.setLong(1, domainId);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			ResultSet resultSet = statement.executeQuery();
@@ -102,7 +111,7 @@ public class VariantModel {
 
 	public static Variant getById(Long variantId, Connection connection) throws SQLException, ObjectNotFoundException {
 		Variant result = null;
-		String query = queryGroup.getQuery(GET_BY_ID_QUERY);
+		String query = getQueryGroup().getQuery(GET_BY_ID_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setLong(1, variantId);
 			logger.log(Level.INFO, "Executing QUERY" + statement.toString());
@@ -124,7 +133,7 @@ public class VariantModel {
 			throws SQLException, ObjectNotFoundException {
 		Long variantId = variant.getId();
 		try (PreparedStatement statement = connection
-				.prepareStatement(queryGroup.getQuery(GET_RELATION_BY_VARIANT_QUERY))) {
+				.prepareStatement(getQueryGroup().getQuery(GET_RELATION_BY_VARIANT_QUERY))) {
 			statement.setLong(1, variantId);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
@@ -146,7 +155,7 @@ public class VariantModel {
 			return;
 
 		Long variantId = variant.getId();
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(STORE_RELATION_QUERY))) {
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_RELATION_QUERY))) {
 			for (VariantRelation relation : variant.getRelations()) {
 				statement.setInt(1, relation.getId());
 				statement.setLong(2, variantId);
@@ -160,7 +169,7 @@ public class VariantModel {
 		if (variant.getVariantNames().isEmpty())
 			return;
 
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(STORE_NAMES_QUERY))) {
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_NAMES_QUERY))) {
 			Long variantId = variant.getId();
 			for (VariantName variantName : variant.getVariantNames()) {
 				statement.setString(1, variantName.getPunycode());
@@ -174,7 +183,7 @@ public class VariantModel {
 	private static void setVariantNames(Variant variant, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		try (PreparedStatement statement = connection
-				.prepareStatement(queryGroup.getQuery(GET_NAMES_BY_VARIANT_QUERY))) {
+				.prepareStatement(getQueryGroup().getQuery(GET_NAMES_BY_VARIANT_QUERY))) {
 			statement.setLong(1, variant.getId());
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();

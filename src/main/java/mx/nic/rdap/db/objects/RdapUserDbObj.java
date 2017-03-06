@@ -23,7 +23,6 @@ public class RdapUserDbObj extends RdapUser implements DatabaseObject {
 	}
 
 	public RdapUserDbObj() {
-		// TODO Auto-generated constructor stub
 	}
 
 	/*

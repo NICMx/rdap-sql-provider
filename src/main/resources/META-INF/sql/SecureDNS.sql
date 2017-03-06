@@ -1,8 +1,8 @@
 #storeToDatabase
-INSERT INTO rdap.secure_dns VALUES (null, ?, ?, ?, ?);
+INSERT INTO {schema}.secure_dns VALUES (null, ?, ?, ?, ?);
 
 #getByDomain
-SELECT * FROM rdap.secure_dns s WHERE s.dom_id = ?;
+SELECT * FROM {schema}.secure_dns s WHERE s.dom_id = ?;
 
 #deleteFromDatabase
-DELETE FROM rdap.secure_dns WHERE dom_id=?;
+DELETE FROM {schema}.secure_dns WHERE dom_id=?;

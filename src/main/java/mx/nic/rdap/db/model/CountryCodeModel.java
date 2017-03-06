@@ -28,13 +28,21 @@ public class CountryCodeModel {
 	private static Map<String, Integer> idByCountryName;
 	private static final String GET_ALL_QUERY = "getAll";
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
-			throw new RuntimeException("Error loading query group", e);
+			throw new RuntimeException("Error loading query group");
 		}
+	}
 
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
 	}
 
 	/**
@@ -45,7 +53,7 @@ public class CountryCodeModel {
 		countryNameById = new HashMap<Integer, String>();
 		idByCountryName = new HashMap<String, Integer>();
 
-		String query = queryGroup.getQuery(GET_ALL_QUERY);
+		String query = getQueryGroup().getQuery(GET_ALL_QUERY);
 
 		PreparedStatement statement = con.prepareStatement(query);
 		ResultSet rs = statement.executeQuery();

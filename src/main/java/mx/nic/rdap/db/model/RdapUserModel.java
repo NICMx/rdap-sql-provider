@@ -30,12 +30,21 @@ public class RdapUserModel {
 
 	private static QueryGroup queryGroup = null;
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
 			throw new RuntimeException("Error loading query group");
 		}
+	}
+
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
 	}
 
 	/**
@@ -54,7 +63,7 @@ public class RdapUserModel {
 	public static void storeToDatabase(RdapUserDbObj user, Connection connection)
 			throws SQLException, RequiredValueNotFoundException {
 		isValidForStore(user);
-		String query = queryGroup.getQuery(STORE_QUERY);
+		String query = getQueryGroup().getQuery(STORE_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			user.storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
@@ -65,7 +74,7 @@ public class RdapUserModel {
 
 	public static RdapUserDbObj getByName(String name, Connection connection)
 			throws SQLException, ObjectNotFoundException {
-		String query = queryGroup.getQuery(GET_BY_NAME_QUERY);
+		String query = getQueryGroup().getQuery(GET_BY_NAME_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, name);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
@@ -85,13 +94,13 @@ public class RdapUserModel {
 	 * 
 	 */
 	public static void cleanRdapUserDatabase(Connection connection) throws SQLException {
-		String query = queryGroup.getQuery(DELETE_ROLES_QUERY);
+		String query = getQueryGroup().getQuery(DELETE_ROLES_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			statement.executeUpdate();
 
 		}
-		query = queryGroup.getQuery(DELETE_QUERY);
+		query = getQueryGroup().getQuery(DELETE_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			statement.executeUpdate();

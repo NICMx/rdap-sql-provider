@@ -35,12 +35,21 @@ public class PublicIdModel {
 	private static final String ENTITY_STORE_QUERY = "storeEntityPublicIdsToDatabase";
 	private static final String DOMAIN_STORE_QUERY = "storeDomainPublicIdsToDatabase";
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
 			throw new RuntimeException("Error loading query group");
 		}
+	}
+
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
 	}
 
 	public static void storeAllToDatabase(List<PublicId> publicIds, Connection connection) throws SQLException {
@@ -50,7 +59,7 @@ public class PublicIdModel {
 	}
 
 	public static Long storeToDatabase(PublicId publicId, Connection connection) throws SQLException {
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(STORE_QUERY),
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_QUERY),
 				Statement.RETURN_GENERATED_KEYS);) {
 			((PublicIdDbObj) publicId).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
@@ -70,7 +79,7 @@ public class PublicIdModel {
 		if (publicIds.isEmpty())
 			return;
 
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(query))) {
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(query))) {
 			for (PublicId publicId : publicIds) {
 				Long resultId = PublicIdModel.storeToDatabase(publicId, connection);
 				statement.setLong(1, id);
@@ -92,7 +101,7 @@ public class PublicIdModel {
 	}
 
 	private static List<PublicId> getBy(Long entityId, Connection connection, String query) throws SQLException {
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(query))) {
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(query))) {
 			statement.setLong(1, entityId);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {

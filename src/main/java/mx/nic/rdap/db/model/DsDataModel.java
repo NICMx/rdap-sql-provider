@@ -31,17 +31,26 @@ public class DsDataModel {
 
 	protected static QueryGroup queryGroup = null;
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
-			throw new RuntimeException("Error loading query group.");
+			throw new RuntimeException("Error loading query group");
 		}
+	}
+
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
 	}
 
 	public static long storeToDatabase(DsData dsData, Connection connection)
 			throws SQLException, RequiredValueNotFoundException {
-		String query = queryGroup.getQuery(STORE_QUERY);
+		String query = getQueryGroup().getQuery(STORE_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 			((DsDataDbObj) dsData).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
@@ -77,7 +86,7 @@ public class DsDataModel {
 	 * 
 	 */
 	public static List<DsData> getBySecureDnsId(Long secureDnsId, Connection connection) throws SQLException {
-		String query = queryGroup.getQuery(GET_QUERY);
+		String query = getQueryGroup().getQuery(GET_QUERY);
 		List<DsData> resultList = null;
 
 		try (PreparedStatement statement = connection.prepareStatement(query);) { // QUERY

@@ -41,12 +41,21 @@ public class RolModel {
 
 	private static QueryGroup queryGroup = null;
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
-			throw new RuntimeException("Error while loading query group on " + EntityModel.class.getName(), e);
+			throw new RuntimeException("Error loading query group");
 		}
+	}
+
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
 	}
 
 	public static List<Rol> getDomainEntityRol(Long domainId, Long entityId, Connection connection)
@@ -75,7 +84,7 @@ public class RolModel {
 
 	private static List<Rol> getNestedEntityRol(Long ownerId, Long nestedEntityId, Connection connection,
 			String getQuery) throws SQLException {
-		String query = queryGroup.getQuery(getQuery);
+		String query = getQueryGroup().getQuery(getQuery);
 		List<Rol> roles = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setLong(1, ownerId);
@@ -129,7 +138,7 @@ public class RolModel {
 		if (entities.isEmpty())
 			return;
 
-		String query = queryGroup.getQuery(storeQuery);
+		String query = getQueryGroup().getQuery(storeQuery);
 
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setLong(1, ownerId);
@@ -150,7 +159,7 @@ public class RolModel {
 			return;
 		}
 
-		String query = queryGroup.getQuery(ENTITY_STORE_QUERY);
+		String query = getQueryGroup().getQuery(ENTITY_STORE_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			for (Rol rol : mainEntity.getRoles()) {
 				for (Entity nestedEntity : nestedEntities) {
@@ -170,7 +179,7 @@ public class RolModel {
 		if (nestedEntitiesId.isEmpty()) {
 			return Collections.emptyList();
 		}
-		String query = queryGroup.getQuery(MAIN_ENTITY_GET_QUERY);
+		String query = getQueryGroup().getQuery(MAIN_ENTITY_GET_QUERY);
 
 		StringBuilder sb = new StringBuilder();
 		int i;

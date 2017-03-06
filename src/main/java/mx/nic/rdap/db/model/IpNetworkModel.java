@@ -47,12 +47,21 @@ public class IpNetworkModel {
 	private static final String GET_BY_DOMAIN_ID = "getByDomainId";
 	private static final String GET_BY_HANDLE = "getByHandle";
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
-			throw new RuntimeException("Error while loading query group on " + IpNetworkModel.class.getName(), e);
+			throw new RuntimeException("Error loading query group");
 		}
+	}
+
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
 	}
 
 	private static void isValidForStore(IpNetwork ipNetwork) throws RdapDataAccessException {
@@ -91,7 +100,7 @@ public class IpNetworkModel {
 	public static Long storeToDatabase(IpNetwork ipNetwork, Connection connection)
 			throws RdapDataAccessException, SQLException {
 		isValidForStore(ipNetwork);
-		String query = queryGroup.getQuery(STORE_TO_DATABASE);
+		String query = getQueryGroup().getQuery(STORE_TO_DATABASE);
 
 		Long resultId = null;
 		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);) {
@@ -165,7 +174,7 @@ public class IpNetworkModel {
 		BigInteger start = IpUtils.addressToNumber(inetAddress);
 		BigInteger end = IpUtils.addressToNumber((Inet4Address) lastAddressFromNetwork);
 
-		String query = queryGroup.getQuery(GET_BY_IPV4);
+		String query = getQueryGroup().getQuery(GET_BY_IPV4);
 		IpNetworkDbObj ipDao = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setInt(1, cidr);
@@ -194,7 +203,7 @@ public class IpNetworkModel {
 		BigInteger endUpperPart = IpUtils.inet6AddressToUpperPart((Inet6Address) lastAddressFromNetwork);
 		BigInteger endLowerPart = IpUtils.inet6AddressToLowerPart((Inet6Address) lastAddressFromNetwork);
 
-		String query = queryGroup.getQuery(GET_BY_IPV6);
+		String query = getQueryGroup().getQuery(GET_BY_IPV6);
 		IpNetworkDbObj ipDao = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setInt(1, cidr);
@@ -265,7 +274,7 @@ public class IpNetworkModel {
 
 	public static IpNetwork getByDomainId(long domainId, Connection connection)
 			throws SQLException, ObjectNotFoundException {
-		String query = queryGroup.getQuery(GET_BY_DOMAIN_ID);
+		String query = getQueryGroup().getQuery(GET_BY_DOMAIN_ID);
 		IpNetworkDbObj result = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setLong(1, domainId);
@@ -289,7 +298,7 @@ public class IpNetworkModel {
 
 	private static List<IpNetwork> getByRdapObjectId(long id, Connection connection, String getQueryId)
 			throws SQLException {
-		String query = queryGroup.getQuery(getQueryId);
+		String query = getQueryGroup().getQuery(getQueryId);
 		List<IpNetwork> results = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setLong(1, id);
@@ -317,7 +326,7 @@ public class IpNetworkModel {
 
 	public static IpNetworkDbObj getByHandle(String handle, Connection connection)
 			throws SQLException, ObjectNotFoundException {
-		String query = queryGroup.getQuery(GET_BY_HANDLE);
+		String query = getQueryGroup().getQuery(GET_BY_HANDLE);
 		IpNetworkDbObj result = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setString(1, handle);

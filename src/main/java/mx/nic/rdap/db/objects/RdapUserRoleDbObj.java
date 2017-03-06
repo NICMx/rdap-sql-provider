@@ -22,7 +22,7 @@ public class RdapUserRoleDbObj extends RdapUserRole implements DatabaseObject {
 	}
 
 	public RdapUserRoleDbObj() {
-		// TODO Auto-generated constructor stub
+		// no code;
 	}
 
 	/*

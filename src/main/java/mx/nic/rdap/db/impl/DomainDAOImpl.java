@@ -133,6 +133,19 @@ public class DomainDAOImpl implements DomainDAO {
 		}
 		return domains;
 	}
+	
+	@Override
+	public SearchResultStruct<Domain> searchByRegexNsName(String regexNsName, Integer resultLimit,
+			boolean useNameserverAsDomainAttribute) throws RdapDataAccessException {
+		try (Connection connection = DatabaseSession.getRdapConnection()) {
+			return DomainModel.searchByRegexNsLdhName(regexNsName, resultLimit, useNameserverAsDomainAttribute,
+					connection);
+		} catch (SQLSyntaxErrorException e) {
+			throw new InvalidValueException(e.getMessage(), e);
+		} catch (SQLException e) {
+			throw new RdapDataAccessException(e);
+		}
+	}
 
 	@Override
 	public SearchResultStruct<Domain> searchByRegexNsIp(String ip, Integer resultLimit, boolean useNsAsAttribute)

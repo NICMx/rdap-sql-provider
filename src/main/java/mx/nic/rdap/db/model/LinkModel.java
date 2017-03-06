@@ -58,12 +58,21 @@ public class LinkModel {
 	private static final String REMARK_DELETE_QUERY = "deleteRemarkLinksRelation";
 	private static final String EVENTS_DELETE_QUERY = "deleteEventLinksRelation";
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			LinkModel.queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
 			throw new RuntimeException("Error loading query group");
 		}
+	}
+
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
 	}
 
 	/**
@@ -84,7 +93,7 @@ public class LinkModel {
 	public static Long storeToDatabase(Link link, Connection connection)
 			throws SQLException, RequiredValueNotFoundException {
 		isValidForStore(link);
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery("storeToDatabase"),
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery("storeToDatabase"),
 				Statement.RETURN_GENERATED_KEYS)) {
 			((LinkDbObj) link).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
@@ -143,7 +152,7 @@ public class LinkModel {
 		if (links.isEmpty())
 			return;
 
-		String query = queryGroup.getQuery(storeQueryId);
+		String query = getQueryGroup().getQuery(storeQueryId);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			for (Link link : links) {
 				Long linkId = LinkModel.storeToDatabase(link, connection);
@@ -189,7 +198,7 @@ public class LinkModel {
 
 	private static List<LinkDbObj> getByRelationId(Long id, Connection connection, String queryGetId)
 			throws SQLException {
-		String query = queryGroup.getQuery(queryGetId);
+		String query = getQueryGroup().getQuery(queryGetId);
 		List<LinkDbObj> result = null;
 
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -212,7 +221,7 @@ public class LinkModel {
 	}
 
 	public static List<Link> getAll(Connection connection) throws SQLException {
-		String query = queryGroup.getQuery("getAll");
+		String query = getQueryGroup().getQuery("getAll");
 		List<Link> result = null;
 
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -236,7 +245,7 @@ public class LinkModel {
 	public static void updateEntityLinksInDatabase(List<Link> previousLinks, List<Link> links, Long entityId,
 			Connection connection) throws SQLException, RequiredValueNotFoundException {
 		if (!previousLinks.isEmpty()) {
-			deleteLinksRelationByLinkId(queryGroup.getQuery(ENTITY_DELETE_QUERY), previousLinks, connection);
+			deleteLinksRelationByLinkId(getQueryGroup().getQuery(ENTITY_DELETE_QUERY), previousLinks, connection);
 			deletePreviousLinks(previousLinks, connection);
 		}
 		if (!links.isEmpty())
@@ -246,7 +255,7 @@ public class LinkModel {
 	public static void updateNameserverLinksInDatabase(List<Link> previousLinks, List<Link> links, Long nameserverId,
 			Connection connection) throws SQLException, RequiredValueNotFoundException {
 		if (!previousLinks.isEmpty()) {
-			deleteLinksRelationByLinkId(queryGroup.getQuery(NAMESERVER_DELETE_QUERY), previousLinks, connection);
+			deleteLinksRelationByLinkId(getQueryGroup().getQuery(NAMESERVER_DELETE_QUERY), previousLinks, connection);
 			deletePreviousLinks(previousLinks, connection);
 		}
 		if (!links.isEmpty())
@@ -256,7 +265,7 @@ public class LinkModel {
 	public static void updateDSLinksInDatabase(List<Link> previousLinks, List<Link> links, Long dsId,
 			Connection connection) throws SQLException, RequiredValueNotFoundException {
 		if (!previousLinks.isEmpty()) {
-			deleteLinksRelationByLinkId(queryGroup.getQuery(DS_DELETE_QUERY), previousLinks, connection);
+			deleteLinksRelationByLinkId(getQueryGroup().getQuery(DS_DELETE_QUERY), previousLinks, connection);
 			deletePreviousLinks(previousLinks, connection);
 		}
 		if (!links.isEmpty())
@@ -266,7 +275,7 @@ public class LinkModel {
 	public static void updateDomainLinksInDatabase(List<Link> previousLinks, List<Link> links, Long domainId,
 			Connection connection) throws SQLException, RequiredValueNotFoundException {
 		if (!previousLinks.isEmpty()) {
-			deleteLinksRelationByLinkId(queryGroup.getQuery(DOMAIN_DELETE_QUERY), previousLinks, connection);
+			deleteLinksRelationByLinkId(getQueryGroup().getQuery(DOMAIN_DELETE_QUERY), previousLinks, connection);
 			deletePreviousLinks(previousLinks, connection);
 		}
 		if (!links.isEmpty())
@@ -276,7 +285,7 @@ public class LinkModel {
 	public static void updateIpNetworkLinksInDatabase(List<Link> previousLinks, List<Link> links, Long ipNetworkId,
 			Connection connection) throws SQLException, RequiredValueNotFoundException {
 		if (!previousLinks.isEmpty()) {
-			deleteLinksRelationByLinkId(queryGroup.getQuery(IP_NETWORK_DELETE_QUERY), previousLinks, connection);
+			deleteLinksRelationByLinkId(getQueryGroup().getQuery(IP_NETWORK_DELETE_QUERY), previousLinks, connection);
 			deletePreviousLinks(previousLinks, connection);
 		}
 		if (!links.isEmpty())
@@ -286,7 +295,7 @@ public class LinkModel {
 	public static void updateAutnumLinksInDatabase(List<Link> previousLinks, List<Link> links, Long autnumId,
 			Connection connection) throws SQLException, RequiredValueNotFoundException {
 		if (!previousLinks.isEmpty()) {
-			deleteLinksRelationByLinkId(queryGroup.getQuery(AUTNUM_DELETE_QUERY), previousLinks, connection);
+			deleteLinksRelationByLinkId(getQueryGroup().getQuery(AUTNUM_DELETE_QUERY), previousLinks, connection);
 			deletePreviousLinks(previousLinks, connection);
 		}
 		if (!links.isEmpty())
@@ -296,14 +305,14 @@ public class LinkModel {
 	public static void deleteEventLinksData(List<Link> previousLinks, Connection connection)
 			throws SQLException, RequiredValueNotFoundException {
 		if (!previousLinks.isEmpty()) {
-			deleteLinksRelationByLinkId(queryGroup.getQuery(EVENTS_DELETE_QUERY), previousLinks, connection);
+			deleteLinksRelationByLinkId(getQueryGroup().getQuery(EVENTS_DELETE_QUERY), previousLinks, connection);
 			deletePreviousLinks(previousLinks, connection);
 		}
 	}
 
 	public static void deleteRemarksLinksData(List<Link> previousLinks, Connection connection) throws SQLException {
 		if (!previousLinks.isEmpty()) {
-			deleteLinksRelationByLinkId(queryGroup.getQuery(REMARK_DELETE_QUERY), previousLinks, connection);
+			deleteLinksRelationByLinkId(getQueryGroup().getQuery(REMARK_DELETE_QUERY), previousLinks, connection);
 			deletePreviousLinks(previousLinks, connection);
 		}
 	}
@@ -331,7 +340,7 @@ public class LinkModel {
 		for (Link link : previousLinks) {
 			ids.add(link.getId());
 		}
-		String query = queryGroup.getQuery(DELETE_QUERY);
+		String query = getQueryGroup().getQuery(DELETE_QUERY);
 		String dynamicQuery = Util.createDynamicQueryWithInClause(ids.size(), query);
 
 		try (PreparedStatement statement = connection.prepareStatement(dynamicQuery)) {

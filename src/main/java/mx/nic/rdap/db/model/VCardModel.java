@@ -34,18 +34,27 @@ public class VCardModel {
 	private final static String GET_QUERY = "getById";
 	private final static String GET_BY_ENTITY_QUERY = "getByEntityId";
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
-			throw new RuntimeException("Error while loading query group on " + VCardModel.class.getName(), e);
+			throw new RuntimeException("Error loading query group");
 		}
+	}
+
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
 	}
 
 	public static long storeToDatabase(VCard vCard, Connection connection) throws SQLException {
 		long vCardId;
 
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(STORE_QUERY),
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_QUERY),
 				Statement.RETURN_GENERATED_KEYS);) {
 			((VCardDbObj) vCard).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
@@ -70,7 +79,7 @@ public class VCardModel {
 		if (vCardList.isEmpty())
 			return;
 
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(STORE_ENTITY_CONTACT_QUERY),
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_ENTITY_CONTACT_QUERY),
 				Statement.RETURN_GENERATED_KEYS);) {
 			for (VCard vCard : vCardList) {
 				statement.setLong(1, registrarId);
@@ -89,7 +98,7 @@ public class VCardModel {
 	 */
 	public static VCard getById(Long vCardId, Connection connection) throws SQLException, ObjectNotFoundException {
 		VCard vCardResult = null;
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(GET_QUERY));) {
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_QUERY));) {
 			statement.setLong(1, vCardId);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();
@@ -111,7 +120,7 @@ public class VCardModel {
 	public static List<VCard> getByEntityId(Long registrarId, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		List<VCard> vCardResults = null;
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(GET_BY_ENTITY_QUERY));) {
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_ENTITY_QUERY));) {
 			statement.setLong(1, registrarId);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();

@@ -25,12 +25,21 @@ public class RdapUserRoleModel {
 	private final static String GET_QUERY = "getByUserName";
 	private static QueryGroup queryGroup = null;
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
 			throw new RuntimeException("Error loading query group");
 		}
+	}
+
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
 	}
 
 	/**
@@ -46,7 +55,7 @@ public class RdapUserRoleModel {
 	public static void storeRdapUserRoleToDatabase(RdapUserRoleDbObj userRole, Connection connection)
 			throws RequiredValueNotFoundException, SQLException {
 		isValidForStore(userRole);
-		String query = queryGroup.getQuery(STORE_QUERY);
+		String query = getQueryGroup().getQuery(STORE_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			userRole.storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
@@ -56,7 +65,7 @@ public class RdapUserRoleModel {
 
 	public static RdapUserRoleDbObj getByUserName(String userName, Connection connection)
 			throws SQLException, ObjectNotFoundException {
-		String query = queryGroup.getQuery(GET_QUERY);
+		String query = getQueryGroup().getQuery(GET_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, userName);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());

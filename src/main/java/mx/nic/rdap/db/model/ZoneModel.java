@@ -44,13 +44,21 @@ public class ZoneModel {
 	private static final String IS_REVERSE_IPV4_ENABLED_KEY = "is_reverse_ipv4_enabled";
 	private static final String IS_REVERSE_IPV6_ENABLED_KEY = "is_reverse_ipv6_enabled";
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
-			throw new RuntimeException("Error loading query group", e);
+			throw new RuntimeException("Error loading query group");
 		}
+	}
 
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
 	}
 
 	/**
@@ -115,7 +123,7 @@ public class ZoneModel {
 		zoneById = new HashMap<Integer, String>();
 		idByZone = new HashMap<String, Integer>();
 
-		String query = queryGroup.getQuery(GET_ALL_QUERY);
+		String query = getQueryGroup().getQuery(GET_ALL_QUERY);
 
 		PreparedStatement statement = con.prepareStatement(query);
 		ResultSet rs = statement.executeQuery();
@@ -139,7 +147,7 @@ public class ZoneModel {
 			return idByZoneName;
 		}
 
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(STORE_QUERY),
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_QUERY),
 				Statement.RETURN_GENERATED_KEYS)) {
 			statement.setString(1, zoneName);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());

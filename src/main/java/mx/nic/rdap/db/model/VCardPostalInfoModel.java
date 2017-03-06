@@ -30,12 +30,21 @@ public class VCardPostalInfoModel {
 	private final static String GET_BY_VCARD_QUERY = "getByVCardId";
 	protected static QueryGroup queryGroup = null;
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
-			throw new RuntimeException("Error while loading query group on " + VCardPostalInfoModel.class.getName(), e);
+			throw new RuntimeException("Error loading query group");
 		}
+	}
+
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
 	}
 
 	/**
@@ -45,7 +54,7 @@ public class VCardPostalInfoModel {
 	public static long storeToDatabase(VCardPostalInfo vCardPostalInfo, Connection connection) throws SQLException {
 		long insertedId;
 
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(STORE_QUERY),
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_QUERY),
 				Statement.RETURN_GENERATED_KEYS);) {
 			((VCardPostalInfoDbObj) vCardPostalInfo).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
@@ -69,7 +78,7 @@ public class VCardPostalInfoModel {
 	public static VCardPostalInfo getById(Long vCardPostalInfoId, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		VCardPostalInfo vCardPostalInfoResult = null;
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(GET_QUERY));) {
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_QUERY));) {
 			statement.setLong(1, vCardPostalInfoId);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();
@@ -87,7 +96,7 @@ public class VCardPostalInfoModel {
 	public static List<VCardPostalInfo> getByVCardId(Long vCardId, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		List<VCardPostalInfo> vCardPostalInfoResult = null;
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(GET_BY_VCARD_QUERY));) {
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_VCARD_QUERY));) {
 			statement.setLong(1, vCardId);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();

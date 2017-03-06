@@ -1,20 +1,20 @@
 #storeToDatabase
-INSERT INTO rdap.vcard VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?);
+INSERT INTO {schema}.vcard VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?);
 
 #storeEntityContact
-INSERT INTO rdap.entity_contact VALUES (?, ?);
+INSERT INTO {schema}.entity_contact VALUES (?, ?);
 
 #getById
-SELECT * FROM rdap.vcard v WHERE v.vca_id = ?;
+SELECT * FROM {schema}.vcard v WHERE v.vca_id = ?;
 
 #getAll
-SELECT * FROM rdap.vcard ORDER BY 1 ASC;
+SELECT * FROM {schema}.vcard ORDER BY 1 ASC;
 
 #getByEntityId
-SELECT vca.* FROM rdap.vcard vca JOIN rdap.entity_contact eco ON eco.vca_id = vca.vca_id WHERE eco.ent_id = ?;
+SELECT vca.* FROM {schema}.vcard vca JOIN {schema}.entity_contact eco ON eco.vca_id = vca.vca_id WHERE eco.ent_id = ?;
 
 #deleteById
-DELETE FROM rdap.vcard WHERE vca_id IN (?);
+DELETE FROM {schema}.vcard WHERE vca_id IN (?);
 
 #deleteRegistrarContact
-DELETE FROM rdap.entity_contact WHERE ent_id=?;
+DELETE FROM {schema}.entity_contact WHERE ent_id=?;

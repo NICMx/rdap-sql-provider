@@ -30,12 +30,21 @@ public class RemarkDescriptionModel {
 
 	protected static QueryGroup queryGroup = null;
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			RemarkDescriptionModel.queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
 			throw new RuntimeException("Error loading query group");
 		}
+	}
+
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
 	}
 
 	public static void storeAllToDatabase(List<RemarkDescription> descriptions, Long remarkInsertedId,
@@ -47,7 +56,7 @@ public class RemarkDescriptionModel {
 	}
 
 	public static void storeToDatabase(RemarkDescription remarkDescription, Connection connection) throws SQLException {
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(INSERT_QUERY))) {
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(INSERT_QUERY))) {
 			((RemarkDescriptionDbObj) remarkDescription).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			statement.executeUpdate();
@@ -56,7 +65,7 @@ public class RemarkDescriptionModel {
 
 	public static List<RemarkDescription> findByRemarkId(Long id, Connection connection)
 			throws SQLException, ObjectNotFoundException {
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(GET_QUERY))) {
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_QUERY))) {
 			statement.setLong(1, id);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {

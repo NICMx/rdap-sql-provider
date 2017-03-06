@@ -38,12 +38,21 @@ public class StatusModel {
 	private static final String AUTNUM_GET_QUERY = "getByAutnumid";
 	private static final String IP_NETWORK_GET_QUERY = "getByIpNetworkId";
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			StatusModel.queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
 			throw new RuntimeException("Error loading query group");
 		}
+	}
+
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
 	}
 
 	public static void storeNameserverStatusToDatabase(List<Status> statusList, Long nameserverId,
@@ -76,7 +85,7 @@ public class StatusModel {
 		if (statusList.isEmpty())
 			return;
 
-		String query = queryGroup.getQuery(storeQueryId);
+		String query = getQueryGroup().getQuery(storeQueryId);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			for (Status status : statusList) {
 				statement.setLong(1, id);
@@ -109,7 +118,7 @@ public class StatusModel {
 
 	public static List<Status> getByRelationsId(Long id, Connection connection, String getQueryId) throws SQLException {
 		List<Status> result = null;
-		String query = queryGroup.getQuery(getQueryId);
+		String query = getQueryGroup().getQuery(getQueryId);
 
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setLong(1, id);

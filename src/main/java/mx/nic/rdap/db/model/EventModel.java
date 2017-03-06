@@ -44,12 +44,21 @@ public class EventModel {
 	private static final String AUTNUM_STORE_QUERY = "storeAutnumEventsToDatabase";
 	private static final String IP_NETWORK_STORE_QUERY = "storeIpNetworkEventsToDatabase";
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			EventModel.queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
 			throw new RuntimeException("Error loading query group");
 		}
+	}
+
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
 	}
 
 	private static void isValidForStore(Event event) throws RequiredValueNotFoundException {
@@ -62,7 +71,7 @@ public class EventModel {
 	public static long storeToDatabase(Event event, Connection connection)
 			throws SQLException, RequiredValueNotFoundException {
 		isValidForStore(event);
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery("storeToDatabase"),
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery("storeToDatabase"),
 				Statement.RETURN_GENERATED_KEYS)) {
 			((EventDbObj) event).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
@@ -111,7 +120,7 @@ public class EventModel {
 		if (events.isEmpty())
 			return;
 
-		String query = queryGroup.getQuery(storeQueryId);
+		String query = getQueryGroup().getQuery(storeQueryId);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			for (Event event : events) {
 				Long eventId = EventModel.storeToDatabase(event, connection);
@@ -148,7 +157,7 @@ public class EventModel {
 	}
 
 	private static List<Event> getByRelationId(Long id, Connection connection, String getQueryId) throws SQLException {
-		String query = queryGroup.getQuery(getQueryId);
+		String query = getQueryGroup().getQuery(getQueryId);
 		List<Event> result = null;
 
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -172,7 +181,7 @@ public class EventModel {
 	}
 
 	public static List<Event> getAll(Connection connection) throws SQLException {
-		String query = queryGroup.getQuery("getAll");
+		String query = getQueryGroup().getQuery("getAll");
 		List<Event> result = null;
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());

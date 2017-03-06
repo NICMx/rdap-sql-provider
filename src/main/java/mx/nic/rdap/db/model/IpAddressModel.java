@@ -32,17 +32,26 @@ public class IpAddressModel {
 
 	protected static QueryGroup queryGroup = null;
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			IpAddressModel.queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
 			throw new RuntimeException("Error loading query group");
 		}
 	}
 
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
+	}
+
 	public static void storeToDatabase(NameserverIpAddressesStruct struct, long nameserverId, Connection connection)
 			throws SQLException {
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(STORE_QUERY),
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_QUERY),
 				Statement.RETURN_GENERATED_KEYS)) {
 			for (IpAddress addressV4 : struct.getIpv4Adresses()) {
 				addressV4.setNameserverId(nameserverId);
@@ -69,7 +78,7 @@ public class IpAddressModel {
 
 	public static NameserverIpAddressesStruct getIpAddressStructByNameserverId(Long nameserverId, Connection connection)
 			throws SQLException, ObjectNotFoundException {
-		String query = queryGroup.getQuery(GET_QUERY);
+		String query = getQueryGroup().getQuery(GET_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setLong(1, nameserverId);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
@@ -98,7 +107,7 @@ public class IpAddressModel {
 	 * @throws ObjectNotFoundException
 	 */
 	public static List<IpAddressDbObj> getAll(Connection connection) throws SQLException, ObjectNotFoundException {
-		String query = queryGroup.getQuery(GET_ALL_QUERY);
+		String query = getQueryGroup().getQuery(GET_ALL_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();

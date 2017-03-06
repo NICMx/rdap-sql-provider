@@ -29,17 +29,26 @@ public class SecureDNSModel {
 
 	protected static QueryGroup queryGroup = null;
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			SecureDNSModel.queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
 			throw new RuntimeException("Error loading query group");
 		}
 	}
 
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
+	}
+
 	public static Long storeToDatabase(SecureDNS secureDns, Connection connection)
 			throws SQLException, RequiredValueNotFoundException {
-		String query = queryGroup.getQuery(STORE_QUERY);
+		String query = getQueryGroup().getQuery(STORE_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 			((SecureDNSDbObj) secureDns).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
@@ -59,7 +68,7 @@ public class SecureDNSModel {
 
 	public static SecureDNS getByDomain(Long domainId, Connection connection)
 			throws SQLException, ObjectNotFoundException {
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(GET_QUERY));) {
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_QUERY));) {
 			statement.setLong(1, domainId);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			ResultSet resultSet = statement.executeQuery();

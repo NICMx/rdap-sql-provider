@@ -42,12 +42,21 @@ public class RemarkModel {
 
 	protected static QueryGroup queryGroup = null;
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			RemarkModel.queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
 			throw new RuntimeException("Error loading query group");
 		}
+	}
+
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
 	}
 
 	public static long storeToDatabase(Remark remark, Connection connection)
@@ -55,7 +64,7 @@ public class RemarkModel {
 
 		// The Remark's id is autoincremental, Statement.RETURN_GENERATED_KEYS
 		// give us the id generated for the object stored
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery("storeToDatabase"),
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery("storeToDatabase"),
 				Statement.RETURN_GENERATED_KEYS)) {
 			((RemarkDbObj) remark).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
@@ -76,7 +85,7 @@ public class RemarkModel {
 		if (remarks.isEmpty())
 			return;
 
-		String query = queryGroup.getQuery(queryId);
+		String query = getQueryGroup().getQuery(queryId);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			for (Remark remark : remarks) {
 				Long remarkId = RemarkModel.storeToDatabase(remark, connection);
@@ -115,7 +124,7 @@ public class RemarkModel {
 
 	private static List<Remark> getByRelationId(Long id, Connection connection, String queryId)
 			throws SQLException, ObjectNotFoundException {
-		String query = queryGroup.getQuery(queryId);
+		String query = getQueryGroup().getQuery(queryId);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setLong(1, id);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
@@ -151,7 +160,7 @@ public class RemarkModel {
 	}
 
 	public static List<Remark> getAll(Connection connection) throws SQLException, ObjectNotFoundException {
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery("getAll"));
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery("getAll"));
 				ResultSet resultSet = statement.executeQuery();) {
 			return processResultSet(resultSet, connection);
 		}

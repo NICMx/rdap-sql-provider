@@ -33,12 +33,21 @@ public class AutnumModel {
 	private static final String GET_BY_ID = "getAutnumById";
 	private static final String GET_BY_HANDLE = "getAutnumByHandle";
 
-	static {
+	public static void loadQueryGroup(String schema) {
 		try {
-			queryGroup = new QueryGroup(QUERY_GROUP);
+			QueryGroup qG = new QueryGroup(QUERY_GROUP, schema);
+			setQueryGroup(qG);
 		} catch (IOException e) {
 			throw new RuntimeException("Error loading query group");
 		}
+	}
+
+	private static void setQueryGroup(QueryGroup qG) {
+		queryGroup = qG;
+	}
+
+	private static QueryGroup getQueryGroup() {
+		return queryGroup;
 	}
 
 	/**
@@ -51,7 +60,7 @@ public class AutnumModel {
 		isValidForStore(autnum);
 
 		Long autnumId;
-		String query = queryGroup.getQuery(STORE_QUERY);
+		String query = getQueryGroup().getQuery(STORE_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 			((AutnumDbObj) autnum).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing query:" + statement.toString());
@@ -92,7 +101,7 @@ public class AutnumModel {
 
 	public static AutnumDbObj getAutnumById(Long autnumId, Connection connection)
 			throws SQLException, ObjectNotFoundException {
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(GET_BY_ID))) {
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_ID))) {
 			statement.setLong(1, autnumId);
 			logger.log(Level.INFO, "Executing query: " + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
@@ -108,7 +117,7 @@ public class AutnumModel {
 
 	public static AutnumDbObj getByRange(Long autnumValue, Connection connection)
 			throws SQLException, ObjectNotFoundException {
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(GET_BY_RANGE))) {
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_RANGE))) {
 			statement.setLong(1, autnumValue);
 			statement.setLong(2, autnumValue);
 			logger.log(Level.INFO, "Executing query: " + statement.toString());
@@ -125,7 +134,7 @@ public class AutnumModel {
 
 	public static AutnumDbObj getByHandle(String handle, Connection connection)
 			throws SQLException, ObjectNotFoundException {
-		try (PreparedStatement statement = connection.prepareStatement(queryGroup.getQuery(GET_BY_HANDLE))) {
+		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_HANDLE))) {
 			statement.setString(1, handle);
 			logger.log(Level.INFO, "Executing query: " + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 import mx.nic.rdap.db.DatabaseSession;
+import mx.nic.rdap.db.SchemaConfiguration;
 import mx.nic.rdap.db.exception.InitializationException;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.model.CountryCodeModel;
@@ -22,7 +23,8 @@ public class SqlProviderImplementation implements DataAccessImplementation {
 	@Override
 	public void init(Properties properties) throws InitializationException {
 		DatabaseSession.initRdapConnection(properties);
-		
+		SchemaConfiguration.init(properties);
+
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			CountryCodeModel.loadAllFromDatabase(connection);
 		} catch (SQLException e) {

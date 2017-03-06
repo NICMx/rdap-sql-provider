@@ -1,11 +1,11 @@
 #storeToDatabase
-INSERT INTO rdap.zone VALUES(null,?);
+INSERT INTO {schema}.zone VALUES(null,?);
 
 #getByZoneId
-SELECT * FROM rdap.zone WHERE zone_id=?;
+SELECT * FROM {schema}.zone WHERE zone_id=?;
 
 #getByZoneName
-SELECT * FROM  rdap.zone WHERE zone_name=?;
+SELECT * FROM  {schema}.zone WHERE zone_name=?;
 
 #getAll
-SELECT * FROM rdap.zone;
+SELECT * FROM {schema}.zone;
