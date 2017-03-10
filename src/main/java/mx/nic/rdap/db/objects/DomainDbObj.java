@@ -38,7 +38,7 @@ public class DomainDbObj extends Domain implements DatabaseObject {
 	public void loadFromDatabase(ResultSet resultSet) throws SQLException {
 		this.setId(resultSet.getLong("dom_id"));
 		this.setHandle(resultSet.getString("dom_handle"));
-		this.setPunycodeName(resultSet.getString("dom_ldh_name"));
+		this.setLdhName(resultSet.getString("dom_ldh_name"));
 		if (resultSet.getString("dom_unicode_name") == null || resultSet.getString("dom_unicode_name").isEmpty()) {
 			this.setUnicodeName(null);
 		} else

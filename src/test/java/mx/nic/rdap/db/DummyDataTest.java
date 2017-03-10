@@ -79,7 +79,7 @@ public class DummyDataTest extends DatabaseTest {
 			boolean hasNameservers, boolean hasRemarks, boolean hasLinks, boolean hasEvents)
 			throws RequiredValueNotFoundException, IOException, SQLException, ObjectNotFoundException {
 		DomainDbObj domain = new DomainDbObj();
-		domain.setPunycodeName(name);
+		domain.setLdhName(name);
 		domain.setHandle(handle);
 		domain.setPort43("whois.mx");
 		try {
@@ -90,8 +90,8 @@ public class DummyDataTest extends DatabaseTest {
 		}
 		domain.setZone(zone);
 		if (hasNameservers) {
-			domain.setNameServers(createNameservers(domain.getPunycodeName() + zone, getRandomBoolean(),
-					getRandomBoolean(), getRandomBoolean(), getRandomBoolean()));
+			domain.setNameServers(createNameservers(domain.getLdhName() + zone, getRandomBoolean(), getRandomBoolean(),
+					getRandomBoolean(), getRandomBoolean()));
 		}
 		if (hasEntities) {
 			domain.setEntities(createRandomEntities(name, hasEntities, hasRemarks, hasLinks, hasEvents));

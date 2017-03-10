@@ -155,7 +155,8 @@ public class VariantModel {
 			return;
 
 		Long variantId = variant.getId();
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_RELATION_QUERY))) {
+		try (PreparedStatement statement = connection
+				.prepareStatement(getQueryGroup().getQuery(STORE_RELATION_QUERY))) {
 			for (VariantRelation relation : variant.getRelations()) {
 				statement.setInt(1, relation.getId());
 				statement.setLong(2, variantId);
@@ -172,7 +173,7 @@ public class VariantModel {
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_NAMES_QUERY))) {
 			Long variantId = variant.getId();
 			for (VariantName variantName : variant.getVariantNames()) {
-				statement.setString(1, variantName.getPunycode());
+				statement.setString(1, variantName.getLdhName());
 				statement.setLong(2, variantId);
 				logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 				statement.executeUpdate();

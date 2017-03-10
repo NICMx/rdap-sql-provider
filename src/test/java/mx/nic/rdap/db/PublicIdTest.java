@@ -95,7 +95,7 @@ public class PublicIdTest extends DatabaseTest {
 		dom.getEntities().add(ent);
 		dom.getEntities().add(registrar);
 		dom.setHandle("domcommx");
-		dom.setPunycodeName("mydomaintest.mx");
+		dom.setLdhName("mydomaintest.mx");
 
 		String zoneName = "mx";
 		try {

@@ -62,7 +62,7 @@ public class DomainTest extends DatabaseTest {
 
 		Domain dom = new DomainDbObj();
 		dom.setHandle("dummyhandle");
-		dom.setPunycodeName("ninio");
+		dom.setLdhName("ninio");
 
 		Integer zoneId = null;
 		String zoneName = "example";
@@ -163,7 +163,7 @@ public class DomainTest extends DatabaseTest {
 		}
 
 		domain.setZone("mx");
-		domain.setPunycodeName(domainName);
+		domain.setLdhName(domainName);
 		domain.setSecureDNS(SecureDnsTest.createDefaultSDNS());
 
 		// Creates and inserts a list of variants into the domain
