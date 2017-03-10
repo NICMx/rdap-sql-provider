@@ -6,6 +6,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,6 +35,7 @@ public class AutnumModel {
 	private static final String GET_BY_RANGE = "getByRange";
 	private static final String GET_BY_ID = "getAutnumById";
 	private static final String GET_BY_HANDLE = "getAutnumByHandle";
+	private static final String GET_BY_ENTITY = "getAutnumByEntity";
 
 	public static void loadQueryGroup(String schema) {
 		try {
@@ -181,6 +185,56 @@ public class AutnumModel {
 	public static void storeAutnumEntities(Autnum autnum, Connection connection) throws SQLException {
 		EntityModel.validateParentEntities(autnum.getEntities(), connection);
 		RolModel.storeAutnumEntityRoles(autnum.getEntities(), autnum.getId(), connection);
+	}
+
+	public static List<Autnum> getByEntityId(Long entityId, Connection connection) throws SQLException {
+		return getByRdapObjectId(entityId, connection, GET_BY_ENTITY);
+	}
+
+	private static List<Autnum> getByRdapObjectId(long id, Connection connection, String getQueryId)
+			throws SQLException {
+		String query = getQueryGroup().getQuery(getQueryId);
+		List<Autnum> autnums = null;
+		try (PreparedStatement statement = connection.prepareStatement(query)) {
+			statement.setLong(1, id);
+			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
+			ResultSet rs = statement.executeQuery();
+			if (!rs.next()) {
+				return Collections.emptyList();
+			}
+			autnums = new ArrayList<Autnum>();
+
+			do {
+				AutnumDbObj autnum = new AutnumDbObj();
+				autnum.loadFromDatabase(rs);
+				autnums.add(autnum);
+			} while (rs.next());
+		}
+
+		for (Autnum autnum : autnums) {
+			loadSimpleNestedObjects(autnum, connection);
+		}
+		return autnums;
+	}
+
+	private static void loadSimpleNestedObjects(Autnum autnum, Connection connection) throws SQLException {
+		Long ipNetworkId = autnum.getId();
+
+		// Retrieve the events
+		autnum.getEvents().addAll(EventModel.getByIpNetworkId(ipNetworkId, connection));
+
+		// Retrieve the links
+		autnum.getLinks().addAll(LinkModel.getByIpNetworkId(ipNetworkId, connection));
+
+		// Retrieve the status
+		autnum.getStatus().addAll(StatusModel.getByIpNetworkId(ipNetworkId, connection));
+
+		// Retrieve the remarks
+		try {
+			autnum.getRemarks().addAll(RemarkModel.getByIpNetworkId(ipNetworkId, connection));
+		} catch (ObjectNotFoundException onfe) {
+			// Do nothing, remarks is not required
+		}
 	}
 
 }

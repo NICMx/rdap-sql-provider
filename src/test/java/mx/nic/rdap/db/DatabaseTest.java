@@ -3,6 +3,7 @@ package mx.nic.rdap.db;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.Properties;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -27,8 +28,8 @@ public class DatabaseTest {
 	@Before
 	public void before() throws SQLException, IOException {
 		connection = DatabaseSession.getRdapConnection();
-		ZoneModel.loadAllFromDatabase(connection);
-		CountryCodeModel.loadAllFromDatabase(connection);
+		// ZoneModel.loadAllFromDatabase(connection);
+		// CountryCodeModel.loadAllFromDatabase(connection);
 	}
 
 	@After
@@ -39,10 +40,10 @@ public class DatabaseTest {
 	@BeforeClass
 	public static void init() throws SQLException, IOException, InitializationException {
 		DatabaseSession.initRdapConnection(TestUtil.loadProperties(rdapDatabaseConfigurationFile));
+		SchemaConfiguration.init(new Properties());
 		try (Connection con = DatabaseSession.getRdapConnection();) {
 			ZoneModel.loadAllFromDatabase(con);
 			CountryCodeModel.loadAllFromDatabase(con);
-
 		}
 	}
 

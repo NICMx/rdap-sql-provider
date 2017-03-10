@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.core.catalog.Rol;
 import mx.nic.rdap.core.catalog.Status;
+import mx.nic.rdap.core.db.Autnum;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.Event;
 import mx.nic.rdap.core.db.IpNetwork;
@@ -139,7 +140,6 @@ public class EntityModel {
 
 		if (!entity.getRoles().isEmpty() && !entity.getEntities().isEmpty())
 			RolModel.storeMainEntityRol(entity.getEntities(), entity, connection);
-
 	}
 
 	private static void storeVcardList(Entity entity, Connection connection) throws SQLException {
@@ -222,6 +222,9 @@ public class EntityModel {
 		List<IpNetwork> networks = IpNetworkModel.getByEntityId(entityId, connection);
 		entity.getIpNetworks().addAll(networks);
 
+		// retrieve the autnums
+		List<Autnum> autnums = AutnumModel.getByEntityId(entityId, connection);
+		entity.getAutnums().addAll(autnums);
 	}
 
 	private static EntityDbObj processResultSet(ResultSet resultSet, Connection connection)

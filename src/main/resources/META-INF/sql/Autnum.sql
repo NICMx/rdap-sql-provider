@@ -12,3 +12,6 @@ SELECT * FROM {schema}.autonomous_system_number asn WHERE asn.asn_start_autnum <
 
 #getAutnumByHandle
 SELECT * FROM {schema}.autonomous_system_number asn WHERE asn.asn_handle = ?;
+
+#getAutnumByEntity
+SELECT asn.* FROM {schema}.autonomous_system_number asn JOIN {schema}.asn_entity_roles ent ON ent.asn_id = asn.asn_id WHERE ent.ent_id = ?;
