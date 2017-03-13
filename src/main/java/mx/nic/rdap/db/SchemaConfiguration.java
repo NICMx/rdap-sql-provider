@@ -17,6 +17,7 @@ import mx.nic.rdap.db.model.EntityModel;
 import mx.nic.rdap.db.model.EventModel;
 import mx.nic.rdap.db.model.IpAddressModel;
 import mx.nic.rdap.db.model.IpNetworkModel;
+import mx.nic.rdap.db.model.KeyDataModel;
 import mx.nic.rdap.db.model.LinkModel;
 import mx.nic.rdap.db.model.NameserverModel;
 import mx.nic.rdap.db.model.PublicIdModel;
@@ -109,6 +110,7 @@ public class SchemaConfiguration {
 		DBConfigurationModel.loadQueryGroup(schema);
 		DomainModel.loadQueryGroup(schema);
 		DsDataModel.loadQueryGroup(schema);
+		KeyDataModel.loadQueryGroup(schema);
 		EntityModel.loadQueryGroup(schema);
 		EventModel.loadQueryGroup(schema);
 		IpAddressModel.loadQueryGroup(schema);

@@ -106,7 +106,7 @@ public class PublicIdTest extends DatabaseTest {
 		}
 		dom.setZone(zoneName);
 
-		SecureDNSDbObj secureDNS = SecureDnsTest.getSecureDns(null, null, false, false, null);
+		SecureDNSDbObj secureDNS = SecureDnsTest.getSecureDns(null, null, false, false, null, null);
 		dom.setSecureDNS(secureDNS);
 
 		try {

@@ -25,6 +25,9 @@ SELECT lin.* FROM {schema}.link lin JOIN {schema}.asn_links asn ON asn.lin_id=li
 #getByIpNetworkId
 SELECT lin.* FROM {schema}.link lin JOIN {schema}.ip_network_links ine ON ine.lin_id=lin.lin_id WHERE ine.ine_id=?;
 
+#getByKeyDataId
+SELECT lin.* FROM {schema}.link lin JOIN {schema}.key_links kdl ON kdl.lin_id=lin.lin_id WHERE kdl.kd_id=?;
+
 #storeNameserverLinksToDatabase
 INSERT INTO {schema}.nameserver_links VALUES(?,?);
 
@@ -51,6 +54,9 @@ INSERT INTO {schema}.asn_links VALUES(?,?);
 
 #storeIpNetworkLinksToDatabase
 INSERT INTO {schema}.ip_network_links VALUES (?, ?);
+
+#storeKeyDataLinksToDatabase
+INSERT INTO {schema}.key_links VALUES(?,?);
 
 #deleteEntityLinksRelation
 DELETE FROM {schema}.entity_links WHERE lin_id IN (?);

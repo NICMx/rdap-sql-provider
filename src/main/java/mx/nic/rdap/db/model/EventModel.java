@@ -36,6 +36,7 @@ public class EventModel {
 	private static final String ENTITY_GET_QUERY = "getByEntityId";
 	private static final String AUTNUM_GET_QUERY = "getByAutnumId";
 	private static final String IP_NETWORK_GET_QUERY = "getByIpNetworkId";
+	private static final String KEY_DATA_GET_QUERY = "getByKeyDataId";
 
 	private static final String NAMESERVER_STORE_QUERY = "storeNameserverEventsToDatabase";
 	private static final String DS_DATA_STORE_QUERY = "storeDsDataEventsToDatabase";
@@ -43,6 +44,7 @@ public class EventModel {
 	private static final String ENTITY_STORE_QUERY = "storeEntityEventsToDatabase";
 	private static final String AUTNUM_STORE_QUERY = "storeAutnumEventsToDatabase";
 	private static final String IP_NETWORK_STORE_QUERY = "storeIpNetworkEventsToDatabase";
+	private static final String KEY_DATA_STORE_QUERY = "storeKeyDataEventsToDatabase";
 
 	public static void loadQueryGroup(String schema) {
 		try {
@@ -110,6 +112,11 @@ public class EventModel {
 		storeRelationEventsToDatabase(events, dsDataId, connection, DS_DATA_STORE_QUERY);
 	}
 
+	public static void storeKeyDataEventsToDatabase(List<Event> events, Long keyDataId, Connection connection)
+			throws SQLException, RequiredValueNotFoundException {
+		storeRelationEventsToDatabase(events, keyDataId, connection, KEY_DATA_STORE_QUERY);
+	}
+
 	public static void storeIpNetworkEventsToDatabase(List<Event> events, Long ipNetworkId, Connection connection)
 			throws SQLException, RequiredValueNotFoundException {
 		storeRelationEventsToDatabase(events, ipNetworkId, connection, IP_NETWORK_STORE_QUERY);
@@ -138,6 +145,10 @@ public class EventModel {
 
 	public static List<Event> getByDsDataId(Long dsDataId, Connection connection) throws SQLException {
 		return getByRelationId(dsDataId, connection, DS_DATA_GET_QUERY);
+	}
+
+	public static List<Event> getByKeyDataId(Long keyDataId, Connection connection) throws SQLException {
+		return getByRelationId(keyDataId, connection, KEY_DATA_GET_QUERY);
 	}
 
 	public static List<Event> getByDomainId(Long domainId, Connection connection) throws SQLException {

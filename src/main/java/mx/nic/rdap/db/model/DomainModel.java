@@ -27,6 +27,7 @@ import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.objects.DomainDbObj;
 import mx.nic.rdap.db.objects.IpAddressDbObj;
+import mx.nic.rdap.db.objects.IpNetworkDbObj;
 import mx.nic.rdap.db.struct.SearchResultStruct;
 
 /**
@@ -119,8 +120,17 @@ public class DomainModel {
 
 		}
 		storeDomainEntities(domain.getEntities(), domainId, connection);
-		if (domain.getIpNetwork() != null) {
-			storeDomainIpNetworkRelationToDatabase(domainId, domain.getIpNetwork().getId(), connection);
+		IpNetwork ipNetwork = domain.getIpNetwork();
+		if (ipNetwork != null) {
+			try {
+				IpNetworkDbObj ipNetResult = IpNetworkModel.getByHandle(ipNetwork.getHandle(), connection);
+				ipNetwork.setId(ipNetResult.getId());
+			} catch (ObjectNotFoundException e) {
+				throw new NullPointerException(
+						"IpNetwork: " + ipNetwork.getHandle() + "was not inserted previously to the database");
+			}
+
+			storeDomainIpNetworkRelationToDatabase(domainId, ipNetwork.getId(), connection);
 		}
 	}
 

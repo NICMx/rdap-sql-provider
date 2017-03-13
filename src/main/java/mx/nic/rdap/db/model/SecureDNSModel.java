@@ -62,6 +62,7 @@ public class SecureDNSModel {
 		}
 
 		DsDataModel.storeAllToDatabase(secureDns.getDsData(), secureDns.getId(), connection);
+		KeyDataModel.storeAllToDatabase(secureDns.getKeyData(), secureDns.getId(), connection);
 
 		return secureDns.getId();
 	}
@@ -78,6 +79,7 @@ public class SecureDNSModel {
 
 			SecureDNSDbObj secureDns = new SecureDNSDbObj(resultSet);
 			secureDns.setDsData(DsDataModel.getBySecureDnsId(secureDns.getId(), connection));
+			secureDns.setKeyData(KeyDataModel.getBySecureDnsId(secureDns.getId(), connection));
 			return secureDns;
 		}
 	}

@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,6 +17,7 @@ import mx.nic.rdap.core.db.Domain;
 import mx.nic.rdap.core.db.DsData;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.Event;
+import mx.nic.rdap.core.db.KeyData;
 import mx.nic.rdap.core.db.Link;
 import mx.nic.rdap.core.db.SecureDNS;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
@@ -28,6 +30,7 @@ import mx.nic.rdap.db.objects.DomainDbObj;
 import mx.nic.rdap.db.objects.DsDataDbObj;
 import mx.nic.rdap.db.objects.EntityDbObj;
 import mx.nic.rdap.db.objects.EventDbObj;
+import mx.nic.rdap.db.objects.KeyDataDbObj;
 import mx.nic.rdap.db.objects.LinkDbObj;
 import mx.nic.rdap.db.objects.SecureDNSDbObj;
 
@@ -41,7 +44,7 @@ public class SecureDnsTest extends DatabaseTest {
 		Domain dom = createSimpleDomain();
 		Long domainId = dom.getId();
 
-		SecureDNS secureDns = getSecureDns(null, domainId, true, false, null);
+		SecureDNS secureDns = getSecureDns(null, domainId, true, false, null, null);
 
 		try {
 			SecureDNSModel.storeToDatabase(secureDns, connection);
@@ -68,6 +71,7 @@ public class SecureDnsTest extends DatabaseTest {
 
 		List<DsData> dsDataList = new ArrayList<>();
 
+		// ******** DS DATA INFO *******
 		// Links data
 		List<Link> links = new ArrayList<Link>();
 		Link link = new LinkDbObj();
@@ -105,8 +109,50 @@ public class SecureDnsTest extends DatabaseTest {
 		DsData dsData2 = getDsData(null, null, 1234, 1, "abcd5432", 1, null, null);
 		dsDataList.add(dsData);
 		dsDataList.add(dsData2);
+		// ******** ENDS DS DATA INFO *******
 
-		SecureDNS secureDns = getSecureDns(null, domainId, true, true, dsDataList);
+		// -------------- KEY DATA INFO ----------
+		// Links data
+		List<Link> keyLinks = new ArrayList<Link>();
+		Link keyLink = new LinkDbObj();
+		keyLink.setValue("http://example.net/nameserver/xxxx");
+		keyLink.setRel("self");
+		keyLink.setHref("http://example.net/nameserver/xxxx");
+		keyLink.setType("application/rdap+json");
+		keyLinks.add(keyLink);
+
+		// Events Data
+		List<Event> keyEvents = new ArrayList<Event>();
+		Event keyEvent1 = new EventDbObj();
+		keyEvent1.setEventAction(EventAction.REGISTRATION);
+		keyEvent1.setEventDate(new Date());
+
+		Event keyEvent2 = new EventDbObj();
+		keyEvent2.setEventAction(EventAction.LAST_CHANGED);
+		keyEvent2.setEventDate(new Date());
+		keyEvent2.setEventActor("joe@example.com");
+
+		// event links data
+		List<Link> keyEventLinks = new ArrayList<Link>();
+		Link keyEventLink = new LinkDbObj();
+		keyEventLink.setValue("eventLink1");
+		keyEventLink.setRel("eventlink");
+		keyEventLink.setHref("http://example.net/eventlink/xxxx");
+		keyEventLink.setType("application/rdap+json");
+		keyEventLinks.add(keyEventLink);
+		keyEvent2.setLinks(keyEventLinks);
+
+		keyEvents.add(keyEvent1);
+		keyEvents.add(keyEvent2);
+
+		KeyData keyData1 = getKeyData(null, null, 1, 2, "publickkey1", 3, keyLinks, keyEvents);
+		KeyData keyData2 = getKeyData(null, null, 2, 3, "publicKey2", 4, null, null);
+		List<KeyData> keyDataList = new ArrayList<>();
+		keyDataList.add(keyData1);
+		keyDataList.add(keyData2);
+		// -------------- ENDS KEY DATA INFO ----------
+
+		SecureDNS secureDns = getSecureDns(null, domainId, true, true, dsDataList, keyDataList);
 
 		try {
 			SecureDNSModel.storeToDatabase(secureDns, connection);
@@ -128,7 +174,7 @@ public class SecureDnsTest extends DatabaseTest {
 	}
 
 	public static SecureDNSDbObj getSecureDns(Long id, Long domainId, boolean zoneSigned, boolean delegationSigned,
-			List<DsData> dsData) {
+			List<DsData> dsData, List<KeyData> keyDataList) {
 		SecureDNSDbObj sDns = new SecureDNSDbObj();
 		sDns.setId(id);
 		sDns.setZoneSigned(zoneSigned);
@@ -136,6 +182,10 @@ public class SecureDnsTest extends DatabaseTest {
 		sDns.setDomainId(domainId);
 		if (dsData != null)
 			sDns.getDsData().addAll(dsData);
+
+		if (Objects.nonNull(keyDataList)) {
+			sDns.getKeyData().addAll(keyDataList);
+		}
 
 		return sDns;
 	}
@@ -156,6 +206,29 @@ public class SecureDnsTest extends DatabaseTest {
 			ds.getLinks().addAll(links);
 
 		return ds;
+	}
+
+	public static KeyDataDbObj getKeyData(Long id, Long secureDNSid, Integer flags, Integer protocol, String key,
+			Integer algorithm, List<Link> links, List<Event> events) {
+
+		KeyDataDbObj keyData = new KeyDataDbObj();
+
+		keyData.setId(id);
+		keyData.setSecureDNSId(secureDNSid);
+		keyData.setFlags(flags);
+		keyData.setProtocol(protocol);
+		keyData.setPublicKey(key);
+		keyData.setAlgorithm(algorithm);
+
+		if (Objects.nonNull(links)) {
+			keyData.getLinks().addAll(links);
+		}
+
+		if (Objects.nonNull(events)) {
+			keyData.getEvents().addAll(events);
+		}
+
+		return keyData;
 	}
 
 	public static SecureDNSDbObj createDefaultSDNS() {
@@ -199,7 +272,13 @@ public class SecureDnsTest extends DatabaseTest {
 		dsDataList.add(dsData);
 		dsDataList.add(dsData2);
 
-		SecureDNS secureDns = getSecureDns(null, null, true, true, dsDataList);
+		KeyData keyData1 = getKeyData(null, null, 1, 2, "publickkey1", 3, links, events);
+		KeyData keyData2 = getKeyData(null, null, 2, 3, "publicKey2", 4, null, null);
+		List<KeyData> keyDataList = new ArrayList<>();
+		keyDataList.add(keyData1);
+		keyDataList.add(keyData2);
+
+		SecureDNS secureDns = getSecureDns(null, null, true, true, dsDataList, keyDataList);
 		return (SecureDNSDbObj) secureDns;
 	}
 

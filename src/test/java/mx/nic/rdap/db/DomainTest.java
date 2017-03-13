@@ -25,6 +25,7 @@ import mx.nic.rdap.core.db.DsData;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.Event;
 import mx.nic.rdap.core.db.IpAddress;
+import mx.nic.rdap.core.db.KeyData;
 import mx.nic.rdap.core.db.Link;
 import mx.nic.rdap.core.db.Nameserver;
 import mx.nic.rdap.core.db.PublicId;
@@ -268,7 +269,48 @@ public class DomainTest extends DatabaseTest {
 		dsDataList.add(dsData);
 		dsDataList.add(dsData2);
 
-		SecureDNS secureDns = SecureDnsTest.getSecureDns(null, null, true, true, dsDataList);
+		// -------------- KEY DATA INFO ----------
+		// Links data
+		List<Link> keyLinks = new ArrayList<Link>();
+		Link keyLink = new LinkDbObj();
+		keyLink.setValue("http://example.net/nameserver/xxxx");
+		keyLink.setRel("self");
+		keyLink.setHref("http://example.net/nameserver/xxxx");
+		keyLink.setType("application/rdap+json");
+		keyLinks.add(keyLink);
+
+		// Events Data
+		List<Event> keyEvents = new ArrayList<Event>();
+		Event keyEvent1 = new EventDbObj();
+		keyEvent1.setEventAction(EventAction.REGISTRATION);
+		keyEvent1.setEventDate(new Date());
+
+		Event keyEvent2 = new EventDbObj();
+		keyEvent2.setEventAction(EventAction.LAST_CHANGED);
+		keyEvent2.setEventDate(new Date());
+		keyEvent2.setEventActor("joe@example.com");
+
+		// event links data
+		List<Link> keyEventLinks = new ArrayList<Link>();
+		Link keyEventLink = new LinkDbObj();
+		keyEventLink.setValue("eventLink1");
+		keyEventLink.setRel("eventlink");
+		keyEventLink.setHref("http://example.net/eventlink/xxxx");
+		keyEventLink.setType("application/rdap+json");
+		keyEventLinks.add(keyEventLink);
+		keyEvent2.setLinks(keyEventLinks);
+
+		keyEvents.add(keyEvent1);
+		keyEvents.add(keyEvent2);
+
+		KeyData keyData1 = SecureDnsTest.getKeyData(null, null, 2, 3, "publicKey2", 4, null, null);
+		KeyData keyData2 = SecureDnsTest.getKeyData(null, null, 2, 3, "publicKey2", 4, null, null);
+		List<KeyData> keyDataList = new ArrayList<>();
+		keyDataList.add(keyData1);
+		keyDataList.add(keyData2);
+		// -------------- ENDS KEY DATA INFO ----------
+
+		SecureDNS secureDns = SecureDnsTest.getSecureDns(null, null, true, true, dsDataList, keyDataList);
 		domain.setSecureDNS(secureDns);
 
 		Long domainId = null;

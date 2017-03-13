@@ -91,6 +91,10 @@ public class SQLProviderConfiguration {
 	private static void validateConfigurationForMigrator() {
 		commonValidation();
 		validateRequiredProperty(MIGRATION_SCHEMA_KEY);
+		if (getDefaultSchema().equalsIgnoreCase(getMigrationSchema())) {
+			throw new InvalidConfigurationException(SCHEMA_KEY + " and " + MIGRATION_SCHEMA_KEY
+					+ "have the same values, please provide diferent schema names");
+		}
 	}
 
 	private static void validateLongValue(String key, String longValue) {

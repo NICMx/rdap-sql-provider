@@ -19,6 +19,9 @@ SELECT eve.eve_id, eve.eac_id, eve.eve_actor, eve.eve_date FROM {schema}.event e
 #getByIpNetworkId
 SELECT eve.eve_id, eve.eac_id, eve.eve_actor, eve.eve_date FROM {schema}.event eve JOIN {schema}.ip_network_events ine ON ine.eve_id=eve.eve_id WHERE ine.ine_id=?;
 
+#getByKeyDataId
+SELECT eve.eve_id,eve.eac_id,eve.eve_actor,eve.eve_date FROM {schema}.event eve JOIN {schema}.key_events kde ON kde.eve_id=eve.eve_id WHERE kde.kd_id=?;
+
 #storeNameserverEventsToDatabase
 INSERT INTO {schema}.nameserver_events values (?,?);
 
@@ -36,6 +39,9 @@ INSERT INTO {schema}.asn_events VALUES (?,?);
 
 #storeIpNetworkEventsToDatabase
 INSERT INTO {schema}.ip_network_events VALUES (?,?);
+
+#storeKeyDataEventsToDatabase
+INSERT INTO {schema}.key_events VALUES (?,?);
 
 #getAll
 SELECT * FROM {schema}.event;

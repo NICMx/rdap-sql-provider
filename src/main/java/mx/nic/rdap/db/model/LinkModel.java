@@ -38,6 +38,7 @@ public class LinkModel {
 	private static final String ENTITY_GET_QUERY = "getByEntityId";
 	private static final String AUTNUM_GET_QUERY = "getByAutnumId";
 	private static final String IP_NETWORK_GET_QUERY = "getByIpNetworkId";
+	private static final String KEY_DATA_GET_QUERY = "getByKeyDataId";
 
 	private static final String NAMESERVER_STORE_QUERY = "storeNameserverLinksToDatabase";
 	private static final String EVENT_STORE_QUERY = "storeEventLinksToDatabase";
@@ -47,6 +48,7 @@ public class LinkModel {
 	private static final String ENTITY_STORE_QUERY = "storeEntityLinksToDatabase";
 	private static final String AUTNUM_STORE_QUERY = "storeAutnumLinksToDatabase";
 	private static final String IP_NETWORK_STORE_QUERY = "storeIpNetworkLinksToDatabase";
+	private static final String KEY_DATA_STORE_QUERY = "storeKeyDataLinksToDatabase";
 
 	private static final String DELETE_QUERY = "deleteLinksById";
 	private static final String NAMESERVER_DELETE_QUERY = "deleteNameserverLinksRelation";
@@ -121,6 +123,11 @@ public class LinkModel {
 		storeLinkRelationToDatabase(links, dsDataId, connection, DS_DATA_STORE_QUERY);
 	}
 
+	public static void storeKeyDataLinksToDatabase(List<Link> links, Long keyDataId, Connection connection)
+			throws SQLException, RequiredValueNotFoundException {
+		storeLinkRelationToDatabase(links, keyDataId, connection, KEY_DATA_STORE_QUERY);
+	}
+
 	public static void storeEventLinksToDatabase(List<Link> links, Long eventId, Connection connection)
 			throws SQLException, RequiredValueNotFoundException {
 		storeLinkRelationToDatabase(links, eventId, connection, EVENT_STORE_QUERY);
@@ -182,6 +189,10 @@ public class LinkModel {
 
 	public static List<LinkDbObj> getByDsDataId(Long dsDataId, Connection connection) throws SQLException {
 		return getByRelationId(dsDataId, connection, DS_DATA_GET_QUERY);
+	}
+
+	public static List<LinkDbObj> getByKeyDataId(Long keyDataId, Connection connection) throws SQLException {
+		return getByRelationId(keyDataId, connection, KEY_DATA_GET_QUERY);
 	}
 
 	public static List<LinkDbObj> getByEntityId(Long entityId, Connection connection) throws SQLException {
