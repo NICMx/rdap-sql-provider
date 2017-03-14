@@ -210,13 +210,8 @@ public class EntityModel {
 		entity.getPublicIds().addAll(PublicIdModel.getByEntity(entityId, connection));
 
 		// Retrieve the entities
-		try {
-			List<Entity> entitiesByEntityId = getEntitiesByEntityId(entityId, connection);
-			entity.getEntities().addAll(entitiesByEntityId);
-			entity.getRoles().addAll(RolModel.getMainEntityRol(entitiesByEntityId, entity, connection));
-		} catch (ObjectNotFoundException onfe) {
-			// Do nothing, entities is not required
-		}
+		List<Entity> entitiesByEntityId = getEntitiesByEntityId(entityId, connection);
+		entity.getEntities().addAll(entitiesByEntityId);
 
 		// retrieve the networks
 		List<IpNetwork> networks = IpNetworkModel.getByEntityId(entityId, connection);

@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 import mx.nic.rdap.core.catalog.Rol;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.db.QueryGroup;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 
 /**
  * Model for the {@link Rol} objects of nested entities of main objects.
@@ -37,7 +36,7 @@ public class RolModel {
 	private static final String NAMESERVER_GET_QUERY = "getNSRol";
 	private static final String AUTNUM_GET_QUERY = "getAutnumRol";
 	private static final String IP_NETWORK_GET_QUERY = "getIpNetworkRol";
-	private static final String MAIN_ENTITY_GET_QUERY = "getMainEntityRol";
+	// private static final String MAIN_ENTITY_GET_QUERY = "getMainEntityRol";
 
 	private static QueryGroup queryGroup = null;
 
@@ -174,40 +173,8 @@ public class RolModel {
 
 	}
 
-	public static List<Rol> getMainEntityRol(List<Entity> nestedEntitiesId, Entity mainEntity, Connection connection)
-			throws SQLException, ObjectNotFoundException {
-		if (nestedEntitiesId.isEmpty()) {
-			return Collections.emptyList();
-		}
-		String query = getQueryGroup().getQuery(MAIN_ENTITY_GET_QUERY);
-
-		StringBuilder sb = new StringBuilder();
-		int i;
-		for (i = 0; i < nestedEntitiesId.size() - 1; i++) {
-			sb.append(nestedEntitiesId.get(i).getId() + ", ");
-		}
-		sb.append(nestedEntitiesId.get(i).getId());
-
-		List<Rol> resultRoles = null;
-		try (PreparedStatement statement = connection.prepareStatement(query);) {
-			statement.setLong(1, mainEntity.getId());
-			statement.setString(2, sb.toString());
-			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
-			ResultSet rs = statement.executeQuery();
-			if (!rs.next())
-				return Collections.emptyList();
-
-			resultRoles = new ArrayList<>();
-			do {
-				int rolId = rs.getInt(1);
-				if (rs.wasNull()) {
-					throw new ObjectNotFoundException("Return rows, but not valid rol id");
-				}
-				resultRoles.add(Rol.getById(rolId));
-			} while (rs.next());
-		}
-
-		return resultRoles;
-	}
+	// TODO create a getRoles function for the main entity object requested from
+	// other table other than entityEntityRol
+	// https://mailarchive.ietf.org/arch/msg/weirds/UYlSy0WCKGp_pxy7DMRAxIhi0n0
 
 }

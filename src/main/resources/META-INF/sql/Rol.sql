@@ -28,9 +28,6 @@ SELECT rol.rol_id FROM {schema}.asn_entity_roles rol WHERE rol.asn_id = ? AND ro
 #getIpNetworkRol
 SELECT rol.rol_id FROM {schema}.ip_network_entity_roles rol WHERE rol.ine_id = ? AND rol.ent_id = ?;
 
-#getMainEntityRol
-SELECT DISTINCT rol.rol_id FROM {schema}.entity_entity_roles rol WHERE rol.ent_id = ? AND rol.main_ent_id IN (?);
-
 #deleteEntityEntityRoles
 DELETE FROM {schema}.entity_entity_roles  WHERE ent_id=?;
 

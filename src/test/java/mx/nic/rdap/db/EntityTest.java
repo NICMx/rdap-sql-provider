@@ -428,7 +428,7 @@ public class EntityTest extends DatabaseTest {
 	@Test
 	public void createAndInsertRegistrar() {
 		Entity entity = createEntity(null, "rar_test", "whois.rar_test.com");
-		entity.getRoles().add(Rol.REGISTRAR);
+		// entity.getRoles().add(Rol.REGISTRAR);
 
 		Entity legal = createEntity(null, "legal_contact", null);
 		legal.getRoles().add(Rol.ADMINISTRATIVE);
