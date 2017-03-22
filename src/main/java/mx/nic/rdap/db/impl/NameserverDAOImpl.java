@@ -34,7 +34,7 @@ public class NameserverDAOImpl implements NameserverDAO {
 	}
 
 	@Override
-	public SearchResultStruct<Nameserver> searchByName(String namePattern, Integer resultLimit)
+	public SearchResultStruct<Nameserver> searchByName(String namePattern, int resultLimit)
 			throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return NameserverModel.searchByName(namePattern, resultLimit, connection);
@@ -44,7 +44,7 @@ public class NameserverDAOImpl implements NameserverDAO {
 	}
 
 	@Override
-	public SearchResultStruct<Nameserver> searchByIp(String ipaddressPattern, Integer resultLimit)
+	public SearchResultStruct<Nameserver> searchByIp(String ipaddressPattern, int resultLimit)
 			throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return NameserverModel.searchByIp(ipaddressPattern, resultLimit, connection);
@@ -54,7 +54,7 @@ public class NameserverDAOImpl implements NameserverDAO {
 	}
 
 	@Override
-	public SearchResultStruct<Nameserver> searchByRegexName(String namePattern, Integer resultLimit)
+	public SearchResultStruct<Nameserver> searchByRegexName(String namePattern, int resultLimit)
 			throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return NameserverModel.searchByRegexName(namePattern, resultLimit, connection);
@@ -66,7 +66,7 @@ public class NameserverDAOImpl implements NameserverDAO {
 	}
 
 	@Override
-	public SearchResultStruct<Nameserver> searchByRegexIp(String ipaddressPattern, Integer resultLimit)
+	public SearchResultStruct<Nameserver> searchByRegexIp(String ipaddressPattern, int resultLimit)
 			throws NotImplementedException {
 		throw new NotImplementedException();
 	}

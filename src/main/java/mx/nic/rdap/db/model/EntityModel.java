@@ -328,7 +328,7 @@ public class EntityModel {
 		return;
 	}
 
-	public static SearchResultStruct<Entity> searchByHandle(String handle, Integer resultLimit, Connection connection)
+	public static SearchResultStruct<Entity> searchByHandle(String handle, int resultLimit, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		String query = null;
 		if (handle.contains("*")) {
@@ -341,7 +341,7 @@ public class EntityModel {
 		return searchBy(handle, resultLimit, connection, query);
 	}
 
-	public static SearchResultStruct<Entity> searchByVCardName(String vcardName, Integer resultLimit,
+	public static SearchResultStruct<Entity> searchByVCardName(String vcardName, int resultLimit,
 			Connection connection) throws SQLException, ObjectNotFoundException {
 		String query = null;
 		if (vcardName.contains("*")) {
@@ -354,17 +354,17 @@ public class EntityModel {
 		return searchBy(vcardName, resultLimit, connection, query);
 	}
 
-	public static SearchResultStruct<Entity> searchByRegexHandle(String regexHandle, Integer resultLimit,
+	public static SearchResultStruct<Entity> searchByRegexHandle(String regexHandle, int resultLimit,
 			Connection connection) throws SQLException, ObjectNotFoundException {
 		return searchBy(regexHandle, resultLimit, connection, getQueryGroup().getQuery(SEARCH_BY_HANDLE_REGEX_QUERY));
 	}
 
-	public static SearchResultStruct<Entity> searchByRegexName(String regexName, Integer resultLimit,
+	public static SearchResultStruct<Entity> searchByRegexName(String regexName, int resultLimit,
 			Connection connection) throws SQLException, ObjectNotFoundException {
 		return searchBy(regexName, resultLimit, connection, getQueryGroup().getQuery(SEARCH_BY_NAME_REGEX_QUERY));
 	}
 
-	private static SearchResultStruct<Entity> searchBy(String criteria, Integer resultLimit, Connection connection,
+	private static SearchResultStruct<Entity> searchBy(String criteria, int resultLimit, Connection connection,
 			String query) throws SQLException, ObjectNotFoundException {
 		SearchResultStruct<Entity> result = new SearchResultStruct<Entity>();
 		// Hack to know is there is more domains that the limit, used for

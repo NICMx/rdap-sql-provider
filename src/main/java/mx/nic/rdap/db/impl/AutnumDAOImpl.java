@@ -20,7 +20,7 @@ public class AutnumDAOImpl implements AutnumDAO {
 	}
 
 	@Override
-	public Autnum getByRange(Long autnumValue) throws RdapDataAccessException {
+	public Autnum getByRange(long autnumValue) throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return AutnumModel.getByRange(autnumValue, connection);
 		} catch (SQLException e) {

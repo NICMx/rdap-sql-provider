@@ -165,7 +165,7 @@ public class NameserverModel {
 		}
 	}
 
-	public static SearchResultStruct<Nameserver> searchByName(String namePattern, Integer resultLimit,
+	public static SearchResultStruct<Nameserver> searchByName(String namePattern, int resultLimit,
 			Connection connection) throws SQLException, ObjectNotFoundException {
 		String query = null;
 		if (namePattern.contains("*")) {// check if is a partial search
@@ -177,12 +177,12 @@ public class NameserverModel {
 		return searchByName(namePattern, resultLimit, connection, query);
 	}
 
-	public static SearchResultStruct<Nameserver> searchByRegexName(String namePattern, Integer resultLimit,
+	public static SearchResultStruct<Nameserver> searchByRegexName(String namePattern, int resultLimit,
 			Connection connection) throws SQLException, ObjectNotFoundException {
 		return searchByName(namePattern, resultLimit, connection, getQueryGroup().getQuery(SEARCH_BY_NAME_REGEX_QUERY));
 	}
 
-	private static SearchResultStruct<Nameserver> searchByName(String namePattern, Integer resultLimit,
+	private static SearchResultStruct<Nameserver> searchByName(String namePattern, int resultLimit,
 			Connection connection, String query) throws SQLException, ObjectNotFoundException {
 		SearchResultStruct<Nameserver> result = new SearchResultStruct<Nameserver>();
 		// Hack to know is there is more domains that the limit, used for
@@ -220,7 +220,7 @@ public class NameserverModel {
 		}
 	}
 
-	public static SearchResultStruct<Nameserver> searchByIp(String ipaddressPattern, Integer resultLimit,
+	public static SearchResultStruct<Nameserver> searchByIp(String ipaddressPattern, int resultLimit,
 			Connection connection) throws SQLException, InvalidValueException, ObjectNotFoundException {
 		SearchResultStruct<Nameserver> result = new SearchResultStruct<Nameserver>();
 		// Hack to know is there is more domains that the limit, used for

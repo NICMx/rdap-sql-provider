@@ -119,7 +119,7 @@ public class AutnumModel {
 		}
 	}
 
-	public static AutnumDbObj getByRange(Long autnumValue, Connection connection)
+	public static AutnumDbObj getByRange(long autnumValue, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_RANGE))) {
 			statement.setLong(1, autnumValue);

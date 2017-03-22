@@ -238,7 +238,7 @@ public class DomainModel {
 	 * @throws ObjectNotFoundException
 	 * 
 	 */
-	public static SearchResultStruct<Domain> searchByName(String name, String zone, Integer resultLimit,
+	public static SearchResultStruct<Domain> searchByName(String name, String zone, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
@@ -318,7 +318,7 @@ public class DomainModel {
 		}
 	}
 
-	public static SearchResultStruct<Domain> searchByName(String domainName, Integer resultLimit,
+	public static SearchResultStruct<Domain> searchByName(String domainName, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		String query;
@@ -331,14 +331,14 @@ public class DomainModel {
 		return searchByName(domainName, resultLimit, useNameserverAsDomainAttribute, connection, query);
 	}
 
-	public static SearchResultStruct<Domain> searchByRegexName(String regexName, Integer resultLimit,
+	public static SearchResultStruct<Domain> searchByRegexName(String regexName, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		String query = getQueryGroup().getQuery(SEARCH_BY_REGEX_NAME_WITHOUT_ZONE);
 		return searchByName(regexName, resultLimit, useNameserverAsDomainAttribute, connection, query);
 	}
 
-	public static SearchResultStruct<Domain> searchByRegexName(String name, String zone, Integer resultLimit,
+	public static SearchResultStruct<Domain> searchByRegexName(String name, String zone, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
@@ -389,7 +389,7 @@ public class DomainModel {
 	 * @throws ObjectNotFoundException
 	 * 
 	 */
-	private static SearchResultStruct<Domain> searchByName(String domainName, Integer resultLimit,
+	private static SearchResultStruct<Domain> searchByName(String domainName, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection, String query)
 			throws SQLException, ObjectNotFoundException {
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
@@ -433,7 +433,7 @@ public class DomainModel {
 		}
 	}
 
-	public static SearchResultStruct<Domain> searchByNsLdhName(String name, Integer resultLimit,
+	public static SearchResultStruct<Domain> searchByNsLdhName(String name, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		String query = getQueryGroup().getQuery(SEARCH_BY_NAMESERVER_LDH_QUERY);
@@ -441,7 +441,7 @@ public class DomainModel {
 		return searchByNsLdhName(name, resultLimit, useNameserverAsDomainAttribute, connection, query);
 	}
 
-	public static SearchResultStruct<Domain> searchByRegexNsLdhName(String name, Integer resultLimit,
+	public static SearchResultStruct<Domain> searchByRegexNsLdhName(String name, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		String query = getQueryGroup().getQuery(SEARCH_BY_REGEX_NAMESERVER_LDH_QUERY);
@@ -454,7 +454,7 @@ public class DomainModel {
 	 * @throws ObjectNotFoundException
 	 * 
 	 */
-	private static SearchResultStruct<Domain> searchByNsLdhName(String name, Integer resultLimit,
+	private static SearchResultStruct<Domain> searchByNsLdhName(String name, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection, String query)
 			throws SQLException, ObjectNotFoundException {
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
@@ -497,7 +497,7 @@ public class DomainModel {
 	 * @throws ObjectNotFoundException
 	 * 
 	 */
-	public static SearchResultStruct<Domain> searchByNsIp(String ip, Integer resultLimit,
+	public static SearchResultStruct<Domain> searchByNsIp(String ip, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
 			throws SQLException, InvalidValueException, ObjectNotFoundException {
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();

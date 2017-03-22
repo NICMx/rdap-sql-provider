@@ -232,20 +232,6 @@ public class IpNetworkModel {
 		return getByInetAddress(inetAddress, IpUtils.getMaxValidCidr(inetAddress), connection);
 	}
 
-	public static IpNetwork getByInetAddress(String ipAddress, Connection connection)
-			throws SQLException, InvalidValueException, ObjectNotFoundException {
-		InetAddress inetAddress;
-		inetAddress = IpUtils.validateIpAddress(ipAddress);
-		return getByInetAddress(inetAddress, connection);
-	}
-
-	public static IpNetwork getByInetAddress(String ipAddress, Integer cidr, Connection connection)
-			throws SQLException, InvalidValueException, ObjectNotFoundException {
-		InetAddress inetAddress;
-		inetAddress = IpUtils.validateIpAddress(ipAddress);
-		return getByInetAddress(inetAddress, cidr, connection);
-	}
-
 	public static IpNetwork getByInetAddress(InetAddress inetAddress, Integer cidr, Connection connection)
 			throws SQLException, InvalidValueException, ObjectNotFoundException {
 		IpNetwork result = null;

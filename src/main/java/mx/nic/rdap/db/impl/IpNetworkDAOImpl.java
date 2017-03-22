@@ -1,5 +1,6 @@
 package mx.nic.rdap.db.impl;
 
+import java.net.InetAddress;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -20,7 +21,7 @@ public class IpNetworkDAOImpl implements IpNetworkDAO {
 	}
 
 	@Override
-	public IpNetwork getByInetAddress(String ipAddress) throws RdapDataAccessException {
+	public IpNetwork getByInetAddress(InetAddress ipAddress) throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return IpNetworkModel.getByInetAddress(ipAddress, connection);
 		} catch (SQLException e) {
@@ -29,7 +30,7 @@ public class IpNetworkDAOImpl implements IpNetworkDAO {
 	}
 
 	@Override
-	public IpNetwork getByInetAddress(String ipAddress, Integer cidr) throws RdapDataAccessException {
+	public IpNetwork getByInetAddress(InetAddress ipAddress, int cidr) throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return IpNetworkModel.getByInetAddress(ipAddress, cidr, connection);
 		} catch (SQLException e) {

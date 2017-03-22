@@ -3,6 +3,7 @@ package mx.nic.rdap.db.impl;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.util.logging.Logger;
 
 import mx.nic.rdap.db.DatabaseSession;
 import mx.nic.rdap.db.SchemaConfiguration;
@@ -19,6 +20,11 @@ import mx.nic.rdap.db.spi.NameserverDAO;
 import mx.nic.rdap.db.spi.RdapUserDAO;
 
 public class SqlProviderImplementation implements DataAccessImplementation {
+
+	private static final String NAMESERVER_AS_DOMAIN_ATTRIBUTE_KEY = "nameserver_as_domain_attribute";
+	private static final Logger logger = Logger.getLogger(SqlProviderImplementation.class.getName());
+
+	private Boolean useNsAsAttribute;
 
 	@Override
 	public void init(Properties properties) throws InitializationException {
@@ -42,6 +48,15 @@ public class SqlProviderImplementation implements DataAccessImplementation {
 		} catch (ObjectNotFoundException e) {
 			throw new InitializationException("Trouble found while validating zones.", e);
 		}
+
+		String useNsAsAttributeString = properties.getProperty(NAMESERVER_AS_DOMAIN_ATTRIBUTE_KEY);
+		if (useNsAsAttributeString != null) {
+			useNsAsAttribute = Boolean.parseBoolean(useNsAsAttributeString);
+		} else {
+			logger.info("Note: The key '" + NAMESERVER_AS_DOMAIN_ATTRIBUTE_KEY
+					+ "' is not present in the data access configuration. "
+					+ "Domain and Nameserver requests will be rejected.");
+		}
 	}
 
 	@Override
@@ -51,7 +66,11 @@ public class SqlProviderImplementation implements DataAccessImplementation {
 
 	@Override
 	public DomainDAO getDomainDAO() {
-		return new DomainDAOImpl();
+		if (useNsAsAttribute == null) {
+			return null;
+		}
+
+		return new DomainDAOImpl(useNsAsAttribute);
 	}
 
 	@Override
@@ -66,6 +85,12 @@ public class SqlProviderImplementation implements DataAccessImplementation {
 
 	@Override
 	public NameserverDAO getNameserverDAO() {
+		// Asking for NS when they are being stored as attributes does not seem
+		// to make sense.
+		if (useNsAsAttribute == null || useNsAsAttribute) {
+			return null;
+		}
+
 		return new NameserverDAOImpl();
 	}
 

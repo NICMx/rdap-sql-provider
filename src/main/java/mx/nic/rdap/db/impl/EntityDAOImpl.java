@@ -32,7 +32,7 @@ public class EntityDAOImpl implements EntityDAO {
 	}
 
 	@Override
-	public SearchResultStruct<Entity> searchByHandle(String handle, Integer resultLimit) throws RdapDataAccessException {
+	public SearchResultStruct<Entity> searchByHandle(String handle, int resultLimit) throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return EntityModel.searchByHandle(handle, resultLimit, connection);
 		} catch (SQLException e) {
@@ -41,7 +41,7 @@ public class EntityDAOImpl implements EntityDAO {
 	}
 
 	@Override
-	public SearchResultStruct<Entity> searchByVCardName(String vCardName, Integer resultLimit)
+	public SearchResultStruct<Entity> searchByVCardName(String vCardName, int resultLimit)
 			throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return EntityModel.searchByVCardName(vCardName, resultLimit, connection);
@@ -51,7 +51,7 @@ public class EntityDAOImpl implements EntityDAO {
 	}
 
 	@Override
-	public SearchResultStruct<Entity> searchByRegexHandle(String regexHandle, Integer resultLimit)
+	public SearchResultStruct<Entity> searchByRegexHandle(String regexHandle, int resultLimit)
 			throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return EntityModel.searchByRegexHandle(regexHandle, resultLimit, connection);
@@ -63,7 +63,7 @@ public class EntityDAOImpl implements EntityDAO {
 	}
 
 	@Override
-	public SearchResultStruct<Entity> searchByRegexVCardName(String regexName, Integer resultLimit)
+	public SearchResultStruct<Entity> searchByRegexVCardName(String regexName, int resultLimit)
 			throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return EntityModel.searchByRegexName(regexName, resultLimit, connection);
