@@ -4,9 +4,6 @@ INSERT INTO {schema}.variant VALUES (null,?,?);
 #getByDomainId
 SELECT * FROM {schema}.variant v WHERE v.dom_id=?;
 
-#getById
-SELECT * FROM {schema}.variant v WHERE v.var_id = ?;
-
 #getAll
 SELECT * FROM {schema}.variant;
 

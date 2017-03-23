@@ -10,9 +10,6 @@ SELECT * FROM {schema}.domain WHERE dom_handle=?;
 #getByLdhName
 SELECT * FROM {schema}.domain WHERE (dom_ldh_name=? OR dom_unicode_name=?) AND zone_id = ?;
 
-#getDomainById
-SELECT * FROM {schema}.domain WHERE dom_id=?;
-
 #searchByPartialNameWZone
 SELECT domain.* FROM {schema}.domain WHERE (domain.dom_ldh_name LIKE ? OR domain.dom_unicode_name LIKE ? ) AND domain.zone_id = ? ORDER BY 1 LIMIT ?;
 

@@ -22,7 +22,6 @@ import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.Nameserver;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.InvalidValueException;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.objects.NameserverDbObj;
 import mx.nic.rdap.db.struct.SearchResultStruct;
@@ -148,7 +147,7 @@ public class NameserverModel {
 	}
 
 	public static NameserverDbObj findByName(String name, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+			throws SQLException {
 		String query = getQueryGroup().getQuery(FIND_BY_NAME_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, IDN.toASCII(name));
@@ -156,7 +155,7 @@ public class NameserverModel {
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (!resultSet.next()) {
-					throw new ObjectNotFoundException("Object not found.");
+					return null;
 				}
 				NameserverDbObj nameserver = new NameserverDbObj(resultSet);
 				NameserverModel.loadNestedObjects(nameserver, connection);
@@ -166,7 +165,7 @@ public class NameserverModel {
 	}
 
 	public static SearchResultStruct<Nameserver> searchByName(String namePattern, int resultLimit,
-			Connection connection) throws SQLException, ObjectNotFoundException {
+			Connection connection) throws SQLException {
 		String query = null;
 		if (namePattern.contains("*")) {// check if is a partial search
 			query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_NAME_QUERY);
@@ -178,12 +177,12 @@ public class NameserverModel {
 	}
 
 	public static SearchResultStruct<Nameserver> searchByRegexName(String namePattern, int resultLimit,
-			Connection connection) throws SQLException, ObjectNotFoundException {
+			Connection connection) throws SQLException {
 		return searchByName(namePattern, resultLimit, connection, getQueryGroup().getQuery(SEARCH_BY_NAME_REGEX_QUERY));
 	}
 
 	private static SearchResultStruct<Nameserver> searchByName(String namePattern, int resultLimit,
-			Connection connection, String query) throws SQLException, ObjectNotFoundException {
+			Connection connection, String query) throws SQLException {
 		SearchResultStruct<Nameserver> result = new SearchResultStruct<Nameserver>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -198,7 +197,7 @@ public class NameserverModel {
 			try (ResultSet resultSet = statement.executeQuery()) {
 
 				if (!resultSet.next()) {
-					throw new ObjectNotFoundException("Object not found");
+					return null;
 				}
 				do {
 					NameserverDbObj nameserver = new NameserverDbObj(resultSet);
@@ -221,7 +220,7 @@ public class NameserverModel {
 	}
 
 	public static SearchResultStruct<Nameserver> searchByIp(String ipaddressPattern, int resultLimit,
-			Connection connection) throws SQLException, InvalidValueException, ObjectNotFoundException {
+			Connection connection) throws SQLException, InvalidValueException {
 		SearchResultStruct<Nameserver> result = new SearchResultStruct<Nameserver>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -245,7 +244,7 @@ public class NameserverModel {
 			try (ResultSet resultSet = statement.executeQuery()) {
 
 				if (!resultSet.next()) {
-					throw new ObjectNotFoundException("Object not found");
+					return null;
 				}
 				do {
 					NameserverDbObj nameserver = new NameserverDbObj(resultSet);
@@ -299,20 +298,14 @@ public class NameserverModel {
 	private static void loadNestedObjects(Nameserver nameserver, Connection connection) throws SQLException {
 
 		// Retrieve the ipAddress
-		try {
-			nameserver.setIpAddresses(IpAddressModel.getIpAddressStructByNameserverId(nameserver.getId(), connection));
-		} catch (ObjectNotFoundException onfe) {
-			// Do nothing, ipaddresses is not required
-		}
+		nameserver.setIpAddresses(IpAddressModel.getIpAddressStructByNameserverId(nameserver.getId(), connection));
+
 		// Retrieve the status
 		nameserver.getStatus().addAll(StatusModel.getByNameServerId(nameserver.getId(), connection));
 
 		// Retrieve the remarks
-		try {
-			nameserver.getRemarks().addAll(RemarkModel.getByNameserverId(nameserver.getId(), connection));
-		} catch (ObjectNotFoundException onfe) {
-			// Do nothing, remarks is not required
-		}
+		nameserver.getRemarks().addAll(RemarkModel.getByNameserverId(nameserver.getId(), connection));
+
 		// Retrieve the links
 		nameserver.getLinks().addAll(LinkModel.getByNameServerId(nameserver.getId(), connection));
 
@@ -347,7 +340,7 @@ public class NameserverModel {
 	}
 
 	public static NameserverDbObj getByHandle(String handle, Connection rdapConnection)
-			throws SQLException, RequiredValueNotFoundException, ObjectNotFoundException {
+			throws SQLException, RequiredValueNotFoundException {
 		if (handle == null || handle.isEmpty()) {
 			throw new RequiredValueNotFoundException("handle", "Nameserver");
 		}
@@ -357,7 +350,7 @@ public class NameserverModel {
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (!resultSet.next()) {
-					throw new ObjectNotFoundException("Object not found.");
+					return null;
 				}
 				NameserverDbObj nameserver = new NameserverDbObj(resultSet);
 				loadNestedObjects(nameserver, rdapConnection);

@@ -113,12 +113,8 @@ public class VCardModel {
 	/**
 	 * Get a {@link List} of {@link VCard} belonging to a {@link Registrar} by
 	 * the registrar Id.
-	 * 
-	 * @throws ObjectNotFoundException
-	 * 
 	 */
-	public static List<VCard> getByEntityId(Long registrarId, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	public static List<VCard> getByEntityId(Long registrarId, Connection connection) throws SQLException {
 		List<VCard> vCardResults = null;
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_ENTITY_QUERY));) {
 			statement.setLong(1, registrarId);
@@ -128,10 +124,13 @@ public class VCardModel {
 			vCardResults = processListResultSet(resultSet, connection);
 		}
 
+		if (vCardResults == null) {
+			return null;
+		}
+
 		for (VCard vCard : vCardResults) {
 			setSonObjects(vCard, connection);
 		}
-
 		return vCardResults;
 	}
 
@@ -161,15 +160,11 @@ public class VCardModel {
 
 	/**
 	 * Process a {@link ResultSet} and return a {@link List} of {@link VCard}s.
-	 * 
-	 * @throws ObjectNotFoundException
-	 * 
 	 */
-	private static List<VCard> processListResultSet(ResultSet resultSet, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	private static List<VCard> processListResultSet(ResultSet resultSet, Connection connection) throws SQLException {
 		List<VCard> result = new ArrayList<>();
 		if (!resultSet.next()) {
-			throw new ObjectNotFoundException("Object not found");
+			return null;
 		}
 		do {
 			VCardDbObj vCard = new VCardDbObj();

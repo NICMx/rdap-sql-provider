@@ -6,15 +6,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.IpAddress;
 import mx.nic.rdap.core.db.struct.NameserverIpAddressesStruct;
 import mx.nic.rdap.db.QueryGroup;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.objects.IpAddressDbObj;
 
 /**
@@ -28,7 +25,6 @@ public class IpAddressModel {
 	private final static String QUERY_GROUP = "IpAddress";
 	private static final String STORE_QUERY = "storeToDatabase";
 	private static final String GET_QUERY = "getByNameserverId";
-	private static final String GET_ALL_QUERY = "getAll";
 
 	protected static QueryGroup queryGroup = null;
 
@@ -77,14 +73,14 @@ public class IpAddressModel {
 	}
 
 	public static NameserverIpAddressesStruct getIpAddressStructByNameserverId(Long nameserverId, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+			throws SQLException {
 		String query = getQueryGroup().getQuery(GET_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setLong(1, nameserverId);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();
 			if (!resultSet.next()) {
-				throw new ObjectNotFoundException("Object not found.");
+				return null;
 			}
 
 			// Process the resulset to construct the struct
@@ -98,30 +94,6 @@ public class IpAddressModel {
 				}
 			} while (resultSet.next());
 			return struct;
-		}
-	}
-
-	/**
-	 * Unused. Getall the ipAddress from DB
-	 * 
-	 * @throws ObjectNotFoundException
-	 */
-	public static List<IpAddressDbObj> getAll(Connection connection) throws SQLException, ObjectNotFoundException {
-		String query = getQueryGroup().getQuery(GET_ALL_QUERY);
-		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			ResultSet resultSet = statement.executeQuery();
-			if (!resultSet.next()) {
-				throw new ObjectNotFoundException("Object not found.");
-			}
-
-			// Process the resulset to construct the struct
-			List<IpAddressDbObj> addresses = new ArrayList<IpAddressDbObj>();
-			do {
-				IpAddressDbObj ipAddressDAO = new IpAddressDbObj(resultSet);
-				addresses.add(ipAddressDAO);
-			} while (resultSet.next());
-			return addresses;
 		}
 	}
 

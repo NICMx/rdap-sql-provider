@@ -25,7 +25,6 @@ import mx.nic.rdap.core.db.RemarkDescription;
 import mx.nic.rdap.core.db.VCard;
 import mx.nic.rdap.core.db.VCardPostalInfo;
 import mx.nic.rdap.core.db.struct.NameserverIpAddressesStruct;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.DomainModel;
 import mx.nic.rdap.db.model.EntityModel;
@@ -69,7 +68,7 @@ public class DummyDataTest extends DatabaseTest {
 						getRandomBoolean());
 			}
 			connection.commit();
-		} catch (SQLException | ObjectNotFoundException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 			fail();
 		}
@@ -77,7 +76,7 @@ public class DummyDataTest extends DatabaseTest {
 
 	private static void createDomain(String name, String zone, String handle, boolean hasEntities,
 			boolean hasNameservers, boolean hasRemarks, boolean hasLinks, boolean hasEvents)
-			throws RequiredValueNotFoundException, IOException, SQLException, ObjectNotFoundException {
+			throws RequiredValueNotFoundException, IOException, SQLException {
 		DomainDbObj domain = new DomainDbObj();
 		domain.setLdhName(name);
 		domain.setHandle(handle);

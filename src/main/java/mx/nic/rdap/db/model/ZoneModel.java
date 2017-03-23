@@ -63,8 +63,6 @@ public class ZoneModel {
 
 	/**
 	 * Validate if the configurated zones are in the database
-	 * 
-	 * @throws ObjectNotFoundException
 	 */
 	public static void validateConfiguratedZones(Properties properties) throws ObjectNotFoundException {
 		List<String> configuratedZones;
@@ -89,7 +87,7 @@ public class ZoneModel {
 				zoneByIdForServer.put(ZoneModel.getIdByZone().get(zone), zone);
 				idByZoneForServer.put(zone, ZoneModel.getIdByZoneName(zone));
 			} else {
-				logger.log(Level.WARNING, "Configurated zone not found in database : " + zone);
+				logger.log(Level.WARNING, "Configured zone not found in database : " + zone);
 			}
 		}
 		configuratedZones.remove(ZoneModel.REVERSE_IP_V4);
@@ -100,15 +98,15 @@ public class ZoneModel {
 				zoneByIdForServer.put(ZoneModel.getIdByZone().get(zone), zone);
 				idByZoneForServer.put(zone, ZoneModel.getIdByZoneName(zone));
 			} else {
-				logger.log(Level.WARNING, "Configurated zone not found in database : " + zone);
+				logger.log(Level.WARNING, "Configured zone not found in database : " + zone);
 			}
 		}
 		configuratedZones.remove(ZoneModel.REVERSE_IP_V6);
 
 		for (String zone : configuratedZones) {
 			if (ZoneModel.getIdByZone().get(zone) == null) {
-				logger.log(Level.SEVERE, "Configurated zone not found in database:" + zone);
-				throw new ObjectNotFoundException("Configurated zone not found in database:" + zone);
+				logger.log(Level.SEVERE, "Configured zone not found in database:" + zone);
+				throw new ObjectNotFoundException("Configured zone not found in database:" + zone);
 			}
 			zoneByIdForServer.put(ZoneModel.getIdByZone().get(zone), zone);
 			idByZoneForServer.put(zone, ZoneModel.getIdByZoneName(zone));

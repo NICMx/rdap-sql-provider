@@ -23,7 +23,6 @@ import mx.nic.rdap.core.db.Remark;
 import mx.nic.rdap.core.db.RemarkDescription;
 import mx.nic.rdap.core.db.VCard;
 import mx.nic.rdap.core.db.VCardPostalInfo;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.model.EntityModel;
 import mx.nic.rdap.db.objects.EntityDbObj;
 import mx.nic.rdap.db.objects.EventDbObj;
@@ -51,7 +50,7 @@ public class EntityTest extends DatabaseTest {
 		// check if exists
 		try {
 			EntityModel.getByHandle("minimunEntity", connection);
-		} catch (SQLException | ObjectNotFoundException s) {
+		} catch (SQLException s) {
 			fail();
 		}
 	}
@@ -159,22 +158,14 @@ public class EntityTest extends DatabaseTest {
 		entity.getVCardList().add(vCard);
 
 		// Store it in the database
-		Long entId = null;
 		try {
-			entId = EntityModel.storeToDatabase(entity, connection);
+			EntityModel.storeToDatabase(entity, connection);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
 
 		// Query the database
-		Entity byId = null;
-		try {
-			byId = EntityModel.getById(entId, connection);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
 		Entity byHandle = null;
 		try {
 			byHandle = EntityModel.getByHandle(entity.getHandle(), connection);
@@ -184,7 +175,6 @@ public class EntityTest extends DatabaseTest {
 		}
 
 		// Compares the results
-		Assert.assertTrue("getById fails", entity.equals(byId));
 		Assert.assertTrue("getByHandle fails", entity.equals(byHandle));
 	}
 
@@ -386,27 +376,15 @@ public class EntityTest extends DatabaseTest {
 		// ----- END OF ENT 2 ------
 
 		// Store it in the database
-		Long entId = null;
-		Long entId2 = null;
 		try {
-			entId = EntityModel.storeToDatabase(entity, connection);
-			entId2 = EntityModel.storeToDatabase(entity2, connection);
+			EntityModel.storeToDatabase(entity, connection);
+			EntityModel.storeToDatabase(entity2, connection);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
 
 		// Query the database
-		Entity byId = null;
-		Entity byId2 = null;
-		try {
-			byId = EntityModel.getById(entId, connection);
-			byId2 = EntityModel.getById(entId2, connection);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
-
 		Entity byHandle = null;
 		Entity byHandle2 = null;
 		try {
@@ -418,8 +396,6 @@ public class EntityTest extends DatabaseTest {
 		}
 
 		// Compares the results
-		Assert.assertTrue("getById fails", entity.equals(byId));
-		Assert.assertTrue("getById2 fails", entity2.equals(byId2));
 		Assert.assertTrue("getByHandle fails", entity.equals(byHandle));
 		Assert.assertTrue("getByHandle2 fails", entity2.equals(byHandle2));
 
@@ -440,22 +416,14 @@ public class EntityTest extends DatabaseTest {
 		entity.getEntities().add(legal);
 
 		// Store it in the database
-		Long entId = null;
 		try {
-			entId = EntityModel.storeToDatabase(entity, connection);
+			EntityModel.storeToDatabase(entity, connection);
 		} catch (Exception e) {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
 
 		// Query the database
-		Entity byId = null;
-		try {
-			byId = EntityModel.getById(entId, connection);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
 		Entity byHandle = null;
 		try {
 			byHandle = EntityModel.getByHandle(entity.getHandle(), connection);
@@ -465,7 +433,6 @@ public class EntityTest extends DatabaseTest {
 		}
 
 		// Compares the results
-		Assert.assertTrue("getById fails", entity.equals(byId));
 		Assert.assertTrue("getByHandle fails", entity.equals(byHandle));
 
 	}
@@ -501,8 +468,8 @@ public class EntityTest extends DatabaseTest {
 
 		try {
 			Entity byHandle = EntityModel.getByHandle(entity.getHandle(), connection);
-			return byHandle;
-		} catch (ObjectNotFoundException e) {
+			if (byHandle != null)
+				return byHandle;
 			// if not found, continue;
 		} catch (SQLException e) {
 			e.printStackTrace();

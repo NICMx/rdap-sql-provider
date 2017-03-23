@@ -45,7 +45,6 @@ public class DomainModel {
 
 	private static final String STORE_IP_NETWORK_RELATION_QUERY = "storeDomainIpNetworkRelation";
 	private static final String GET_BY_LDH_QUERY = "getByLdhName";
-	private static final String GET_BY_ID_QUERY = "getDomainById";
 	private static final String GET_BY_HANDLE_QUERY = "getByHandle";
 	private static final String SEARCH_BY_PARTIAL_NAME_WITH_PARTIAL_ZONE_QUERY = "searchByPartialNameWPartialZone";
 	private static final String SEARCH_BY_NAME_WITH_PARTIAL_ZONE_QUERY = "searchByNameWPartialZone";
@@ -78,7 +77,7 @@ public class DomainModel {
 	}
 
 	public static Long storeToDatabase(Domain domain, boolean useNameserverAsAttribute, Connection connection)
-			throws SQLException, RequiredValueNotFoundException, ObjectNotFoundException {
+			throws SQLException, RequiredValueNotFoundException {
 		String query = getQueryGroup().getQuery(STORE_QUERY);
 		Long domainId;
 		isValidForStore((DomainDbObj) domain);
@@ -97,7 +96,7 @@ public class DomainModel {
 	}
 
 	public static void storeNestedObjects(Domain domain, boolean useNameserverAsAttribute, Connection connection)
-			throws SQLException, RequiredValueNotFoundException, ObjectNotFoundException {
+			throws SQLException, RequiredValueNotFoundException {
 		Long domainId = domain.getId();
 		RemarkModel.storeDomainRemarksToDatabase(domain.getRemarks(), domainId, connection);
 		EventModel.storeDomainEventsToDatabase(domain.getEvents(), domainId, connection);
@@ -122,20 +121,19 @@ public class DomainModel {
 		storeDomainEntities(domain.getEntities(), domainId, connection);
 		IpNetwork ipNetwork = domain.getIpNetwork();
 		if (ipNetwork != null) {
-			try {
-				IpNetworkDbObj ipNetResult = IpNetworkModel.getByHandle(ipNetwork.getHandle(), connection);
-				ipNetwork.setId(ipNetResult.getId());
-			} catch (ObjectNotFoundException e) {
+			IpNetworkDbObj ipNetResult = IpNetworkModel.getByHandle(ipNetwork.getHandle(), connection);
+			if (ipNetResult == null) {
 				throw new NullPointerException(
 						"IpNetwork: " + ipNetwork.getHandle() + "was not inserted previously to the database");
 			}
+			ipNetwork.setId(ipNetResult.getId());
 
 			storeDomainIpNetworkRelationToDatabase(domainId, ipNetwork.getId(), connection);
 		}
 	}
 
 	private static void storeDomainNameserversAsObjects(List<Nameserver> nameservers, Long domainId,
-			Connection connection) throws RequiredValueNotFoundException, SQLException, ObjectNotFoundException {
+			Connection connection) throws RequiredValueNotFoundException, SQLException {
 		if (nameservers.size() > 0) {
 			validateDomainNameservers(nameservers, connection);
 			NameserverModel.storeDomainNameserversToDatabase(nameservers, domainId, connection);
@@ -143,7 +141,7 @@ public class DomainModel {
 	}
 
 	private static void validateDomainNameservers(List<Nameserver> nameservers, Connection connection)
-			throws RequiredValueNotFoundException, SQLException, ObjectNotFoundException {
+			throws RequiredValueNotFoundException, SQLException {
 		for (Nameserver ns : nameservers) {
 			Long nsId = NameserverModel.getByHandle(ns.getHandle(), connection).getId();
 			if (nsId == null) {
@@ -182,7 +180,7 @@ public class DomainModel {
 	}
 
 	public static DomainDbObj findByLdhName(String name, Integer zoneId, boolean useNameserverAsDomainAttribute,
-			Connection connection) throws SQLException, ObjectNotFoundException {
+			Connection connection) throws SQLException {
 		String query = getQueryGroup().getQuery(GET_BY_LDH_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, IDN.toASCII(name));
@@ -191,7 +189,7 @@ public class DomainModel {
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (!resultSet.next()) {
-					throw new ObjectNotFoundException("Object not found.");
+					return null;
 				}
 				DomainDbObj domain = new DomainDbObj(resultSet);
 				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
@@ -200,30 +198,14 @@ public class DomainModel {
 		}
 	}
 
-	public static Domain getDomainById(Long domainId, boolean useNameserverAsDomainAttribute, Connection connection)
-			throws SQLException, ObjectNotFoundException {
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_ID_QUERY))) {
-			statement.setLong(1, domainId);
-			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
-			try (ResultSet resultSet = statement.executeQuery()) {
-				if (!resultSet.next()) {
-					throw new ObjectNotFoundException("Object not found.");
-				}
-				Domain domain = new DomainDbObj(resultSet);
-				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
-				return domain;
-			}
-		}
-	}
-
 	public static DomainDbObj getByHandle(String handle, boolean useNameserverAsDomainAttribute, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+			throws SQLException {
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_HANDLE_QUERY))) {
 			statement.setString(1, handle);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (!resultSet.next()) {
-					throw new ObjectNotFoundException("Object not found.");
+					return null;
 				}
 				DomainDbObj domain = new DomainDbObj(resultSet);
 				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
@@ -234,9 +216,6 @@ public class DomainModel {
 
 	/**
 	 * Searches a domain by it´s name and TLD
-	 * 
-	 * @throws ObjectNotFoundException
-	 * 
 	 */
 	public static SearchResultStruct<Domain> searchByName(String name, String zone, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
@@ -320,7 +299,7 @@ public class DomainModel {
 
 	public static SearchResultStruct<Domain> searchByName(String domainName, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+			throws SQLException {
 		String query;
 		if (domainName.contains("*")) {
 			domainName = domainName.replaceAll("\\*", "%");
@@ -333,14 +312,14 @@ public class DomainModel {
 
 	public static SearchResultStruct<Domain> searchByRegexName(String regexName, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+			throws SQLException {
 		String query = getQueryGroup().getQuery(SEARCH_BY_REGEX_NAME_WITHOUT_ZONE);
 		return searchByName(regexName, resultLimit, useNameserverAsDomainAttribute, connection, query);
 	}
 
 	public static SearchResultStruct<Domain> searchByRegexName(String name, String zone, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+			throws SQLException {
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -362,7 +341,7 @@ public class DomainModel {
 			logger.log(Level.INFO, "Executing query" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();
 			if (!resultSet.next()) {
-				throw new ObjectNotFoundException("Object not found.");
+				return null;
 			}
 			List<DomainDbObj> domains = new ArrayList<DomainDbObj>();
 			do {
@@ -385,13 +364,10 @@ public class DomainModel {
 
 	/**
 	 * Searches a domain by it's name when user don´t care about the TLD
-	 * 
-	 * @throws ObjectNotFoundException
-	 * 
 	 */
 	private static SearchResultStruct<Domain> searchByName(String domainName, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection, String query)
-			throws SQLException, ObjectNotFoundException {
+			throws SQLException {
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -412,7 +388,7 @@ public class DomainModel {
 			ResultSet resultSet = statement.executeQuery();
 
 			if (!resultSet.next()) {
-				throw new ObjectNotFoundException("Object not found.");
+				return null;
 			}
 			List<DomainDbObj> domains = new ArrayList<DomainDbObj>();
 			do {
@@ -435,7 +411,7 @@ public class DomainModel {
 
 	public static SearchResultStruct<Domain> searchByNsLdhName(String name, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+			throws SQLException {
 		String query = getQueryGroup().getQuery(SEARCH_BY_NAMESERVER_LDH_QUERY);
 		name = name.replace("*", "%");
 		return searchByNsLdhName(name, resultLimit, useNameserverAsDomainAttribute, connection, query);
@@ -443,20 +419,17 @@ public class DomainModel {
 
 	public static SearchResultStruct<Domain> searchByRegexNsLdhName(String name, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+			throws SQLException {
 		String query = getQueryGroup().getQuery(SEARCH_BY_REGEX_NAMESERVER_LDH_QUERY);
 		return searchByNsLdhName(name, resultLimit, useNameserverAsDomainAttribute, connection, query);
 	}
 
 	/**
 	 * Searches all domains with a nameserver by name
-	 * 
-	 * @throws ObjectNotFoundException
-	 * 
 	 */
 	private static SearchResultStruct<Domain> searchByNsLdhName(String name, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection, String query)
-			throws SQLException, ObjectNotFoundException {
+			throws SQLException {
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -469,7 +442,7 @@ public class DomainModel {
 			ResultSet resultSet = statement.executeQuery();
 
 			if (!resultSet.next()) {
-				throw new ObjectNotFoundException("Object not found.");
+				return null;
 			}
 			List<DomainDbObj> domains = new ArrayList<DomainDbObj>();
 			do {
@@ -492,14 +465,10 @@ public class DomainModel {
 
 	/**
 	 * searches all domains with a nameserver by address
-	 * 
-	 * @throws InvalidValueException
-	 * @throws ObjectNotFoundException
-	 * 
 	 */
 	public static SearchResultStruct<Domain> searchByNsIp(String ip, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
-			throws SQLException, InvalidValueException, ObjectNotFoundException {
+			throws SQLException, InvalidValueException {
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -523,7 +492,7 @@ public class DomainModel {
 			ResultSet resultSet = statement.executeQuery();
 
 			if (!resultSet.next()) {
-				throw new ObjectNotFoundException("Object not found.");
+				return null;
 			}
 			List<DomainDbObj> domains = new ArrayList<DomainDbObj>();
 			do {
@@ -567,26 +536,17 @@ public class DomainModel {
 		domain.getStatus().addAll(StatusModel.getByDomainId(domainId, connection));
 
 		// Retrieve the remarks
-		try {
-			domain.getRemarks().addAll(RemarkModel.getByDomainId(domainId, connection));
-		} catch (ObjectNotFoundException onfe) {
-			// Do nothing, remarks is not required
-		}
+		domain.getRemarks().addAll(RemarkModel.getByDomainId(domainId, connection));
+
 		// Retrieve the public ids
 		domain.setPublicIds(PublicIdModel.getByDomain(domainId, connection));
 
 		// Retrieve the secure dns
-		try {
-			domain.setSecureDNS(SecureDNSModel.getByDomain(domainId, connection));
-		} catch (ObjectNotFoundException onfe) {
-			// Do nothing, secure dns is not required
-		}
+		domain.setSecureDNS(SecureDNSModel.getByDomain(domainId, connection));
+
 		// Retrieve the variants
-		try {
-			domain.setVariants(VariantModel.getByDomainId(domainId, connection));
-		} catch (ObjectNotFoundException onfe) {
-			// Do nothing, variants is not required
-		}
+		domain.setVariants(VariantModel.getByDomainId(domainId, connection));
+
 		// Retrieve the domainsNs
 		domain.getNameServers()
 				.addAll(NameserverModel.getByDomainId(domainId, useNameserverAsDomainAttribute, connection));
@@ -595,12 +555,7 @@ public class DomainModel {
 		domain.getEntities().addAll(EntityModel.getEntitiesByDomainId(domainId, connection));
 
 		// Retrieve the ipNetwork
-		try {
-			IpNetwork network = IpNetworkModel.getByDomainId(domainId, connection);
-			domain.setIpNetwork(network);
-		} catch (ObjectNotFoundException e) {
-			// Do nothing, ipNetwork is not requiered
-		}
+		domain.setIpNetwork(IpNetworkModel.getByDomainId(domainId, connection));
 	}
 
 	/**

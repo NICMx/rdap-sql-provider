@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 import mx.nic.rdap.core.db.Autnum;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.db.QueryGroup;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.objects.AutnumDbObj;
 
@@ -104,13 +103,13 @@ public class AutnumModel {
 	}
 
 	public static AutnumDbObj getAutnumById(Long autnumId, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+			throws SQLException {
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_ID))) {
 			statement.setLong(1, autnumId);
 			logger.log(Level.INFO, "Executing query: " + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (!resultSet.next()) {
-					throw new ObjectNotFoundException("Object not found");
+					return null;
 				}
 				AutnumDbObj autnum = new AutnumDbObj(resultSet);
 				loadNestedObjects(autnum, connection);
@@ -119,15 +118,14 @@ public class AutnumModel {
 		}
 	}
 
-	public static AutnumDbObj getByRange(long autnumValue, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	public static AutnumDbObj getByRange(long autnumValue, Connection connection) throws SQLException {
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_RANGE))) {
 			statement.setLong(1, autnumValue);
 			statement.setLong(2, autnumValue);
 			logger.log(Level.INFO, "Executing query: " + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (!resultSet.next()) {
-					throw new ObjectNotFoundException("Object not found.");
+					return null;
 				}
 				AutnumDbObj autnum = new AutnumDbObj(resultSet);
 				loadNestedObjects(autnum, connection);
@@ -136,14 +134,13 @@ public class AutnumModel {
 		}
 	}
 
-	public static AutnumDbObj getByHandle(String handle, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	public static AutnumDbObj getByHandle(String handle, Connection connection) throws SQLException {
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_HANDLE))) {
 			statement.setString(1, handle);
 			logger.log(Level.INFO, "Executing query: " + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (!resultSet.next()) {
-					throw new ObjectNotFoundException("Object not found.");
+					return null;
 				}
 				AutnumDbObj autnum = new AutnumDbObj(resultSet);
 				loadNestedObjects(autnum, connection);
@@ -154,6 +151,8 @@ public class AutnumModel {
 
 	private static void loadNestedObjects(Autnum autnum, Connection connection) {
 		Long autnumId = autnum.getId();
+
+		// TODO we should not be catching generic exceptions so blatantly.
 
 		try {
 			autnum.getStatus().addAll(StatusModel.getByAutnumId(autnumId, connection));
@@ -230,11 +229,7 @@ public class AutnumModel {
 		autnum.getStatus().addAll(StatusModel.getByIpNetworkId(ipNetworkId, connection));
 
 		// Retrieve the remarks
-		try {
-			autnum.getRemarks().addAll(RemarkModel.getByIpNetworkId(ipNetworkId, connection));
-		} catch (ObjectNotFoundException onfe) {
-			// Do nothing, remarks is not required
-		}
+		autnum.getRemarks().addAll(RemarkModel.getByIpNetworkId(ipNetworkId, connection));
 	}
 
 }

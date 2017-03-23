@@ -2,6 +2,7 @@ package mx.nic.rdap.db;
 
 import static org.junit.Assert.fail;
 
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -21,7 +22,6 @@ import mx.nic.rdap.core.db.Link;
 import mx.nic.rdap.core.db.Remark;
 import mx.nic.rdap.core.db.RemarkDescription;
 import mx.nic.rdap.db.exception.InvalidValueException;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.model.EntityModel;
 import mx.nic.rdap.db.model.IpNetworkModel;
 import mx.nic.rdap.db.objects.EventDbObj;
@@ -42,7 +42,7 @@ public class IpNetworkTest extends DatabaseTest {
 	 * objects with the objects in the database
 	 */
 	@Test
-	public void insertAndGetSimpleObject() {
+	public void insertAndGetSimpleObject() throws UnknownHostException {
 		// create local instances;
 		IpNetwork ipNetwork;
 		try {
@@ -62,8 +62,8 @@ public class IpNetworkTest extends DatabaseTest {
 		// Query the database
 		IpNetwork byIp = null;
 		try {
-			byIp = IpNetworkModel.getByInetAddress("192.168.1.1", 26, connection);
-		} catch (Exception e) {
+			byIp = IpNetworkModel.getByInetAddress(InetAddress.getByName("192.168.1.1"), 26, connection);
+		} catch (InvalidValueException | SQLException e) {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
@@ -73,8 +73,8 @@ public class IpNetworkTest extends DatabaseTest {
 
 		// check if exists
 		try {
-			IpNetworkModel.getByInetAddress("192.168.1.0", connection);
-		} catch (SQLException | InvalidValueException | ObjectNotFoundException e) {
+			IpNetworkModel.getByInetAddress(InetAddress.getByName("192.168.1.0"), connection);
+		} catch (SQLException | InvalidValueException e) {
 			fail("fail existByInetAddress");
 		}
 	}
@@ -85,7 +85,7 @@ public class IpNetworkTest extends DatabaseTest {
 	 * objects with the objects in the database
 	 */
 	@Test
-	public void insertAndGetSimpleObjectIpv6() {
+	public void insertAndGetSimpleObjectIpv6() throws UnknownHostException {
 		// create local instances;
 		IpNetwork ipNetwork;
 		try {
@@ -107,8 +107,8 @@ public class IpNetworkTest extends DatabaseTest {
 		// Query the database
 		IpNetwork byIp = null;
 		try {
-			byIp = IpNetworkModel.getByInetAddress("2001:BABA:CAFE:0003::", connection);
-		} catch (Exception e) {
+			byIp = IpNetworkModel.getByInetAddress(InetAddress.getByName("2001:BABA:CAFE:0003::"), connection);
+		} catch (SQLException | InvalidValueException e) {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
@@ -118,8 +118,8 @@ public class IpNetworkTest extends DatabaseTest {
 
 		// check if exists
 		try {
-			IpNetworkModel.getByInetAddress("2001:BABA:CAFE:0003::", connection);
-		} catch (SQLException | InvalidValueException | ObjectNotFoundException e) {
+			IpNetworkModel.getByInetAddress(InetAddress.getByName("2001:BABA:CAFE:0003::"), connection);
+		} catch (SQLException | InvalidValueException e) {
 			fail("fail existByInetAddress");
 		}
 	}
@@ -130,7 +130,7 @@ public class IpNetworkTest extends DatabaseTest {
 	 * objects with the objects in the database
 	 */
 	@Test
-	public void insertAndGetComplexObject() {
+	public void insertAndGetComplexObject() throws UnknownHostException {
 		// create local instances;
 		IpNetwork ipNetwork;
 		try {
@@ -214,8 +214,8 @@ public class IpNetworkTest extends DatabaseTest {
 		// Query the database
 		IpNetwork byIp = null;
 		try {
-			byIp = IpNetworkModel.getByInetAddress("192.168.1.1", 26, connection);
-		} catch (Exception e) {
+			byIp = IpNetworkModel.getByInetAddress(InetAddress.getByName("192.168.1.1"), 26, connection);
+		} catch (SQLException | InvalidValueException e) {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
@@ -225,7 +225,7 @@ public class IpNetworkTest extends DatabaseTest {
 	}
 
 	@Test
-	public void insertAndGetComplexV6Object() {
+	public void insertAndGetComplexV6Object() throws UnknownHostException {
 		// create local instances;
 		IpNetwork ipNetwork;
 		try {
@@ -310,8 +310,8 @@ public class IpNetworkTest extends DatabaseTest {
 		// Query the database
 		IpNetwork byIp = null;
 		try {
-			byIp = IpNetworkModel.getByInetAddress("2001:BABA:CAFE:0003::", connection);
-		} catch (Exception e) {
+			byIp = IpNetworkModel.getByInetAddress(InetAddress.getByName("2001:BABA:CAFE:0003::"), connection);
+		} catch (SQLException | InvalidValueException e) {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}

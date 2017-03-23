@@ -63,6 +63,12 @@ public class RemarkDescriptionModel {
 		}
 	}
 
+	/**
+	 * @throws ObjectNotFoundException
+	 *             Remarks are supposed to contain descriptions; they are not
+	 *             optional. Callers need to concern themselves with this
+	 *             situation.
+	 */
 	public static List<RemarkDescription> findByRemarkId(Long id, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_QUERY))) {
@@ -70,7 +76,7 @@ public class RemarkDescriptionModel {
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (!resultSet.next()) {
-					throw new ObjectNotFoundException("Object not found.");
+					throw new ObjectNotFoundException("The remark has no descriptions.");
 				}
 				List<RemarkDescription> remarks = new ArrayList<RemarkDescription>();
 				do {

@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.SecureDNS;
 import mx.nic.rdap.db.QueryGroup;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.objects.SecureDNSDbObj;
 
@@ -67,14 +66,13 @@ public class SecureDNSModel {
 		return secureDns.getId();
 	}
 
-	public static SecureDNS getByDomain(Long domainId, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	public static SecureDNS getByDomain(Long domainId, Connection connection) throws SQLException {
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_QUERY));) {
 			statement.setLong(1, domainId);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			ResultSet resultSet = statement.executeQuery();
 			if (!resultSet.next()) {
-				throw new ObjectNotFoundException("Object Not Found");
+				return null;
 			}
 
 			SecureDNSDbObj secureDns = new SecureDNSDbObj(resultSet);

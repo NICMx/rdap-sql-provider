@@ -13,7 +13,6 @@ import mx.nic.rdap.core.catalog.Rol;
 import mx.nic.rdap.core.db.Domain;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.PublicId;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.DomainModel;
 import mx.nic.rdap.db.model.EntityModel;
@@ -111,7 +110,7 @@ public class PublicIdTest extends DatabaseTest {
 
 		try {
 			DomainModel.storeToDatabase(dom, false, connection);
-		} catch (SQLException | RequiredValueNotFoundException | ObjectNotFoundException e) {
+		} catch (SQLException | RequiredValueNotFoundException e) {
 			e.printStackTrace();
 			fail();
 		}

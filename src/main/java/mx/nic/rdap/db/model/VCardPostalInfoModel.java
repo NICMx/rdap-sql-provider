@@ -70,28 +70,7 @@ public class VCardPostalInfoModel {
 	}
 
 	/**
-	 * Get a {@link VCardPostalInfo} by its id.
-	 * 
-	 * @throws ObjectNotFoundException
-	 * 
-	 */
-	public static VCardPostalInfo getById(Long vCardPostalInfoId, Connection connection)
-			throws SQLException, ObjectNotFoundException {
-		VCardPostalInfo vCardPostalInfoResult = null;
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_QUERY));) {
-			statement.setLong(1, vCardPostalInfoId);
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			ResultSet resultSet = statement.executeQuery();
-			vCardPostalInfoResult = processResultSet(resultSet, connection);
-		}
-		return vCardPostalInfoResult;
-	}
-
-	/**
 	 * Gets a {@link List} of {@link VCardPostalInfo} by a VCardId
-	 * 
-	 * @throws ObjectNotFoundException
-	 * 
 	 */
 	public static List<VCardPostalInfo> getByVCardId(Long vCardId, Connection connection)
 			throws SQLException, ObjectNotFoundException {
@@ -106,28 +85,8 @@ public class VCardPostalInfoModel {
 	}
 
 	/**
-	 * Process a {@link ResultSet} and return one {@link VCardPostalInfo}.
-	 * 
-	 * @throws ObjectNotFoundException
-	 * 
-	 */
-	private static VCardPostalInfo processResultSet(ResultSet resultSet, Connection connection)
-			throws SQLException, ObjectNotFoundException {
-		if (!resultSet.next()) {
-			throw new ObjectNotFoundException("Object not found");
-		}
-		VCardPostalInfoDbObj vCardPostalInfo = new VCardPostalInfoDbObj();
-		vCardPostalInfo.loadFromDatabase(resultSet);
-
-		return vCardPostalInfo;
-	}
-
-	/**
 	 * Process a {@link ResultSet} and return a {@link List} of
 	 * {@link VCardPostalInfo}.
-	 * 
-	 * @throws ObjectNotFoundException
-	 * 
 	 */
 	private static List<VCardPostalInfo> processListResultSet(ResultSet resultSet, Connection connection)
 			throws SQLException, ObjectNotFoundException {

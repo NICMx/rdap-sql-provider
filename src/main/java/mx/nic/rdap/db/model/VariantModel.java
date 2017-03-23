@@ -33,7 +33,6 @@ public class VariantModel {
 	private static final String STORE_NAMES_QUERY = "storeVariantNames";
 	private static final String GET_BY_DOMAIN_QUERY = "getByDomainId";
 	private static final String GET_RELATION_BY_VARIANT_QUERY = "getVariantRelationsByVariantId";
-	private static final String GET_BY_ID_QUERY = "getById";
 	private static final String GET_NAMES_BY_VARIANT_QUERY = "getVariantNamesByVariantId";
 
 	protected static QueryGroup queryGroup = null;
@@ -82,8 +81,7 @@ public class VariantModel {
 		return variantInsertedId;
 	}
 
-	public static List<Variant> getByDomainId(Long domainId, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	public static List<Variant> getByDomainId(Long domainId, Connection connection) throws SQLException {
 		List<Variant> variants = null;
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_DOMAIN_QUERY))) {
 			statement.setLong(1, domainId);
@@ -97,36 +95,26 @@ public class VariantModel {
 			variants = new ArrayList<>();
 			do {
 				VariantDbObj variant = new VariantDbObj(resultSet);
+
+				try {
+					setVariantNames(variant, connection);
+				} catch (ObjectNotFoundException e) {
+					logger.log(Level.WARNING, "Variant " + variant.getId() + " has no names.", e);
+					continue;
+				}
+
+				try {
+					setVariantRelations(variant, connection);
+				} catch (ObjectNotFoundException e) {
+					logger.log(Level.WARNING, "Variant " + variant.getId() + " has no relations.", e);
+					continue;
+				}
+
 				variants.add(variant);
 			} while (resultSet.next());
 		}
 
-		for (Variant variant : variants) {
-			setVariantNames(variant, connection);
-			setVariantRelations(variant, connection);
-		}
-
 		return variants;
-	}
-
-	public static Variant getById(Long variantId, Connection connection) throws SQLException, ObjectNotFoundException {
-		Variant result = null;
-		String query = getQueryGroup().getQuery(GET_BY_ID_QUERY);
-		try (PreparedStatement statement = connection.prepareStatement(query);) {
-			statement.setLong(1, variantId);
-			logger.log(Level.INFO, "Executing QUERY" + statement.toString());
-			ResultSet resultSet = statement.executeQuery();
-			if (!resultSet.next()) {
-				throw new ObjectNotFoundException("Object Not found");
-			}
-
-			result = new VariantDbObj(resultSet);
-		}
-
-		setVariantNames(result, connection);
-		setVariantRelations(result, connection);
-
-		return result;
 	}
 
 	private static void setVariantRelations(Variant variant, Connection connection)

@@ -122,8 +122,7 @@ public class RemarkModel {
 		storeRelationRemarksToDatabase(remarks, ipNetworkId, connection, IP_NETWORK_STORE_QUERY);
 	}
 
-	private static List<Remark> getByRelationId(Long id, Connection connection, String queryId)
-			throws SQLException, ObjectNotFoundException {
+	private static List<Remark> getByRelationId(Long id, Connection connection, String queryId) throws SQLException {
 		String query = getQueryGroup().getQuery(queryId);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setLong(1, id);
@@ -134,49 +133,57 @@ public class RemarkModel {
 		}
 	}
 
-	public static List<Remark> getByNameserverId(Long nameserverId, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	public static List<Remark> getByNameserverId(Long nameserverId, Connection connection) throws SQLException {
 		return getByRelationId(nameserverId, connection, NAMESERVER_GET_QUERY);
 	}
 
-	public static List<Remark> getByDomainId(Long domainId, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	public static List<Remark> getByDomainId(Long domainId, Connection connection) throws SQLException {
 		return getByRelationId(domainId, connection, DOMAIN_GET_QUERY);
 	}
 
-	public static List<Remark> getByEntityId(Long entityId, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	public static List<Remark> getByEntityId(Long entityId, Connection connection) throws SQLException {
 		return getByRelationId(entityId, connection, ENTITY_GET_QUERY);
 	}
 
-	public static List<Remark> getByAutnumId(Long autnumId, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	public static List<Remark> getByAutnumId(Long autnumId, Connection connection) throws SQLException {
 		return getByRelationId(autnumId, connection, AUTNUM_GET_QUERY);
 	}
 
-	public static List<Remark> getByIpNetworkId(Long ipNetworkId, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	public static List<Remark> getByIpNetworkId(Long ipNetworkId, Connection connection) throws SQLException {
 		return getByRelationId(ipNetworkId, connection, IP_NETWORK_GET_QUERY);
 	}
 
-	public static List<Remark> getAll(Connection connection) throws SQLException, ObjectNotFoundException {
+	public static List<Remark> getAll(Connection connection) throws SQLException {
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery("getAll"));
 				ResultSet resultSet = statement.executeQuery();) {
 			return processResultSet(resultSet, connection);
 		}
 	}
 
-	private static List<Remark> processResultSet(ResultSet resultSet, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	/**
+	 * As a contract, never returns <code>null</code> nor throws
+	 * {@link ObjectNotFoundException}. This is because remarks are never
+	 * mandatory, and the callers should not worry about their nonexistence.
+	 */
+	private static List<Remark> processResultSet(ResultSet resultSet, Connection connection) throws SQLException {
 		if (!resultSet.next()) {
 			return Collections.emptyList();
 		}
+
 		List<Remark> remarks = new ArrayList<Remark>();
 		do {
 			RemarkDbObj remark = new RemarkDbObj(resultSet);
-			// load the remark descriptions of the remark
-			remark.setDescriptions(RemarkDescriptionModel.findByRemarkId(remark.getId(), connection));
-			// Load the remark's links
+
+			try {
+				remark.getDescriptions().addAll(RemarkDescriptionModel.findByRemarkId(remark.getId(), connection));
+			} catch (ObjectNotFoundException e) {
+				// Descriptions are supposed to be mandatory; looks like we're
+				// dealing with a corrupted database.
+				// It's not our fault though, so ignore it and continue.
+				logger.warning("The remark whose ID is " + remark.getId() + " has no descriptions.");
+				continue;
+			}
+
 			remark.getLinks().addAll(LinkModel.getByRemarkId(remark.getId(), connection));
 			remarks.add(remark);
 		} while (resultSet.next());

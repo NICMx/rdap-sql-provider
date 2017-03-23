@@ -9,7 +9,6 @@ import org.junit.Test;
 import mx.nic.rdap.core.db.Link;
 import mx.nic.rdap.core.db.Remark;
 import mx.nic.rdap.core.db.RemarkDescription;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.RemarkModel;
 import mx.nic.rdap.db.objects.LinkDbObj;
@@ -79,7 +78,7 @@ public class RemarkTest extends DatabaseTest {
 				System.out.println(remark.toString());
 			}
 			assert true;
-		} catch (SQLException | ObjectNotFoundException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 			assert false;
 		}

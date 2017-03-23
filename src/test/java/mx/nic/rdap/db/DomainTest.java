@@ -35,7 +35,6 @@ import mx.nic.rdap.core.db.SecureDNS;
 import mx.nic.rdap.core.db.Variant;
 import mx.nic.rdap.core.db.VariantName;
 import mx.nic.rdap.core.db.struct.NameserverIpAddressesStruct;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.DomainModel;
 import mx.nic.rdap.db.model.EntityModel;
@@ -75,32 +74,31 @@ public class DomainTest extends DatabaseTest {
 		}
 		dom.setZone(zoneName);
 
-		Long domId = null;
 		try {
-			domId = DomainModel.storeToDatabase(dom, false, connection);
-		} catch (SQLException | RequiredValueNotFoundException | ObjectNotFoundException e) {
+			DomainModel.storeToDatabase(dom, false, connection);
+		} catch (SQLException | RequiredValueNotFoundException e) {
 			e.printStackTrace();
 			fail();
 		}
 
-		Domain domainById = null;
+		Domain domainByHandle = null;
 		Domain findByLdhName = null;
 		try {
-			domainById = DomainModel.getDomainById(domId, false, connection);
+			domainByHandle = DomainModel.getByHandle(dom.getHandle(), false, connection);
 			findByLdhName = DomainModel.findByLdhName(dom.getLdhName(), zoneId, false, connection);
 			System.out.println(findByLdhName.getLdhName());
-		} catch (SQLException | ObjectNotFoundException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 			fail();
 		}
 
 		// Compares the results
-		Assert.assertTrue("getById fails", dom.equals(domainById));
+		Assert.assertTrue("getByHandle fails", dom.equals(domainByHandle));
 		Assert.assertTrue("findByLdhName fails", dom.equals(findByLdhName));
 
 		try {
 			DomainModel.findByLdhName(dom.getLdhName(), zoneId, false, connection);
-		} catch (SQLException | ObjectNotFoundException s) {
+		} catch (SQLException s) {
 			s.printStackTrace();
 			fail();
 		}
@@ -313,10 +311,9 @@ public class DomainTest extends DatabaseTest {
 		SecureDNS secureDns = SecureDnsTest.getSecureDns(null, null, true, true, dsDataList, keyDataList);
 		domain.setSecureDNS(secureDns);
 
-		Long domainId = null;
 		try {
-			domainId = DomainModel.storeToDatabase(domain, false, connection);
-		} catch (SQLException | RequiredValueNotFoundException | ObjectNotFoundException e) {
+			DomainModel.storeToDatabase(domain, false, connection);
+		} catch (SQLException | RequiredValueNotFoundException e) {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
@@ -327,19 +324,19 @@ public class DomainTest extends DatabaseTest {
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
-		// Get domain By its id
-		Domain domainById = null;
+
+		Domain domainByHandle = null;
 		Domain findByLdhName = null;
 		try {
-			domainById = DomainModel.getDomainById(domainId, false, connection);
+			domainByHandle = DomainModel.getByHandle(domain.getHandle(), false, connection);
 			findByLdhName = DomainModel.findByLdhName(domain.getLdhName(), zoneId, false, connection);
-		} catch (SQLException | ObjectNotFoundException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 			fail(e.getMessage());
 		}
 
 		// Compares the results
-		Assert.assertTrue("getById fails", domain.equals(domainById));
+		Assert.assertTrue("getByHandle fails", domain.equals(domainByHandle));
 		Assert.assertTrue("findByLdhName fails", domain.equals(findByLdhName));
 
 	}
@@ -451,7 +448,7 @@ public class DomainTest extends DatabaseTest {
 		try {
 			Entity byHandle = EntityModel.getByHandle(entity.getHandle(), connection);
 			return byHandle;
-		} catch (SQLException | ObjectNotFoundException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 			fail();
 		}

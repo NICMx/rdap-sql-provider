@@ -21,7 +21,6 @@ import mx.nic.rdap.core.db.IpNetwork;
 import mx.nic.rdap.core.db.PublicId;
 import mx.nic.rdap.core.db.VCard;
 import mx.nic.rdap.db.QueryGroup;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.objects.EntityDbObj;
 import mx.nic.rdap.db.struct.SearchResultStruct;
@@ -40,7 +39,6 @@ public class EntityModel {
 
 	private final static String STORE_QUERY = "storeToDatabase";
 	private final static String GET_ID_BY_HANDLE_QUERY = "getIdByHandle";
-	private final static String GET_BY_ID_QUERY = "getById";
 	private final static String GET_BY_HANDLE_QUERY = "getByHandle";
 
 	private final static String SEARCH_BY_PARTIAL_HANDLE_QUERY = "searchByPartialHandle";
@@ -152,21 +150,8 @@ public class EntityModel {
 		}
 	}
 
-	public static Entity getById(Long entityId, Connection connection) throws SQLException, ObjectNotFoundException {
-		Entity entResult = null;
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_ID_QUERY));) {
-			statement.setLong(1, entityId);
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			ResultSet resultSet = statement.executeQuery();
-			entResult = processResultSet(resultSet, connection);
-		}
-
-		loadNestedObjects(entResult, connection);
-		return entResult;
-	}
-
 	public static EntityDbObj getByHandle(String entityHandle, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+			throws SQLException {
 		EntityDbObj entResult = null;
 		try (PreparedStatement statement = connection
 				.prepareStatement(getQueryGroup().getQuery(GET_BY_HANDLE_QUERY));) {
@@ -176,6 +161,10 @@ public class EntityModel {
 			entResult = processResultSet(resultSet, connection);
 		}
 
+		if (entResult == null) {
+			return null;
+		}
+
 		loadNestedObjects(entResult, connection);
 		return entResult;
 	}
@@ -183,12 +172,8 @@ public class EntityModel {
 	private static void loadNestedObjects(Entity entity, Connection connection) throws SQLException {
 
 		Long entityId = entity.getId();
-		try {
-			List<VCard> vCardList = VCardModel.getByEntityId(entityId, connection);
-			entity.getVCardList().addAll(vCardList);
-		} catch (ObjectNotFoundException e) {
-			// Do nothing, vcard is not required
-		}
+
+		entity.getVCardList().addAll(VCardModel.getByEntityId(entityId, connection));
 
 		// Retrieve the status
 		entity.getStatus().addAll(StatusModel.getByEntityId(entityId, connection));
@@ -197,11 +182,7 @@ public class EntityModel {
 		entity.getLinks().addAll(LinkModel.getByEntityId(entityId, connection));
 
 		// Retrive the remarks
-		try {
-			entity.getRemarks().addAll(RemarkModel.getByEntityId(entityId, connection));
-		} catch (ObjectNotFoundException onfe) {
-			// Do nothing, remarks is not required
-		}
+		entity.getRemarks().addAll(RemarkModel.getByEntityId(entityId, connection));
 
 		// Retrieve the events
 		entity.getEvents().addAll(EventModel.getByEntityId(entityId, connection));
@@ -222,10 +203,9 @@ public class EntityModel {
 		entity.getAutnums().addAll(autnums);
 	}
 
-	private static EntityDbObj processResultSet(ResultSet resultSet, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	private static EntityDbObj processResultSet(ResultSet resultSet, Connection connection) throws SQLException {
 		if (!resultSet.next()) {
-			throw new ObjectNotFoundException("Object not found");
+			return null;
 		}
 
 		EntityDbObj entity = new EntityDbObj();
@@ -308,12 +288,9 @@ public class EntityModel {
 
 		for (Entity entity : entities) {
 			Long entityId = entity.getId();
-			try {
-				List<VCard> vCardList = VCardModel.getByEntityId(entityId, connection);
-				entity.getVCardList().addAll(vCardList);
-			} catch (ObjectNotFoundException e) {
-				// Could not have a VCard.
-			}
+			
+			List<VCard> vCardList = VCardModel.getByEntityId(entityId, connection);
+			entity.getVCardList().addAll(vCardList);
 
 			List<Status> statusList = StatusModel.getByEntityId(entityId, connection);
 			entity.getStatus().addAll(statusList);
@@ -329,7 +306,7 @@ public class EntityModel {
 	}
 
 	public static SearchResultStruct<Entity> searchByHandle(String handle, int resultLimit, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+			throws SQLException {
 		String query = null;
 		if (handle.contains("*")) {
 			query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_HANDLE_QUERY);
@@ -342,7 +319,7 @@ public class EntityModel {
 	}
 
 	public static SearchResultStruct<Entity> searchByVCardName(String vcardName, int resultLimit,
-			Connection connection) throws SQLException, ObjectNotFoundException {
+			Connection connection) throws SQLException {
 		String query = null;
 		if (vcardName.contains("*")) {
 			vcardName = vcardName.replace("*", "%");
@@ -355,17 +332,17 @@ public class EntityModel {
 	}
 
 	public static SearchResultStruct<Entity> searchByRegexHandle(String regexHandle, int resultLimit,
-			Connection connection) throws SQLException, ObjectNotFoundException {
+			Connection connection) throws SQLException {
 		return searchBy(regexHandle, resultLimit, connection, getQueryGroup().getQuery(SEARCH_BY_HANDLE_REGEX_QUERY));
 	}
 
 	public static SearchResultStruct<Entity> searchByRegexName(String regexName, int resultLimit,
-			Connection connection) throws SQLException, ObjectNotFoundException {
+			Connection connection) throws SQLException {
 		return searchBy(regexName, resultLimit, connection, getQueryGroup().getQuery(SEARCH_BY_NAME_REGEX_QUERY));
 	}
 
 	private static SearchResultStruct<Entity> searchBy(String criteria, int resultLimit, Connection connection,
-			String query) throws SQLException, ObjectNotFoundException {
+			String query) throws SQLException {
 		SearchResultStruct<Entity> result = new SearchResultStruct<Entity>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -379,7 +356,7 @@ public class EntityModel {
 			ResultSet rs = statement.executeQuery();
 
 			if (!rs.next()) {
-				throw new ObjectNotFoundException("Object not found.");
+				return null;
 			}
 
 			do {

@@ -1,9 +1,6 @@
 #storeToDatabase
 INSERT INTO {schema}.entity VALUES (null, ?, ?);
 
-#getById
-SELECT * FROM {schema}.entity e WHERE e.ent_id = ?;
-
 #getByHandle
 SELECT * FROM {schema}.entity e WHERE e.ent_handle = ?;
 

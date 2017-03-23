@@ -23,7 +23,6 @@ import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.IpNetwork;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.InvalidValueException;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RdapDataAccessException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.objects.IpNetworkDbObj;
@@ -160,15 +159,11 @@ public class IpNetworkModel {
 		ipNetwork.getStatus().addAll(StatusModel.getByIpNetworkId(ipNetworkId, connection));
 
 		// Retrieve the remarks
-		try {
-			ipNetwork.getRemarks().addAll(RemarkModel.getByIpNetworkId(ipNetworkId, connection));
-		} catch (ObjectNotFoundException onfe) {
-			// Do nothing, remarks is not required
-		}
+		ipNetwork.getRemarks().addAll(RemarkModel.getByIpNetworkId(ipNetworkId, connection));
 	}
 
 	private static IpNetwork getByInet4Address(Inet4Address inetAddress, Integer cidr, Connection connection)
-			throws UnknownHostException, SQLException, InvalidValueException, ObjectNotFoundException {
+			throws UnknownHostException, SQLException, InvalidValueException {
 		InetAddress lastAddressFromNetwork = IpUtils.getLastAddressFromNetwork(inetAddress, cidr);
 
 		BigInteger start = IpUtils.addressToNumber(inetAddress);
@@ -183,7 +178,7 @@ public class IpNetworkModel {
 			ResultSet rs = statement.executeQuery();
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			if (!rs.next()) {
-				throw new ObjectNotFoundException("Object not found");
+				return null;
 			}
 
 			ipDao = new IpNetworkDbObj();
@@ -194,7 +189,7 @@ public class IpNetworkModel {
 	}
 
 	private static IpNetwork getByInet6Address(Inet6Address inetAddress, Integer cidr, Connection connection)
-			throws UnknownHostException, SQLException, InvalidValueException, ObjectNotFoundException {
+			throws UnknownHostException, SQLException, InvalidValueException {
 		InetAddress lastAddressFromNetwork = IpUtils.getLastAddressFromNetwork(inetAddress, cidr);
 
 		BigInteger startUpperPart = IpUtils.inet6AddressToUpperPart(inetAddress);
@@ -217,7 +212,7 @@ public class IpNetworkModel {
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 
 			if (!rs.next()) {
-				throw new ObjectNotFoundException("Object not found");
+				return null;
 			}
 
 			ipDao = new IpNetworkDbObj();
@@ -228,12 +223,12 @@ public class IpNetworkModel {
 	}
 
 	public static IpNetwork getByInetAddress(InetAddress inetAddress, Connection connection)
-			throws SQLException, InvalidValueException, ObjectNotFoundException {
+			throws SQLException, InvalidValueException {
 		return getByInetAddress(inetAddress, IpUtils.getMaxValidCidr(inetAddress), connection);
 	}
 
 	public static IpNetwork getByInetAddress(InetAddress inetAddress, Integer cidr, Connection connection)
-			throws SQLException, InvalidValueException, ObjectNotFoundException {
+			throws SQLException, InvalidValueException {
 		IpNetwork result = null;
 		if (inetAddress instanceof Inet4Address) {
 			IpUtils.validateIpv4Cidr(cidr);
@@ -258,8 +253,7 @@ public class IpNetworkModel {
 		return result;
 	}
 
-	public static IpNetwork getByDomainId(long domainId, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	public static IpNetwork getByDomainId(long domainId, Connection connection) throws SQLException {
 		String query = getQueryGroup().getQuery(GET_BY_DOMAIN_ID);
 		IpNetworkDbObj result = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
@@ -267,7 +261,7 @@ public class IpNetworkModel {
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			ResultSet rs = statement.executeQuery();
 			if (!rs.next()) {
-				throw new ObjectNotFoundException("Object not found");
+				return null;
 			}
 
 			result = new IpNetworkDbObj();
@@ -310,8 +304,7 @@ public class IpNetworkModel {
 		return results;
 	}
 
-	public static IpNetworkDbObj getByHandle(String handle, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+	public static IpNetworkDbObj getByHandle(String handle, Connection connection) throws SQLException {
 		String query = getQueryGroup().getQuery(GET_BY_HANDLE);
 		IpNetworkDbObj result = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
@@ -319,7 +312,7 @@ public class IpNetworkModel {
 			logger.log(Level.INFO, "Executing QUERY : " + statement.toString());
 			ResultSet rs = statement.executeQuery();
 			if (!rs.next()) {
-				throw new ObjectNotFoundException("Object not found");
+				return null;
 			}
 
 			result = new IpNetworkDbObj();

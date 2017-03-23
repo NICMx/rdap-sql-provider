@@ -20,7 +20,6 @@ import mx.nic.rdap.core.db.Event;
 import mx.nic.rdap.core.db.KeyData;
 import mx.nic.rdap.core.db.Link;
 import mx.nic.rdap.core.db.SecureDNS;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.DomainModel;
 import mx.nic.rdap.db.model.EntityModel;
@@ -56,7 +55,7 @@ public class SecureDnsTest extends DatabaseTest {
 		SecureDNS byDomain = null;
 		try {
 			byDomain = SecureDNSModel.getByDomain(domainId, connection);
-		} catch (SQLException | ObjectNotFoundException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 			fail();
 		}
@@ -164,7 +163,7 @@ public class SecureDnsTest extends DatabaseTest {
 		SecureDNS byDomain = null;
 		try {
 			byDomain = SecureDNSModel.getByDomain(domainId, connection);
-		} catch (SQLException | ObjectNotFoundException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 			fail();
 		}
@@ -332,7 +331,7 @@ public class SecureDnsTest extends DatabaseTest {
 
 		try {
 			DomainModel.storeToDatabase(dom, false, connection);
-		} catch (SQLException | RequiredValueNotFoundException | ObjectNotFoundException e) {
+		} catch (SQLException | RequiredValueNotFoundException e) {
 			e.printStackTrace();
 			fail();
 		}

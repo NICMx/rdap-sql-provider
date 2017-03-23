@@ -18,7 +18,6 @@ import mx.nic.rdap.core.db.Event;
 import mx.nic.rdap.core.db.Link;
 import mx.nic.rdap.core.db.Remark;
 import mx.nic.rdap.core.db.RemarkDescription;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.AutnumModel;
 import mx.nic.rdap.db.model.EntityModel;
@@ -102,7 +101,7 @@ public class AutnumTest extends DatabaseTest {
 
 		try {
 			getByRange = AutnumModel.getByRange(autnum.getStartAutnum(), connection);
-		} catch (SQLException | ObjectNotFoundException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 			fail();
 		}
@@ -111,7 +110,7 @@ public class AutnumTest extends DatabaseTest {
 
 		try {
 			getById = AutnumModel.getAutnumById(autnum.getId(), connection);
-		} catch (SQLException | ObjectNotFoundException e) {
+		} catch (SQLException e) {
 			e.printStackTrace();
 			fail();
 		}
@@ -119,7 +118,7 @@ public class AutnumTest extends DatabaseTest {
 
 		try {
 			AutnumModel.getByRange(101L, connection);
-		} catch (SQLException | ObjectNotFoundException s) {
+		} catch (SQLException s) {
 			fail();
 		}
 	}

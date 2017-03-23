@@ -58,9 +58,7 @@ public class DomainDAOImpl implements DomainDAO {
 			throw new ObjectNotFoundException("Zone not found.");
 
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			Domain domain = DomainModel.findByLdhName(name, ZoneModel.getIdByZoneName(zone), useNsAsAttribute,
-					connection);
-			return domain;
+			return DomainModel.findByLdhName(name, ZoneModel.getIdByZoneName(zone), useNsAsAttribute, connection);
 		} catch (SQLException e) {
 			throw new RdapDataAccessException(e);
 		}
