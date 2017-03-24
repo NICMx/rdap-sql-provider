@@ -9,7 +9,7 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import mx.nic.rdap.core.catalog.Rol;
+import mx.nic.rdap.core.catalog.Role;
 import mx.nic.rdap.core.db.Domain;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.PublicId;
@@ -66,13 +66,13 @@ public class PublicIdTest extends DatabaseTest {
 		Entity registrar = new EntityDbObj();
 		registrar.setHandle("whois");
 		registrar.setPort43("whois.mx");
-		registrar.getRoles().add(Rol.SPONSOR);
+		registrar.getRoles().add(Role.SPONSOR);
 
 		Entity ent = new EntityDbObj();
 		ent.setHandle("usr_evaldez");
-		ent.getRoles().add(Rol.REGISTRANT);
-		ent.getRoles().add(Rol.ADMINISTRATIVE);
-		ent.getRoles().add(Rol.TECHNICAL);
+		ent.getRoles().add(Role.REGISTRANT);
+		ent.getRoles().add(Role.ADMINISTRATIVE);
+		ent.getRoles().add(Role.TECHNICAL);
 
 		try {
 			EntityModel.storeToDatabase(registrar, connection);

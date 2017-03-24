@@ -156,7 +156,7 @@ public class DomainModel {
 			throws SQLException {
 		if (entities.size() > 0) {
 			EntityModel.validateParentEntities(entities, connection);
-			RolModel.storeDomainEntityRoles(entities, domainId, connection);
+			RoleModel.storeDomainEntityRoles(entities, domainId, connection);
 		}
 
 	}

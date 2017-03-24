@@ -10,7 +10,7 @@ import java.util.List;
 import org.junit.Test;
 
 import mx.nic.rdap.core.catalog.EventAction;
-import mx.nic.rdap.core.catalog.Rol;
+import mx.nic.rdap.core.catalog.Role;
 import mx.nic.rdap.core.catalog.Status;
 import mx.nic.rdap.core.db.Autnum;
 import mx.nic.rdap.core.db.Entity;
@@ -39,7 +39,7 @@ public class AutnumTest extends DatabaseTest {
 		Entity registrant = new EntityDbObj();
 		registrant.setHandle("testHandler");
 		registrant.setPort43("testestestest");
-		registrant.getRoles().add(Rol.REGISTRANT);
+		registrant.getRoles().add(Role.REGISTRANT);
 
 		try {
 			EntityModel.storeToDatabase(registrant, connection);

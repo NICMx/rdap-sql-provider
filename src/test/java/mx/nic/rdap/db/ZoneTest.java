@@ -5,14 +5,12 @@ package mx.nic.rdap.db;
 
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.ZoneModel;
 
 /**
@@ -26,7 +24,7 @@ public class ZoneTest extends DatabaseTest {
 	 * Creates a new Zone instance and stores it in the database, then it get an
 	 * instance with the id generated
 	 */
-	public void insertAndGetBy() throws IOException, SQLException, RequiredValueNotFoundException {
+	public void insertAndGetBy() {
 		Random random = new Random();
 		int randomInt = random.nextInt();
 

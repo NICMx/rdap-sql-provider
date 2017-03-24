@@ -1,6 +1,5 @@
 package mx.nic.rdap.db;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -36,7 +35,7 @@ public class LinkTest extends DatabaseTest {
 	}
 
 	// XXX Is this test necessary? @Test
-	public void getAll() throws IOException {
+	public void getAll() {
 		try {
 			List<Link> links = LinkModel.getAll(connection);
 			for (Link link : links) {

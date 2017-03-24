@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import mx.nic.rdap.core.catalog.Rol;
+import mx.nic.rdap.core.catalog.Role;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.Nameserver;
 import mx.nic.rdap.db.QueryGroup;
@@ -118,7 +118,7 @@ public class NameserverModel {
 	public static void storeNameserverEntities(Nameserver nameserver, Connection connection) throws SQLException {
 		if (nameserver.getEntities().size() > 0) {
 			EntityModel.validateParentEntities(nameserver.getEntities(), connection);
-			RolModel.storeNameserverEntityRoles(nameserver.getEntities(), nameserver.getId(), connection);
+			RoleModel.storeNameserverEntityRoles(nameserver.getEntities(), nameserver.getId(), connection);
 		}
 
 	}
@@ -128,7 +128,7 @@ public class NameserverModel {
 	 * 
 	 */
 	public static void storeDomainNameserversToDatabase(List<Nameserver> nameservers, Long domainId,
-			Connection connection) throws SQLException, RequiredValueNotFoundException {
+			Connection connection) throws SQLException {
 		if (nameservers.isEmpty()) {
 			return;
 		}
@@ -315,7 +315,7 @@ public class NameserverModel {
 		List<Entity> entities = EntityModel.getEntitiesByNameserverId(nameserver.getId(), connection);
 		nameserver.getEntities().addAll(entities);
 		for (Entity entity : entities) {
-			List<Rol> roles = RolModel.getNameserverEntityRol(nameserver.getId(), entity.getId(), connection);
+			List<Role> roles = RoleModel.getNameserverEntityRol(nameserver.getId(), entity.getId(), connection);
 			entity.setRoles(roles);
 		}
 	}

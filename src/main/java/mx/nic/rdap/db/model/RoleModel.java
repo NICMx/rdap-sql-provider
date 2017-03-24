@@ -11,17 +11,17 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import mx.nic.rdap.core.catalog.Rol;
+import mx.nic.rdap.core.catalog.Role;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.db.QueryGroup;
 
 /**
- * Model for the {@link Rol} objects of nested entities of main objects.
+ * Model for the {@link Role} objects of nested entities of main objects.
  * 
  */
-public class RolModel {
+public class RoleModel {
 
-	private final static Logger logger = Logger.getLogger(RolModel.class.getName());
+	private final static Logger logger = Logger.getLogger(RoleModel.class.getName());
 
 	private final static String QUERY_GROUP = "Rol";
 
@@ -57,34 +57,34 @@ public class RolModel {
 		return queryGroup;
 	}
 
-	public static List<Rol> getDomainEntityRol(Long domainId, Long entityId, Connection connection)
+	public static List<Role> getDomainEntityRol(Long domainId, Long entityId, Connection connection)
 			throws SQLException {
 		return getNestedEntityRol(domainId, entityId, connection, DOMAIN_GET_QUERY);
 	}
 
-	public static List<Rol> getNameserverEntityRol(Long nameserverId, Long entityId, Connection connection)
+	public static List<Role> getNameserverEntityRol(Long nameserverId, Long entityId, Connection connection)
 			throws SQLException {
 		return getNestedEntityRol(nameserverId, entityId, connection, NAMESERVER_GET_QUERY);
 	}
 
-	public static List<Rol> getEntityEntityRol(Long mainEntityId, Long nestedEntityId, Connection connection)
+	public static List<Role> getEntityEntityRol(Long mainEntityId, Long nestedEntityId, Connection connection)
 			throws SQLException {
 		return getNestedEntityRol(mainEntityId, nestedEntityId, connection, ENTITY_GET_QUERY);
 	}
 
-	public static List<Rol> getAutnumEntityRol(Long autnumId, Long asnId, Connection connection) throws SQLException {
+	public static List<Role> getAutnumEntityRol(Long autnumId, Long asnId, Connection connection) throws SQLException {
 		return getNestedEntityRol(autnumId, asnId, connection, AUTNUM_GET_QUERY);
 	}
 
-	public static List<Rol> getIpNetworkEntityRol(Long ipNetworkId, Long entityId, Connection connection)
+	public static List<Role> getIpNetworkEntityRol(Long ipNetworkId, Long entityId, Connection connection)
 			throws SQLException {
 		return getNestedEntityRol(ipNetworkId, entityId, connection, IP_NETWORK_GET_QUERY);
 	}
 
-	private static List<Rol> getNestedEntityRol(Long ownerId, Long nestedEntityId, Connection connection,
+	private static List<Role> getNestedEntityRol(Long ownerId, Long nestedEntityId, Connection connection,
 			String getQuery) throws SQLException {
 		String query = getQueryGroup().getQuery(getQuery);
-		List<Rol> roles = null;
+		List<Role> roles = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setLong(1, ownerId);
 			statement.setLong(2, nestedEntityId);
@@ -98,9 +98,9 @@ public class RolModel {
 			do {
 				int rolId = rs.getInt(1);
 				if (rs.wasNull()) {
-					throw new NullPointerException("Rol id was null");
+					throw new NullPointerException("Role id was null");
 				}
-				roles.add(Rol.getById(rolId));
+				roles.add(Role.getById(rolId));
 			} while (rs.next());
 		}
 
@@ -143,8 +143,8 @@ public class RolModel {
 			statement.setLong(1, ownerId);
 			for (Entity entity : entities) {
 				statement.setLong(2, entity.getId());
-				for (Rol rol : entity.getRoles()) {
-					statement.setLong(3, rol.getId());
+				for (Role role : entity.getRoles()) {
+					statement.setLong(3, role.getId());
 					logger.log(Level.INFO, "Executing QUERY" + statement.toString());
 					statement.execute();
 				}
@@ -160,11 +160,11 @@ public class RolModel {
 
 		String query = getQueryGroup().getQuery(ENTITY_STORE_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
-			for (Rol rol : mainEntity.getRoles()) {
+			for (Role role : mainEntity.getRoles()) {
 				for (Entity nestedEntity : nestedEntities) {
 					statement.setLong(1, nestedEntity.getId());
 					statement.setLong(2, mainEntity.getId());
-					statement.setInt(3, rol.getId());
+					statement.setInt(3, role.getId());
 					logger.log(Level.INFO, "Executing QUERY" + statement.toString());
 					statement.execute();
 				}

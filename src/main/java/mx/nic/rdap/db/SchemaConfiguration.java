@@ -25,7 +25,7 @@ import mx.nic.rdap.db.model.RdapUserModel;
 import mx.nic.rdap.db.model.RdapUserRoleModel;
 import mx.nic.rdap.db.model.RemarkDescriptionModel;
 import mx.nic.rdap.db.model.RemarkModel;
-import mx.nic.rdap.db.model.RolModel;
+import mx.nic.rdap.db.model.RoleModel;
 import mx.nic.rdap.db.model.SecureDNSModel;
 import mx.nic.rdap.db.model.StatusModel;
 import mx.nic.rdap.db.model.VCardModel;
@@ -122,7 +122,7 @@ public class SchemaConfiguration {
 		RdapUserRoleModel.loadQueryGroup(schema);
 		RemarkModel.loadQueryGroup(schema);
 		RemarkDescriptionModel.loadQueryGroup(schema);
-		RolModel.loadQueryGroup(schema);
+		RoleModel.loadQueryGroup(schema);
 		SecureDNSModel.loadQueryGroup(schema);
 		StatusModel.loadQueryGroup(schema);
 		VariantModel.loadQueryGroup(schema);

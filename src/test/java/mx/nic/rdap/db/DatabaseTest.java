@@ -26,7 +26,7 @@ public class DatabaseTest {
 	private static String rdapDatabaseConfigurationFile = "database";
 
 	@Before
-	public void before() throws SQLException, IOException {
+	public void before() throws SQLException {
 		connection = DatabaseSession.getRdapConnection();
 		// ZoneModel.loadAllFromDatabase(connection);
 		// CountryCodeModel.loadAllFromDatabase(connection);

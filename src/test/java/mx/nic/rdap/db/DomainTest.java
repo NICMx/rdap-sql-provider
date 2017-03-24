@@ -17,7 +17,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import mx.nic.rdap.core.catalog.EventAction;
-import mx.nic.rdap.core.catalog.Rol;
+import mx.nic.rdap.core.catalog.Role;
 import mx.nic.rdap.core.catalog.Status;
 import mx.nic.rdap.core.catalog.VariantRelation;
 import mx.nic.rdap.core.db.Domain;
@@ -118,13 +118,13 @@ public class DomainTest extends DatabaseTest {
 		Entity registrar = new EntityDbObj();
 		registrar.setHandle("rar_dhfelix");
 		registrar.setPort43("whois.dhfelixrar.mx");
-		registrar.getRoles().add(Rol.SPONSOR);
+		registrar.getRoles().add(Role.SPONSOR);
 
 		Entity ent = new EntityDbObj();
 		ent.setHandle("usr_evaldez");
-		ent.getRoles().add(Rol.REGISTRANT);
-		ent.getRoles().add(Rol.ADMINISTRATIVE);
-		ent.getRoles().add(Rol.TECHNICAL);
+		ent.getRoles().add(Role.REGISTRANT);
+		ent.getRoles().add(Role.ADMINISTRATIVE);
+		ent.getRoles().add(Role.TECHNICAL);
 
 		try {
 			EntityModel.storeToDatabase(registrar, connection);
@@ -528,9 +528,9 @@ public class DomainTest extends DatabaseTest {
 
 		entity.getPublicIds().addAll(listPids);
 
-		List<Rol> listRoles = new ArrayList<>();
-		Rol rol = Rol.REGISTRAR;
-		listRoles.add(rol);
+		List<Role> listRoles = new ArrayList<>();
+		Role role = Role.REGISTRAR;
+		listRoles.add(role);
 		return entity;
 	}
 

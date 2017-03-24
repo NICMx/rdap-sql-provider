@@ -85,7 +85,7 @@ public class AutnumModel {
 			}
 			ent.setId(entId);
 		}
-		RolModel.storeAutnumEntityRoles(autnum.getEntities(), autnumId, connection);
+		RoleModel.storeAutnumEntityRoles(autnum.getEntities(), autnumId, connection);
 
 		return autnumId;
 	}
@@ -183,7 +183,7 @@ public class AutnumModel {
 
 	public static void storeAutnumEntities(Autnum autnum, Connection connection) throws SQLException {
 		EntityModel.validateParentEntities(autnum.getEntities(), connection);
-		RolModel.storeAutnumEntityRoles(autnum.getEntities(), autnum.getId(), connection);
+		RoleModel.storeAutnumEntityRoles(autnum.getEntities(), autnum.getId(), connection);
 	}
 
 	public static List<Autnum> getByEntityId(Long entityId, Connection connection) throws SQLException {

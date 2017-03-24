@@ -13,7 +13,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import mx.nic.rdap.core.catalog.EventAction;
-import mx.nic.rdap.core.catalog.Rol;
+import mx.nic.rdap.core.catalog.Role;
 import mx.nic.rdap.core.catalog.Status;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.Event;
@@ -193,7 +193,7 @@ public class EntityTest extends DatabaseTest {
 		ent.getStatus().add(Status.ACTIVE);
 		ent.getStatus().add(Status.VALIDATED);
 
-		ent.getRoles().add(Rol.SPONSOR);
+		ent.getRoles().add(Role.SPONSOR);
 
 		PublicId pid = new PublicIdDbObj();
 		pid.setPublicId("Dhfelix_rar_from_mx");
@@ -404,13 +404,13 @@ public class EntityTest extends DatabaseTest {
 	@Test
 	public void createAndInsertRegistrar() {
 		Entity entity = createEntity(null, "rar_test", "whois.rar_test.com");
-		// entity.getRoles().add(Rol.REGISTRAR);
+		// entity.getRoles().add(Role.REGISTRAR);
 
 		Entity legal = createEntity(null, "legal_contact", null);
-		legal.getRoles().add(Rol.ADMINISTRATIVE);
+		legal.getRoles().add(Role.ADMINISTRATIVE);
 
 		Entity tech = createEntity(null, "tech_contact", null);
-		tech.getRoles().add(Rol.TECHNICAL);
+		tech.getRoles().add(Role.TECHNICAL);
 
 		entity.getEntities().add(tech);
 		entity.getEntities().add(legal);

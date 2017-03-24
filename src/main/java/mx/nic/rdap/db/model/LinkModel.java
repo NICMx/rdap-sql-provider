@@ -313,8 +313,7 @@ public class LinkModel {
 			storeAutnumLinksToDatabase(links, autnumId, connection);
 	}
 
-	public static void deleteEventLinksData(List<Link> previousLinks, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+	public static void deleteEventLinksData(List<Link> previousLinks, Connection connection) throws SQLException {
 		if (!previousLinks.isEmpty()) {
 			deleteLinksRelationByLinkId(getQueryGroup().getQuery(EVENTS_DELETE_QUERY), previousLinks, connection);
 			deletePreviousLinks(previousLinks, connection);

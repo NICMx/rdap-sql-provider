@@ -132,7 +132,7 @@ public class IpNetworkModel {
 			}
 			ent.setId(entId);
 		}
-		RolModel.storeIpNetworkEntityRoles(ipNetwork.getEntities(), ipNetwork.getId(), connection);
+		RoleModel.storeIpNetworkEntityRoles(ipNetwork.getEntities(), ipNetwork.getId(), connection);
 
 	}
 

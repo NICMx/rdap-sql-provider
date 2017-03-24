@@ -46,8 +46,7 @@ public class DBConfigurationModel {
 		return getPropertyFromDb(SCHEMA_SETTING_KEY, connection);
 	}
 
-	public static void updateSchemaSetting(String newSchemaValue, Connection connection)
-			throws ObjectNotFoundException, SQLException {
+	public static void updateSchemaSetting(String newSchemaValue, Connection connection) throws SQLException {
 		updatePropertyFromDb(newSchemaValue, SCHEMA_SETTING_KEY, connection);
 	}
 
@@ -69,7 +68,7 @@ public class DBConfigurationModel {
 	}
 
 	private static void updatePropertyFromDb(String newValue, String propertyName, Connection connection)
-			throws ObjectNotFoundException, SQLException {
+			throws SQLException {
 		String oldValue;
 		try {
 			oldValue = getPropertyFromDb(propertyName, connection);

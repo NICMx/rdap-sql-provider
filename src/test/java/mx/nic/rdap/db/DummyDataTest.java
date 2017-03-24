@@ -2,7 +2,6 @@ package mx.nic.rdap.db;
 
 import static org.junit.Assert.fail;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
@@ -12,7 +11,7 @@ import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 import mx.nic.rdap.core.catalog.EventAction;
-import mx.nic.rdap.core.catalog.Rol;
+import mx.nic.rdap.core.catalog.Role;
 import mx.nic.rdap.core.catalog.Status;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.Event;
@@ -49,12 +48,12 @@ public class DummyDataTest extends DatabaseTest {
 			'ア', 'イ', 'ウ', 'エ', 'オ', 'а', 'њ', 'ш', 'я', 'й', 'ж', 'ग', '-', '_', 'ब', 'ह', 'द', 'श' };
 	public static String[] zones = { "mx", "lat", "com", "lat.com", "com.mx", "org" };
 
-	public static void main(String[] args) throws RequiredValueNotFoundException, IOException {
+	public static void main(String[] args) throws RequiredValueNotFoundException {
 		DummyDataTest dummyDataTest = new DummyDataTest();
 		dummyDataTest.createDataDummy();
 	}
 
-	public void createDataDummy() throws RequiredValueNotFoundException, IOException {
+	public void createDataDummy() throws RequiredValueNotFoundException {
 		int numberOfDomains = 2000;
 		try {
 			for (int index = 801; index < numberOfDomains; index++) {
@@ -76,7 +75,7 @@ public class DummyDataTest extends DatabaseTest {
 
 	private static void createDomain(String name, String zone, String handle, boolean hasEntities,
 			boolean hasNameservers, boolean hasRemarks, boolean hasLinks, boolean hasEvents)
-			throws RequiredValueNotFoundException, IOException, SQLException {
+			throws RequiredValueNotFoundException, SQLException {
 		DomainDbObj domain = new DomainDbObj();
 		domain.setLdhName(name);
 		domain.setHandle(handle);
@@ -108,7 +107,7 @@ public class DummyDataTest extends DatabaseTest {
 	}
 
 	private static List<Nameserver> createNameservers(String name, boolean hasEntities, boolean hasRemarks,
-			boolean hasLinks, boolean hasEvents) throws RequiredValueNotFoundException, IOException, SQLException {
+			boolean hasLinks, boolean hasEvents) throws RequiredValueNotFoundException, SQLException {
 		List<Nameserver> nameservers = new ArrayList<Nameserver>();
 
 		int numberOfNameservers = ThreadLocalRandom.current().nextInt(1, 3);
@@ -172,7 +171,7 @@ public class DummyDataTest extends DatabaseTest {
 	}
 
 	private static List<Entity> createRandomEntities(String name, boolean hasEntities, boolean hasRemarks,
-			boolean hasLinks, boolean hasEvents) throws RequiredValueNotFoundException, SQLException, IOException {
+			boolean hasLinks, boolean hasEvents) throws RequiredValueNotFoundException, SQLException {
 		List<Entity> entities = new ArrayList<Entity>();
 		int numberOfEntities = ThreadLocalRandom.current().nextInt(1, 3);
 		for (int index = 0; index < numberOfEntities; index++) {
@@ -186,11 +185,11 @@ public class DummyDataTest extends DatabaseTest {
 				statusList.add(Status.ASSOCIATED);
 			entity.setStatus(statusList);
 			if (getRandomBoolean())
-				entity.getRoles().add(Rol.SPONSOR);
+				entity.getRoles().add(Role.SPONSOR);
 			if (getRandomBoolean())
-				entity.getRoles().add(Rol.REGISTRANT);
+				entity.getRoles().add(Role.REGISTRANT);
 			if (getRandomBoolean())
-				entity.getRoles().add(Rol.RESELLER);
+				entity.getRoles().add(Role.RESELLER);
 
 			if (getRandomBoolean()) {
 				PublicId pid = new PublicIdDbObj();

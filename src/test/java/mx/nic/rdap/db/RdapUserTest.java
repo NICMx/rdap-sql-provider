@@ -1,6 +1,5 @@
 package mx.nic.rdap.db;
 
-import java.io.IOException;
 import java.sql.SQLException;
 
 import org.junit.Test;
@@ -60,7 +59,7 @@ public class RdapUserTest extends DatabaseTest {
 	}
 
 	@Test
-	public void cleanUsersTableTest() throws IOException {
+	public void cleanUsersTableTest() {
 		try {
 			RdapUserModel.cleanRdapUserDatabase(connection);
 			assert true;
