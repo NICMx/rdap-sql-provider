@@ -4,7 +4,6 @@ import java.sql.SQLException;
 
 import org.junit.Test;
 
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.RdapUserModel;
 import mx.nic.rdap.db.objects.RdapUserDbObj;
@@ -52,7 +51,7 @@ public class RdapUserTest extends DatabaseTest {
 			RdapUserModel.storeToDatabase(user, connection);
 			RdapUserModel.getByName(userName, connection);
 			assert true;
-		} catch (SQLException | RequiredValueNotFoundException | ObjectNotFoundException e) {
+		} catch (SQLException | RequiredValueNotFoundException e) {
 			e.printStackTrace();
 			assert false;
 		}
