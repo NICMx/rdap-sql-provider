@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.RdapUserRole;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.objects.RdapUserDbObj;
 import mx.nic.rdap.db.objects.RdapUserRoleDbObj;
@@ -74,7 +73,7 @@ public class RdapUserModel {
 	}
 
 	public static RdapUserDbObj getByName(String name, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+			throws SQLException {
 		String query = getQueryGroup().getQuery(GET_BY_NAME_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, name);
@@ -87,7 +86,8 @@ public class RdapUserModel {
 
 				RdapUserRole role = RdapUserRoleModel.getByUserName(user.getName(), connection);
 				if (role == null) {
-					throw new ObjectNotFoundException("User '" + user.getName() + "' has no roles.");
+					logger.log(Level.WARNING, "User '" + user.getName() + "' has no roles.");
+					return null;
 				}
 
 				user.setUserRole(role);

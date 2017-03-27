@@ -22,9 +22,9 @@ import mx.nic.rdap.core.db.IpNetwork;
 import mx.nic.rdap.core.db.Nameserver;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.Util;
-import mx.nic.rdap.db.exception.InvalidValueException;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
+import mx.nic.rdap.db.exception.http.BadRequestException;
+import mx.nic.rdap.db.exception.http.NotFoundException;
 import mx.nic.rdap.db.objects.DomainDbObj;
 import mx.nic.rdap.db.objects.IpAddressDbObj;
 import mx.nic.rdap.db.objects.IpNetworkDbObj;
@@ -219,7 +219,7 @@ public class DomainModel {
 	 */
 	public static SearchResultStruct<Domain> searchByName(String name, String zone, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
-			throws SQLException, ObjectNotFoundException {
+			throws SQLException, NotFoundException {
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -244,7 +244,7 @@ public class DomainModel {
 		} else {
 
 			if (!ZoneModel.existsZone(zone)) {
-				throw new ObjectNotFoundException("Zone not found.");
+				throw new NotFoundException("Zone not found.");
 			}
 
 			if (isPartialName) {
@@ -276,7 +276,7 @@ public class DomainModel {
 			logger.log(Level.INFO, "Executing query" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();
 			if (!resultSet.next()) {
-				throw new ObjectNotFoundException("Object not found.");
+				throw new NotFoundException("Object not found.");
 			}
 			List<DomainDbObj> domains = new ArrayList<DomainDbObj>();
 			do {
@@ -468,7 +468,7 @@ public class DomainModel {
 	 */
 	public static SearchResultStruct<Domain> searchByNsIp(String ip, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
-			throws SQLException, InvalidValueException {
+			throws SQLException, BadRequestException {
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -562,18 +562,18 @@ public class DomainModel {
 	 * Validate if the zone of the request domain is managed by the server
 	 * 
 	 */
-	public static void validateDomainZone(String domainName) throws ObjectNotFoundException {
+	public static void validateDomainZone(String domainName) throws NotFoundException {
 		String domainZone;
 
 		if (ZoneModel.isReverseAddress(domainName)) {
 			domainZone = ZoneModel.getArpaZoneNameFromAddress(domainName);
 			if (domainZone == null) {
-				throw new ObjectNotFoundException("Zone not found.");
+				throw new NotFoundException("Zone not found.");
 			}
 		} else {
 			int indexOf = domainName.indexOf('.');
 			if (indexOf <= 0) {
-				throw new ObjectNotFoundException("Zone not found.");
+				throw new NotFoundException("Zone not found.");
 			}
 
 			domainZone = domainName.substring(indexOf + 1, domainName.length());
@@ -581,7 +581,7 @@ public class DomainModel {
 		}
 
 		if (!ZoneModel.existsZone(domainZone)) {
-			throw new ObjectNotFoundException("Zone not found.");
+			throw new NotFoundException("Zone not found.");
 		}
 	}
 

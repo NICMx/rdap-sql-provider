@@ -1,4 +1,4 @@
-package mx.nic.rdap.db.exceptions;
+package mx.nic.rdap.db.exception;
 
 /**
  * Exception thrown when any configuration property is invalid.

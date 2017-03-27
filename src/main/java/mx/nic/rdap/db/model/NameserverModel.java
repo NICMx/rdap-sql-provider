@@ -5,7 +5,6 @@ import java.net.IDN;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,12 +16,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import mx.nic.rdap.IpUtils;
 import mx.nic.rdap.core.catalog.Role;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.Nameserver;
 import mx.nic.rdap.db.QueryGroup;
-import mx.nic.rdap.db.exception.InvalidValueException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
+import mx.nic.rdap.db.exception.http.BadRequestException;
 import mx.nic.rdap.db.objects.NameserverDbObj;
 import mx.nic.rdap.db.struct.SearchResultStruct;
 
@@ -220,23 +220,21 @@ public class NameserverModel {
 	}
 
 	public static SearchResultStruct<Nameserver> searchByIp(String ipaddressPattern, int resultLimit,
-			Connection connection) throws SQLException, InvalidValueException {
+			Connection connection) throws SQLException, BadRequestException {
 		SearchResultStruct<Nameserver> result = new SearchResultStruct<Nameserver>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
 		resultLimit = resultLimit + 1;
 		String query = "";
 		List<NameserverDbObj> nameservers = new ArrayList<NameserverDbObj>();
-		try {
-			InetAddress address = InetAddress.getByName(ipaddressPattern);
-			if (address instanceof Inet6Address) {
-				query = getQueryGroup().getQuery(SEARCH_BY_IP6_QUERY);
-			} else if (address instanceof Inet4Address) {
-				query = getQueryGroup().getQuery(SEARCH_BY_IP4_QUERY);
-			}
-		} catch (UnknownHostException e) {
-			throw new InvalidValueException("Requested ip is invalid.", "Ip", "Nameserver");
+
+		InetAddress address = IpUtils.validateIpAddress(ipaddressPattern);
+		if (address instanceof Inet6Address) {
+			query = getQueryGroup().getQuery(SEARCH_BY_IP6_QUERY);
+		} else if (address instanceof Inet4Address) {
+			query = getQueryGroup().getQuery(SEARCH_BY_IP4_QUERY);
 		}
+
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, ipaddressPattern);
 			statement.setInt(2, resultLimit);

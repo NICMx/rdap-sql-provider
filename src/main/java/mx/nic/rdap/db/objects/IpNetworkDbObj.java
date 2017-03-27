@@ -2,7 +2,6 @@ package mx.nic.rdap.db.objects;
 
 import java.net.Inet4Address;
 import java.net.Inet6Address;
-import java.net.UnknownHostException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,6 +10,7 @@ import java.sql.Types;
 import mx.nic.rdap.IpUtils;
 import mx.nic.rdap.core.catalog.IpVersion;
 import mx.nic.rdap.core.db.IpNetwork;
+import mx.nic.rdap.db.exception.IpAddressFormatException;
 import mx.nic.rdap.db.model.CountryCodeModel;
 
 /**
@@ -38,23 +38,30 @@ public class IpNetworkDbObj extends IpNetwork implements DatabaseObject {
 		setId(rs.getLong("ine_id"));
 		setHandle(rs.getString("ine_handle"));
 		setParentHandle(rs.getString("ine_parent_handle"));
-		int ipVersion = rs.getInt("ip_version_id");
-		setIpVersion(IpVersion.getByVersionNumber(ipVersion));
+
+		IpVersion ipVersion = IpVersion.getByVersionNumber(rs.getInt("ip_version_id"));
+		if (ipVersion == null) {
+			throw new SQLException("Table value for IP version is invalid: " + rs.getInt("ip_version_id"));
+		}
+		setIpVersion(ipVersion);
+
 		try {
-			if (getIpVersion().equals(IpVersion.V4)) {
+			switch (ipVersion) {
+			case V4:
 				setStartAddress(IpUtils.numberToInet4(rs.getString("ine_start_address_down")));
 				setEndAddress(IpUtils.numberToInet4(rs.getString("ine_end_address_down")));
-			} else if (getIpVersion().equals(IpVersion.V6)) {
+				break;
+			case V6:
 				setStartAddress(IpUtils.numberToInet6(rs.getString("ine_start_address_up"),
 						rs.getString("ine_start_address_down")));
 				setEndAddress(IpUtils.numberToInet6(rs.getString("ine_end_address_up"),
 						rs.getString("ine_end_address_down")));
-			} else {
-
+				break;
 			}
-		} catch (UnknownHostException e) {
+		} catch (IpAddressFormatException e) {
 			throw new SQLException(e);
 		}
+
 		setName(rs.getString("ine_name"));
 		setType(rs.getString("ine_type"));
 		setCountry(CountryCodeModel.getCountryNameById(rs.getInt("ccd_id")));

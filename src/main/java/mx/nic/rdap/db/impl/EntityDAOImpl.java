@@ -2,11 +2,9 @@ package mx.nic.rdap.db.impl;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.SQLSyntaxErrorException;
 
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.db.DatabaseSession;
-import mx.nic.rdap.db.exception.InvalidValueException;
 import mx.nic.rdap.db.exception.RdapDataAccessException;
 import mx.nic.rdap.db.model.EntityModel;
 import mx.nic.rdap.db.spi.EntityDAO;
@@ -55,8 +53,6 @@ public class EntityDAOImpl implements EntityDAO {
 			throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return EntityModel.searchByRegexHandle(regexHandle, resultLimit, connection);
-		} catch (SQLSyntaxErrorException e) {
-			throw new InvalidValueException(e.getMessage(), e);
 		} catch (SQLException e) {
 			throw new RdapDataAccessException(e);
 		}
@@ -67,8 +63,6 @@ public class EntityDAOImpl implements EntityDAO {
 			throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return EntityModel.searchByRegexName(regexName, resultLimit, connection);
-		} catch (SQLSyntaxErrorException e) {
-			throw new InvalidValueException(e.getMessage(), e);
 		} catch (SQLException e) {
 			throw new RdapDataAccessException(e);
 		}

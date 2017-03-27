@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.nio.file.Paths;
 import java.util.Properties;
 
-import mx.nic.rdap.db.exceptions.InvalidConfigurationException;
+import mx.nic.rdap.db.exception.InvalidConfigurationException;
 
 public class SQLProviderConfiguration {
 

@@ -3,16 +3,15 @@ package mx.nic.rdap.db.impl;
 import java.lang.reflect.Array;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.SQLSyntaxErrorException;
 import java.util.Arrays;
 import java.util.List;
 
 import mx.nic.rdap.core.db.Domain;
 import mx.nic.rdap.db.DatabaseSession;
-import mx.nic.rdap.db.exception.InvalidValueException;
-import mx.nic.rdap.db.exception.NotImplementedException;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
 import mx.nic.rdap.db.exception.RdapDataAccessException;
+import mx.nic.rdap.db.exception.http.BadRequestException;
+import mx.nic.rdap.db.exception.http.NotFoundException;
+import mx.nic.rdap.db.exception.http.NotImplementedException;
 import mx.nic.rdap.db.model.DomainModel;
 import mx.nic.rdap.db.model.ZoneModel;
 import mx.nic.rdap.db.spi.DomainDAO;
@@ -41,13 +40,14 @@ public class DomainDAOImpl implements DomainDAO {
 		String name;
 		String zone;
 
+		// TODO validations shouls be done by the server.
 		if (!domainName.contains("."))
-			throw new InvalidValueException("Invalid fqdn");
+			throw new BadRequestException("Invalid fqdn");
 
 		if (ZoneModel.isReverseAddress(domainName)) {
 			zone = ZoneModel.getArpaZoneNameFromAddress(domainName);
 			if (zone == null) {
-				throw new ObjectNotFoundException("Zone not found.");
+				throw new NotFoundException("Zone not found.");
 			}
 			name = ZoneModel.getAddressWithoutArpaZone(domainName);
 		} else {
@@ -55,7 +55,7 @@ public class DomainDAOImpl implements DomainDAO {
 			zone = domainName.substring(domainName.indexOf('.') + 1);
 		}
 		if (!ZoneModel.existsZone(zone))
-			throw new ObjectNotFoundException("Zone not found.");
+			throw new NotFoundException("Zone not found.");
 
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return DomainModel.findByLdhName(name, ZoneModel.getIdByZoneName(zone), useNsAsAttribute, connection);
@@ -70,7 +70,7 @@ public class DomainDAOImpl implements DomainDAO {
 			List<String> labels = Arrays.asList(domainName.split("\\."));
 			for (String label : labels) {
 				if (label.contains("*") && !label.endsWith("*"))
-					throw new InvalidValueException("Patterns can only have an * at the end.");
+					throw new BadRequestException("Patterns can only have an * at the end.");
 			}
 		}
 		SearchResultStruct<Domain> domains = null;
@@ -94,7 +94,7 @@ public class DomainDAOImpl implements DomainDAO {
 			List<String> labels = Arrays.asList(nsName.split("\\."));
 			for (String label : labels) {
 				if (label.contains("*") && !label.endsWith("*"))
-					throw new InvalidValueException("Patterns can only have an * at the end");
+					throw new BadRequestException("Patterns can only have an * at the end");
 			}
 		}
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
@@ -128,8 +128,6 @@ public class DomainDAOImpl implements DomainDAO {
 				domains = DomainModel.searchByRegexName(regexWZone[0], regexWZone[1], resultLimit, useNsAsAttribute,
 						connection);
 			}
-		} catch (SQLSyntaxErrorException e) {
-			throw new InvalidValueException(e.getMessage(), e);
 		} catch (SQLException e) {
 			throw new RdapDataAccessException(e);
 		}
@@ -141,8 +139,6 @@ public class DomainDAOImpl implements DomainDAO {
 			throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return DomainModel.searchByRegexNsLdhName(regexNsName, resultLimit, useNsAsAttribute, connection);
-		} catch (SQLSyntaxErrorException e) {
-			throw new InvalidValueException(e.getMessage(), e);
 		} catch (SQLException e) {
 			throw new RdapDataAccessException(e);
 		}

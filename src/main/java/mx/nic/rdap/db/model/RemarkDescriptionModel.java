@@ -76,7 +76,7 @@ public class RemarkDescriptionModel {
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (!resultSet.next()) {
-					throw new ObjectNotFoundException("The remark has no descriptions.");
+					throw new ObjectNotFoundException("The remark whose id is " + id + " has no descriptions.");
 				}
 				List<RemarkDescription> remarks = new ArrayList<RemarkDescription>();
 				do {

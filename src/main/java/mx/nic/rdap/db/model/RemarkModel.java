@@ -180,7 +180,7 @@ public class RemarkModel {
 				// Descriptions are supposed to be mandatory; looks like we're
 				// dealing with a corrupted database.
 				// It's not our fault though, so ignore it and continue.
-				logger.warning("The remark whose ID is " + remark.getId() + " has no descriptions.");
+				logger.log(Level.WARNING, "Some remark lacks descriptions.", e);
 				continue;
 			}
 

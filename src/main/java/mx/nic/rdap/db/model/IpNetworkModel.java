@@ -5,7 +5,6 @@ import java.math.BigInteger;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,9 +21,9 @@ import mx.nic.rdap.core.catalog.IpVersion;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.IpNetwork;
 import mx.nic.rdap.db.QueryGroup;
-import mx.nic.rdap.db.exception.InvalidValueException;
 import mx.nic.rdap.db.exception.RdapDataAccessException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
+import mx.nic.rdap.db.exception.http.BadRequestException;
 import mx.nic.rdap.db.objects.IpNetworkDbObj;
 
 /**
@@ -163,7 +162,7 @@ public class IpNetworkModel {
 	}
 
 	private static IpNetwork getByInet4Address(Inet4Address inetAddress, Integer cidr, Connection connection)
-			throws UnknownHostException, SQLException, InvalidValueException {
+			throws SQLException, BadRequestException {
 		InetAddress lastAddressFromNetwork = IpUtils.getLastAddressFromNetwork(inetAddress, cidr);
 
 		BigInteger start = IpUtils.addressToNumber(inetAddress);
@@ -189,7 +188,7 @@ public class IpNetworkModel {
 	}
 
 	private static IpNetwork getByInet6Address(Inet6Address inetAddress, Integer cidr, Connection connection)
-			throws UnknownHostException, SQLException, InvalidValueException {
+			throws SQLException, BadRequestException {
 		InetAddress lastAddressFromNetwork = IpUtils.getLastAddressFromNetwork(inetAddress, cidr);
 
 		BigInteger startUpperPart = IpUtils.inet6AddressToUpperPart(inetAddress);
@@ -223,27 +222,19 @@ public class IpNetworkModel {
 	}
 
 	public static IpNetwork getByInetAddress(InetAddress inetAddress, Connection connection)
-			throws SQLException, InvalidValueException {
+			throws SQLException, BadRequestException {
 		return getByInetAddress(inetAddress, IpUtils.getMaxValidCidr(inetAddress), connection);
 	}
 
 	public static IpNetwork getByInetAddress(InetAddress inetAddress, Integer cidr, Connection connection)
-			throws SQLException, InvalidValueException {
+			throws SQLException, BadRequestException {
 		IpNetwork result = null;
 		if (inetAddress instanceof Inet4Address) {
 			IpUtils.validateIpv4Cidr(cidr);
-			try {
-				result = getByInet4Address((Inet4Address) inetAddress, cidr, connection);
-			} catch (UnknownHostException e) {
-				throw new InvalidValueException(e.getMessage(), e);
-			}
+			result = getByInet4Address((Inet4Address) inetAddress, cidr, connection);
 		} else if (inetAddress instanceof Inet6Address) {
 			IpUtils.validateIpv6Cidr(cidr);
-			try {
-				result = getByInet6Address((Inet6Address) inetAddress, cidr, connection);
-			} catch (UnknownHostException e) {
-				throw new InvalidValueException(e.getMessage(), e);
-			}
+			result = getByInet6Address((Inet6Address) inetAddress, cidr, connection);
 		} else {
 			throw new UnsupportedOperationException("Unsupported class:" + inetAddress.getClass().getName());
 		}
