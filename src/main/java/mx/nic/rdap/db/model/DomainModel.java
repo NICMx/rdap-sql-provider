@@ -15,19 +15,20 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import mx.nic.rdap.IpUtils;
 import mx.nic.rdap.core.db.Domain;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.IpNetwork;
 import mx.nic.rdap.core.db.Nameserver;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.Util;
+import mx.nic.rdap.db.exception.IpAddressFormatException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.exception.http.BadRequestException;
 import mx.nic.rdap.db.exception.http.NotFoundException;
 import mx.nic.rdap.db.objects.DomainDbObj;
 import mx.nic.rdap.db.objects.IpAddressDbObj;
 import mx.nic.rdap.db.objects.IpNetworkDbObj;
+import mx.nic.rdap.db.struct.AddressBlock;
 import mx.nic.rdap.db.struct.SearchResultStruct;
 
 /**
@@ -474,7 +475,14 @@ public class DomainModel {
 		// notices
 		resultLimit = resultLimit + 1;
 		IpAddressDbObj ipAddress = new IpAddressDbObj();
-		InetAddress address = IpUtils.validateIpAddress(ip);
+
+		InetAddress address;
+		try {
+			address = AddressBlock.parseAddress(ip);
+		} catch (IpAddressFormatException e) {
+			throw new BadRequestException(e.getMessage(), e);
+		}
+
 		ipAddress.setAddress(address);
 		if (ipAddress.getAddress() instanceof Inet4Address) {
 			ipAddress.setType(4);

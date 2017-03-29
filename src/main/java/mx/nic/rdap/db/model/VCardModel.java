@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -124,10 +125,6 @@ public class VCardModel {
 			vCardResults = processListResultSet(resultSet, connection);
 		}
 
-		if (vCardResults == null) {
-			return null;
-		}
-
 		for (VCard vCard : vCardResults) {
 			setSonObjects(vCard, connection);
 		}
@@ -164,7 +161,7 @@ public class VCardModel {
 	private static List<VCard> processListResultSet(ResultSet resultSet, Connection connection) throws SQLException {
 		List<VCard> result = new ArrayList<>();
 		if (!resultSet.next()) {
-			return null;
+			return Collections.emptyList();
 		}
 		do {
 			VCardDbObj vCard = new VCardDbObj();

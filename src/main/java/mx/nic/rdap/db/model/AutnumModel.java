@@ -149,36 +149,14 @@ public class AutnumModel {
 		}
 	}
 
-	private static void loadNestedObjects(Autnum autnum, Connection connection) {
+	private static void loadNestedObjects(Autnum autnum, Connection connection) throws SQLException {
 		Long autnumId = autnum.getId();
 
-		// TODO we should not be catching generic exceptions so blatantly.
-
-		try {
-			autnum.getStatus().addAll(StatusModel.getByAutnumId(autnumId, connection));
-		} catch (Exception e) {
-
-		}
-		try {
-			autnum.getRemarks().addAll(RemarkModel.getByAutnumId(autnumId, connection));
-		} catch (Exception e) {
-
-		}
-		try {
-			autnum.getLinks().addAll(LinkModel.getByAutnumId(autnumId, connection));
-		} catch (Exception e) {
-
-		}
-		try {
-			autnum.getEvents().addAll(EventModel.getByAutnumId(autnumId, connection));
-		} catch (Exception e) {
-
-		}
-		try {
-			autnum.getEntities().addAll(EntityModel.getEntitiesByAutnumId(autnumId, connection));
-		} catch (Exception e) {
-
-		}
+		autnum.getStatus().addAll(StatusModel.getByAutnumId(autnumId, connection));
+		autnum.getRemarks().addAll(RemarkModel.getByAutnumId(autnumId, connection));
+		autnum.getLinks().addAll(LinkModel.getByAutnumId(autnumId, connection));
+		autnum.getEvents().addAll(EventModel.getByAutnumId(autnumId, connection));
+		autnum.getEntities().addAll(EntityModel.getEntitiesByAutnumId(autnumId, connection));
 	}
 
 	public static void storeAutnumEntities(Autnum autnum, Connection connection) throws SQLException {

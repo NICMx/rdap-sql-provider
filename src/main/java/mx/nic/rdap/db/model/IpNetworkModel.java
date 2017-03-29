@@ -16,15 +16,17 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import mx.nic.rdap.IpUtils;
 import mx.nic.rdap.core.catalog.IpVersion;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.IpNetwork;
 import mx.nic.rdap.db.QueryGroup;
+import mx.nic.rdap.db.exception.IpAddressFormatException;
 import mx.nic.rdap.db.exception.RdapDataAccessException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.exception.http.BadRequestException;
 import mx.nic.rdap.db.objects.IpNetworkDbObj;
+import mx.nic.rdap.db.struct.AddressBlock;
+import mx.nic.rdap.sql.IpUtils;
 
 /**
  * Model for the {@link IpNetworkModel} Object
@@ -62,6 +64,7 @@ public class IpNetworkModel {
 		return queryGroup;
 	}
 
+	// TODO If this needs to start with "is", it should be a goddamn boolean
 	private static void isValidForStore(IpNetwork ipNetwork) throws RdapDataAccessException {
 		if (ipNetwork.getHandle() == null)
 			throw new RequiredValueNotFoundException("handle", "IpNetwork");
@@ -91,8 +94,15 @@ public class IpNetworkModel {
 
 		}
 
-		IpUtils.validateIpCidr(ipNetwork.getStartAddress(), ipNetwork.getCidr());
-		IpUtils.validateLastIpCidr(ipNetwork.getEndAddress(), ipNetwork.getCidr());
+		AddressBlock block;
+		try {
+			block = new AddressBlock(ipNetwork.getStartAddress(), ipNetwork.getCidr());
+		} catch (IpAddressFormatException e) {
+			throw new BadRequestException(e.getMessage(), e);
+		}
+		if (!block.getLastAddress().equals(ipNetwork.getEndAddress())) {
+			throw new BadRequestException(ipNetwork.getEndAddress() + " is not the last address of " + block);
+		}
 	}
 
 	public static Long storeToDatabase(IpNetwork ipNetwork, Connection connection)
@@ -161,17 +171,16 @@ public class IpNetworkModel {
 		ipNetwork.getRemarks().addAll(RemarkModel.getByIpNetworkId(ipNetworkId, connection));
 	}
 
-	private static IpNetwork getByInet4Address(Inet4Address inetAddress, Integer cidr, Connection connection)
-			throws SQLException, BadRequestException {
-		InetAddress lastAddressFromNetwork = IpUtils.getLastAddressFromNetwork(inetAddress, cidr);
+	private static IpNetwork getByIpv4Block(AddressBlock block, Connection connection) throws SQLException {
+		InetAddress lastAddressFromNetwork = block.getLastAddress();
 
-		BigInteger start = IpUtils.addressToNumber(inetAddress);
+		BigInteger start = IpUtils.addressToNumber((Inet4Address) block.getAddress());
 		BigInteger end = IpUtils.addressToNumber((Inet4Address) lastAddressFromNetwork);
 
 		String query = getQueryGroup().getQuery(GET_BY_IPV4);
 		IpNetworkDbObj ipDao = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
-			statement.setInt(1, cidr);
+			statement.setInt(1, block.getPrefix());
 			statement.setString(2, start.toString());
 			statement.setString(3, end.toString());
 			ResultSet rs = statement.executeQuery();
@@ -187,12 +196,11 @@ public class IpNetworkModel {
 		return ipDao;
 	}
 
-	private static IpNetwork getByInet6Address(Inet6Address inetAddress, Integer cidr, Connection connection)
-			throws SQLException, BadRequestException {
-		InetAddress lastAddressFromNetwork = IpUtils.getLastAddressFromNetwork(inetAddress, cidr);
+	private static IpNetwork getByIpv6Block(AddressBlock block, Connection connection) throws SQLException {
+		InetAddress lastAddressFromNetwork = block.getLastAddress();
 
-		BigInteger startUpperPart = IpUtils.inet6AddressToUpperPart(inetAddress);
-		BigInteger startLowerPart = IpUtils.inet6AddressToLowerPart(inetAddress);
+		BigInteger startUpperPart = IpUtils.inet6AddressToUpperPart((Inet6Address) block.getAddress());
+		BigInteger startLowerPart = IpUtils.inet6AddressToLowerPart((Inet6Address) block.getAddress());
 
 		BigInteger endUpperPart = IpUtils.inet6AddressToUpperPart((Inet6Address) lastAddressFromNetwork);
 		BigInteger endLowerPart = IpUtils.inet6AddressToLowerPart((Inet6Address) lastAddressFromNetwork);
@@ -200,7 +208,7 @@ public class IpNetworkModel {
 		String query = getQueryGroup().getQuery(GET_BY_IPV6);
 		IpNetworkDbObj ipDao = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
-			statement.setInt(1, cidr);
+			statement.setInt(1, block.getPrefix());
 			statement.setString(2, startUpperPart.toString());
 			statement.setString(3, startLowerPart.toString());
 
@@ -221,26 +229,17 @@ public class IpNetworkModel {
 		return ipDao;
 	}
 
-	public static IpNetwork getByInetAddress(InetAddress inetAddress, Connection connection)
-			throws SQLException, BadRequestException {
-		return getByInetAddress(inetAddress, IpUtils.getMaxValidCidr(inetAddress), connection);
-	}
-
-	public static IpNetwork getByInetAddress(InetAddress inetAddress, Integer cidr, Connection connection)
-			throws SQLException, BadRequestException {
+	public static IpNetwork getByAddressBlock(AddressBlock block, Connection connection) throws SQLException {
 		IpNetwork result = null;
-		if (inetAddress instanceof Inet4Address) {
-			IpUtils.validateIpv4Cidr(cidr);
-			result = getByInet4Address((Inet4Address) inetAddress, cidr, connection);
-		} else if (inetAddress instanceof Inet6Address) {
-			IpUtils.validateIpv6Cidr(cidr);
-			result = getByInet6Address((Inet6Address) inetAddress, cidr, connection);
+		if (block.getAddress() instanceof Inet4Address) {
+			result = getByIpv4Block(block, connection);
+		} else if (block.getAddress() instanceof Inet6Address) {
+			result = getByIpv6Block(block, connection);
 		} else {
-			throw new UnsupportedOperationException("Unsupported class:" + inetAddress.getClass().getName());
+			throw new UnsupportedOperationException("Unsupported class:" + block.getAddress().getClass().getName());
 		}
 
 		loadNestedObjects(result, connection);
-
 		return result;
 	}
 

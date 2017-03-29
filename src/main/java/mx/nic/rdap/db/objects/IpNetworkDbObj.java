@@ -7,11 +7,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import mx.nic.rdap.IpUtils;
 import mx.nic.rdap.core.catalog.IpVersion;
 import mx.nic.rdap.core.db.IpNetwork;
 import mx.nic.rdap.db.exception.IpAddressFormatException;
 import mx.nic.rdap.db.model.CountryCodeModel;
+import mx.nic.rdap.sql.IpUtils;
 
 /**
  * Data access class for the {@link IpNetwork} object

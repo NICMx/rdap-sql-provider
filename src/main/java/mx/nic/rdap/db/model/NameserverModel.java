@@ -16,14 +16,15 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import mx.nic.rdap.IpUtils;
 import mx.nic.rdap.core.catalog.Role;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.Nameserver;
 import mx.nic.rdap.db.QueryGroup;
+import mx.nic.rdap.db.exception.IpAddressFormatException;
 import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.exception.http.BadRequestException;
 import mx.nic.rdap.db.objects.NameserverDbObj;
+import mx.nic.rdap.db.struct.AddressBlock;
 import mx.nic.rdap.db.struct.SearchResultStruct;
 
 /**
@@ -228,7 +229,13 @@ public class NameserverModel {
 		String query = "";
 		List<NameserverDbObj> nameservers = new ArrayList<NameserverDbObj>();
 
-		InetAddress address = IpUtils.validateIpAddress(ipaddressPattern);
+		InetAddress address;
+		try {
+			address = AddressBlock.parseAddress(ipaddressPattern);
+		} catch (IpAddressFormatException e) {
+			throw new BadRequestException(e.getMessage(), e);
+		}
+
 		if (address instanceof Inet6Address) {
 			query = getQueryGroup().getQuery(SEARCH_BY_IP6_QUERY);
 		} else if (address instanceof Inet4Address) {

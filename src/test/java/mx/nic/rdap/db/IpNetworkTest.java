@@ -1,7 +1,5 @@
 package mx.nic.rdap.db;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,7 +8,6 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import mx.nic.rdap.IpUtils;
 import mx.nic.rdap.core.catalog.EventAction;
 import mx.nic.rdap.core.catalog.IpVersion;
 import mx.nic.rdap.core.catalog.Status;
@@ -19,6 +16,7 @@ import mx.nic.rdap.core.db.IpNetwork;
 import mx.nic.rdap.core.db.Link;
 import mx.nic.rdap.core.db.Remark;
 import mx.nic.rdap.core.db.RemarkDescription;
+import mx.nic.rdap.db.exception.IpAddressFormatException;
 import mx.nic.rdap.db.exception.RdapDataAccessException;
 import mx.nic.rdap.db.exception.http.BadRequestException;
 import mx.nic.rdap.db.model.EntityModel;
@@ -28,6 +26,7 @@ import mx.nic.rdap.db.objects.IpNetworkDbObj;
 import mx.nic.rdap.db.objects.LinkDbObj;
 import mx.nic.rdap.db.objects.RemarkDbObj;
 import mx.nic.rdap.db.objects.RemarkDescriptionDbObj;
+import mx.nic.rdap.db.struct.AddressBlock;
 
 /**
  * Tests for the {@link EntityModel}
@@ -41,7 +40,7 @@ public class IpNetworkTest extends DatabaseTest {
 	 * objects with the objects in the database
 	 */
 	@Test
-	public void insertAndGetSimpleObject() throws RdapDataAccessException, SQLException, UnknownHostException {
+	public void insertAndGetSimpleObject() throws RdapDataAccessException, SQLException, IpAddressFormatException {
 		// create local instances;
 		IpNetwork ipNetwork = createInstance(IpVersion.V4, "192.168.1.0", "192.168.1.255", "home-ip", "type", "MX",
 				null, 24, "client-1234-home-ip");
@@ -49,13 +48,10 @@ public class IpNetworkTest extends DatabaseTest {
 		IpNetworkModel.storeToDatabase(ipNetwork, connection);
 
 		// Query the database
-		IpNetwork byIp = IpNetworkModel.getByInetAddress(InetAddress.getByName("192.168.1.1"), 26, connection);
+		IpNetwork byIp = IpNetworkModel.getByAddressBlock(new AddressBlock("192.168.1.1", 26), connection);
 
 		// Compares the results
 		Assert.assertTrue("getByIp fails", ipNetwork.equals(byIp));
-
-		// check if exists
-		IpNetworkModel.getByInetAddress(InetAddress.getByName("192.168.1.0"), connection);
 	}
 
 	/**
@@ -64,23 +60,20 @@ public class IpNetworkTest extends DatabaseTest {
 	 * objects with the objects in the database
 	 */
 	@Test
-	public void insertAndGetSimpleObjectIpv6() throws RdapDataAccessException, SQLException, UnknownHostException {
+	public void insertAndGetSimpleObjectIpv6() throws RdapDataAccessException, SQLException, IpAddressFormatException {
 		// create local instances;
-		IpNetwork ipNetwork = createInstance(IpVersion.V6, "2001:BABA:CAFE:0003::", null, "home-ip", "type", "MX", null,
+		IpNetwork ipNetwork = createInstance(IpVersion.V6, "2001:BABA:CAFE:0003::",
+				"2001:BABA:CAFE:0003:FFFF:FFFF:FFFF:FFFF", "home-ip", "type", "MX", null,
 				64, "client-1234-home-ip");
-		ipNetwork.setEndAddress(IpUtils.getLastAddressFromNetwork(ipNetwork.getStartAddress(), 64));
 
 		// Store it in the database
 		IpNetworkModel.storeToDatabase(ipNetwork, connection);
 
 		// Query the database
-		IpNetwork byIp = IpNetworkModel.getByInetAddress(InetAddress.getByName("2001:BABA:CAFE:0003::"), connection);
+		IpNetwork byIp = IpNetworkModel.getByAddressBlock(new AddressBlock("2001:BABA:CAFE:0003::"), connection);
 
 		// Compares the results
 		Assert.assertTrue("getByIp fails", ipNetwork.equals(byIp));
-
-		// check if exists
-		IpNetworkModel.getByInetAddress(InetAddress.getByName("2001:BABA:CAFE:0003::"), connection);
 	}
 
 	/**
@@ -89,7 +82,7 @@ public class IpNetworkTest extends DatabaseTest {
 	 * objects with the objects in the database
 	 */
 	@Test
-	public void insertAndGetComplexObject() throws RdapDataAccessException, SQLException, UnknownHostException {
+	public void insertAndGetComplexObject() throws RdapDataAccessException, SQLException, IpAddressFormatException {
 		// create local instances;
 		IpNetwork ipNetwork = createInstance(IpVersion.V4, "192.168.1.0", "192.168.1.255", "home-ip", "type", "MX",
 				null, 24, "client-1234-home-ip");
@@ -161,18 +154,18 @@ public class IpNetworkTest extends DatabaseTest {
 		IpNetworkModel.storeToDatabase(ipNetwork, connection);
 
 		// Query the database
-		IpNetwork byIp = IpNetworkModel.getByInetAddress(InetAddress.getByName("192.168.1.1"), 26, connection);
+		IpNetwork byIp = IpNetworkModel.getByAddressBlock(new AddressBlock("192.168.1.1", 26), connection);
 
 		// Compares the results
 		Assert.assertTrue("getByIp fails", ipNetwork.equals(byIp));
 	}
 
 	@Test
-	public void insertAndGetComplexV6Object() throws UnknownHostException, SQLException, RdapDataAccessException {
+	public void insertAndGetComplexV6Object() throws SQLException, RdapDataAccessException, IpAddressFormatException {
 		// create local instances;
-		IpNetwork ipNetwork = createInstance(IpVersion.V6, "2001:BABA:CAFE:0003::", null, "home-ip", "type", "MX", null,
+		IpNetwork ipNetwork = createInstance(IpVersion.V6, "2001:BABA:CAFE:0003::",
+				"2001:BABA:CAFE:0003:FFFF:FFFF:FFFF:FFFF", "home-ip", "type", "MX", null,
 				64, "client-1234-home-ip");
-		ipNetwork.setEndAddress(IpUtils.getLastAddressFromNetwork(ipNetwork.getStartAddress(), 64));
 
 		// Status data
 		List<Status> statusList = new ArrayList<Status>();
@@ -241,22 +234,28 @@ public class IpNetworkTest extends DatabaseTest {
 		IpNetworkModel.storeToDatabase(ipNetwork, connection);
 
 		// Query the database
-		IpNetwork byIp = IpNetworkModel.getByInetAddress(InetAddress.getByName("2001:BABA:CAFE:0003::"), connection);
+		IpNetwork byIp = IpNetworkModel.getByAddressBlock(new AddressBlock("2001:BABA:CAFE:0003::"), connection);
 
 		// Compares the results
 		Assert.assertTrue("getByIp fails", ipNetwork.equals(byIp));
 	}
 
-	public static IpNetwork createInstance(IpVersion ipVersion, String startAddress, String endAddress, String name,
+	private static IpNetwork createInstance(IpVersion ipVersion, String startAddress, String endAddress, String name,
 			String type, String country, String parentHandle, Integer cidr, String handle) throws BadRequestException {
 		IpNetwork ipNetwork = new IpNetworkDbObj();
 
 		ipNetwork.setHandle(handle);
 		ipNetwork.setIpVersion(ipVersion);
-		if (startAddress != null)
-			ipNetwork.setStartAddress(IpUtils.validateIpAddress(startAddress));
-		if (endAddress != null)
-			ipNetwork.setEndAddress(IpUtils.validateIpAddress(endAddress));
+
+		try {
+			if (startAddress != null)
+				ipNetwork.setStartAddress(AddressBlock.parseAddress(startAddress));
+			if (endAddress != null)
+				ipNetwork.setEndAddress(AddressBlock.parseAddress(endAddress));
+		} catch (IpAddressFormatException e) {
+			throw new BadRequestException(e.getMessage(), e);
+		}
+
 		ipNetwork.setName(name);
 		ipNetwork.setType(type);
 		ipNetwork.setCountry(country);
