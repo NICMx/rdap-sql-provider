@@ -14,7 +14,7 @@ SELECT eve.eve_id,eve.eac_id,eve.eve_actor,eve.eve_date FROM {schema}.event eve 
 SELECT eve.eve_id,eve.eac_id,eve.eve_actor,eve.eve_date FROM {schema}.event eve JOIN {schema}.entity_events ent ON ent.eve_id=eve.eve_id WHERE ent.ent_id=?;
 
 #getByAutnumId
-SELECT eve.eve_id, eve.eac_id, eve.eve_actor, eve.eve_date FROM {schema}.event eve JOIN {schema}.asn_events asn ON asn.eve_id=eve.eve_od WHERE asn.asn_id=?;
+SELECT eve.eve_id, eve.eac_id, eve.eve_actor, eve.eve_date FROM {schema}.event eve JOIN {schema}.asn_events asn ON asn.eve_id=eve.eve_id WHERE asn.asn_id=?;
 
 #getByIpNetworkId
 SELECT eve.eve_id, eve.eac_id, eve.eve_actor, eve.eve_date FROM {schema}.event eve JOIN {schema}.ip_network_events ine ON ine.eve_id=eve.eve_id WHERE ine.ine_id=?;
