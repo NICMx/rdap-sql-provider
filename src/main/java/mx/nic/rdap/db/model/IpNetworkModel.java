@@ -16,16 +16,12 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import mx.nic.rdap.core.catalog.IpVersion;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.IpNetwork;
+import mx.nic.rdap.core.ip.AddressBlock;
 import mx.nic.rdap.db.QueryGroup;
-import mx.nic.rdap.db.exception.IpAddressFormatException;
-import mx.nic.rdap.db.exception.RdapDataAccessException;
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
-import mx.nic.rdap.db.exception.http.BadRequestException;
+import mx.nic.rdap.db.exception.IncompleteObjectException;
 import mx.nic.rdap.db.objects.IpNetworkDbObj;
-import mx.nic.rdap.db.struct.AddressBlock;
 import mx.nic.rdap.sql.IpUtils;
 
 /**
@@ -64,49 +60,24 @@ public class IpNetworkModel {
 		return queryGroup;
 	}
 
-	// TODO If this needs to start with "is", it should be a goddamn boolean
-	private static void isValidForStore(IpNetwork ipNetwork) throws RdapDataAccessException {
+	private static void isValidForStore(IpNetwork ipNetwork) throws IncompleteObjectException {
 		if (ipNetwork.getHandle() == null)
-			throw new RequiredValueNotFoundException("handle", "IpNetwork");
+			throw new IncompleteObjectException("handle", "IpNetwork");
 
-		if (ipNetwork.getStartAddress() == null) {
-			throw new RequiredValueNotFoundException("startAddress", "IpNetwork");
-		}
-
-		if (ipNetwork.getEndAddress() == null) {
-			throw new RequiredValueNotFoundException("endAddress", "IpNetwork");
+		if (ipNetwork.getAddressBlock() == null) {
+			throw new IncompleteObjectException("addressBlock", "IpNetwork");
 		}
 
 		if (ipNetwork.getIpVersion() == null) {
-			throw new RequiredValueNotFoundException("ipVersion", "IpNetwork");
+			throw new IncompleteObjectException("ipVersion", "IpNetwork");
 		}
 
-		if (ipNetwork.getIpVersion() == IpVersion.V4) {
-			if (ipNetwork.getStartAddress() instanceof Inet6Address
-					|| ipNetwork.getEndAddress() instanceof Inet6Address) {
-				throw new RuntimeException("IP version doesn't match with the IpVersion set to the object");
-			}
-		} else {
-			if (ipNetwork.getStartAddress() instanceof Inet4Address
-					|| ipNetwork.getEndAddress() instanceof Inet4Address) {
-				throw new RuntimeException("IP version doesn't match with the IpVersion set to the object");
-			}
-
-		}
-
-		AddressBlock block;
-		try {
-			block = new AddressBlock(ipNetwork.getStartAddress(), ipNetwork.getCidr());
-		} catch (IpAddressFormatException e) {
-			throw new BadRequestException(e.getMessage(), e);
-		}
-		if (!block.getLastAddress().equals(ipNetwork.getEndAddress())) {
-			throw new BadRequestException(ipNetwork.getEndAddress() + " is not the last address of " + block);
+		if (ipNetwork.getIpVersion() != ipNetwork.getAddressBlock().getIpVersion()) {
+			throw new RuntimeException("IP version doesn't match with the IpVersion set to the object");
 		}
 	}
 
-	public static Long storeToDatabase(IpNetwork ipNetwork, Connection connection)
-			throws RdapDataAccessException, SQLException {
+	public static Long storeToDatabase(IpNetwork ipNetwork, Connection connection) throws SQLException {
 		isValidForStore(ipNetwork);
 		String query = getQueryGroup().getQuery(STORE_TO_DATABASE);
 
@@ -127,8 +98,7 @@ public class IpNetworkModel {
 		return resultId;
 	}
 
-	private static void storeNestedObjects(IpNetwork ipNetwork, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+	private static void storeNestedObjects(IpNetwork ipNetwork, Connection connection) throws SQLException {
 		StatusModel.storeIpNetworkStatusToDatabase(ipNetwork.getStatus(), ipNetwork.getId(), connection);
 		RemarkModel.storeIpNetworkRemarksToDatabase(ipNetwork.getRemarks(), ipNetwork.getId(), connection);
 		LinkModel.storeIpNetworkLinksToDatabase(ipNetwork.getLinks(), ipNetwork.getId(), connection);

@@ -35,7 +35,6 @@ import mx.nic.rdap.core.db.SecureDNS;
 import mx.nic.rdap.core.db.Variant;
 import mx.nic.rdap.core.db.VariantName;
 import mx.nic.rdap.core.db.struct.NameserverIpAddressesStruct;
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.DomainModel;
 import mx.nic.rdap.db.model.EntityModel;
 import mx.nic.rdap.db.model.NameserverModel;
@@ -58,57 +57,34 @@ import mx.nic.rdap.db.objects.VariantDbObj;
 public class DomainTest extends DatabaseTest {
 
 	@Test
-	public void insertAndGetSimpleDomain() {
+	public void insertAndGetSimpleDomain() throws SQLException {
 
 		Domain dom = new DomainDbObj();
 		dom.setHandle("dummyhandle");
 		dom.setLdhName("ninio");
 
-		Integer zoneId = null;
 		String zoneName = "example";
-		try {
-			zoneId = ZoneModel.storeToDatabase(zoneName, connection);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-			fail(e1.toString());
-		}
+		Integer zoneId = ZoneModel.storeToDatabase(zoneName, connection);
 		dom.setZone(zoneName);
 
-		try {
-			DomainModel.storeToDatabase(dom, false, connection);
-		} catch (SQLException | RequiredValueNotFoundException e) {
-			e.printStackTrace();
-			fail();
-		}
+		DomainModel.storeToDatabase(dom, false, connection);
 
-		Domain domainByHandle = null;
-		Domain findByLdhName = null;
-		try {
-			domainByHandle = DomainModel.getByHandle(dom.getHandle(), false, connection);
-			findByLdhName = DomainModel.findByLdhName(dom.getLdhName(), zoneId, false, connection);
-			System.out.println(findByLdhName.getLdhName());
-		} catch (SQLException e) {
-			e.printStackTrace();
-			fail();
-		}
+		Domain domainByHandle = DomainModel.getByHandle(dom.getHandle(), false, connection);
+		Domain findByLdhName = DomainModel.findByLdhName(dom.getLdhName(), zoneId, false, connection);
+		System.out.println(findByLdhName.getLdhName());
 
 		// Compares the results
 		Assert.assertTrue("getByHandle fails", dom.equals(domainByHandle));
 		Assert.assertTrue("findByLdhName fails", dom.equals(findByLdhName));
 
-		try {
-			DomainModel.findByLdhName(dom.getLdhName(), zoneId, false, connection);
-		} catch (SQLException s) {
-			s.printStackTrace();
-			fail();
-		}
+		DomainModel.findByLdhName(dom.getLdhName(), zoneId, false, connection);
 	}
 
 	@Test
 	/**
 	 * Inserts a domain and retrieves it
 	 */
-	public void insertDomainAndGet() {
+	public void insertDomainAndGet() throws SQLException, UnknownHostException {
 		Random random = new Random();
 		int randomInt = random.nextInt();
 
@@ -126,40 +102,20 @@ public class DomainTest extends DatabaseTest {
 		ent.getRoles().add(Role.ADMINISTRATIVE);
 		ent.getRoles().add(Role.TECHNICAL);
 
-		try {
-			EntityModel.storeToDatabase(registrar, connection);
-			EntityModel.storeToDatabase(ent, connection);
-		} catch (SQLException | RequiredValueNotFoundException e1) {
-			e1.printStackTrace();
-			fail();
-		}
+		EntityModel.storeToDatabase(registrar, connection);
+		EntityModel.storeToDatabase(ent, connection);
 
-		try {
-			EntityModel.storeToDatabase(registrar, connection);
-			EntityModel.storeToDatabase(ent, connection);
-		} catch (SQLException | RequiredValueNotFoundException e1) {
-			e1.printStackTrace();
-			fail();
-		}
+		EntityModel.storeToDatabase(registrar, connection);
+		EntityModel.storeToDatabase(ent, connection);
 
 		domain.getEntities().add(ent);
 		domain.getEntities().add(registrar);
 		List<Nameserver> nameservers = new ArrayList<Nameserver>();
-		try {
-			nameservers = createDefaultNameservers(randomInt);
-		} catch (UnknownHostException e1) {
-			e1.printStackTrace();
-		}
+		nameservers = createDefaultNameservers(randomInt);
 		domain.setNameServers(nameservers);
 
 		// Creates and inserts a zone
-		Integer zoneId = null;
-		try {
-			zoneId = ZoneModel.storeToDatabase("mx", connection);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-			fail(e1.toString());
-		}
+		Integer zoneId = ZoneModel.storeToDatabase("mx", connection);
 
 		domain.setZone("mx");
 		domain.setLdhName(domainName);
@@ -311,29 +267,15 @@ public class DomainTest extends DatabaseTest {
 		SecureDNS secureDns = SecureDnsTest.getSecureDns(null, null, true, true, dsDataList, keyDataList);
 		domain.setSecureDNS(secureDns);
 
-		try {
-			DomainModel.storeToDatabase(domain, false, connection);
-		} catch (SQLException | RequiredValueNotFoundException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		DomainModel.storeToDatabase(domain, false, connection);
 
 		try (Statement statement = connection.createStatement()) {
 			ResultSet resultSet = statement.executeQuery("SELECT * FROM rdap.domain_entity_roles");
 			resultSet.next();
-		} catch (SQLException e1) {
-			e1.printStackTrace();
 		}
 
-		Domain domainByHandle = null;
-		Domain findByLdhName = null;
-		try {
-			domainByHandle = DomainModel.getByHandle(domain.getHandle(), false, connection);
-			findByLdhName = DomainModel.findByLdhName(domain.getLdhName(), zoneId, false, connection);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		Domain domainByHandle = DomainModel.getByHandle(domain.getHandle(), false, connection);
+		Domain findByLdhName = DomainModel.findByLdhName(domain.getLdhName(), zoneId, false, connection);
 
 		// Compares the results
 		Assert.assertTrue("getByHandle fails", domain.equals(domainByHandle));
@@ -341,7 +283,7 @@ public class DomainTest extends DatabaseTest {
 
 	}
 
-	public static List<Nameserver> createDefaultNameservers(int randomInt) throws UnknownHostException {
+	public static List<Nameserver> createDefaultNameservers(int randomInt) throws UnknownHostException, SQLException {
 		List<Nameserver> nameservers = new ArrayList<Nameserver>();
 		Nameserver nameserver = new NameserverDbObj();
 		nameserver.setHandle("XXXX73532" + randomInt);
@@ -430,12 +372,7 @@ public class DomainTest extends DatabaseTest {
 		events.add(event2);
 		nameserver.setEvents(events);
 		nameservers.add(nameserver);
-		try {
-			NameserverModel.storeToDatabase(nameserver, connection);
-		} catch (SQLException | RequiredValueNotFoundException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		NameserverModel.storeToDatabase(nameserver, connection);
 		return nameservers;
 	}
 
@@ -452,6 +389,9 @@ public class DomainTest extends DatabaseTest {
 			e.printStackTrace();
 			fail();
 		}
+
+		// TODO WTF? this is all unreachable code.
+
 		// Status data
 		List<Status> statusList = new ArrayList<Status>();
 		statusList.add(Status.ACTIVE);

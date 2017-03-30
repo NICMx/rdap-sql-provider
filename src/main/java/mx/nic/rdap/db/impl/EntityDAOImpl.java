@@ -12,11 +12,9 @@ import mx.nic.rdap.db.struct.SearchResultStruct;
 
 public class EntityDAOImpl implements EntityDAO {
 
-	public long storeToDatabase(Entity entity) throws RdapDataAccessException {
+	public long storeToDatabase(Entity entity) throws SQLException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return EntityModel.storeToDatabase(entity, connection);
-		} catch (SQLException e) {
-			throw new RdapDataAccessException(e);
 		}
 	}
 

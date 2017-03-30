@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.DsData;
 import mx.nic.rdap.db.QueryGroup;
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.objects.DsDataDbObj;
 
 /**
@@ -49,7 +48,7 @@ public class DsDataModel {
 	}
 
 	public static long storeToDatabase(DsData dsData, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+			throws SQLException {
 		String query = getQueryGroup().getQuery(STORE_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 			((DsDataDbObj) dsData).storeToDatabase(statement);
@@ -69,7 +68,7 @@ public class DsDataModel {
 	}
 
 	public static void storeAllToDatabase(List<DsData> dsDataList, Long secureDnsId, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+			throws SQLException {
 		if (dsDataList.isEmpty()) {
 			return;
 		}

@@ -4,11 +4,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import mx.nic.rdap.core.db.IpNetwork;
+import mx.nic.rdap.core.ip.AddressBlock;
 import mx.nic.rdap.db.DatabaseSession;
 import mx.nic.rdap.db.exception.RdapDataAccessException;
 import mx.nic.rdap.db.model.IpNetworkModel;
 import mx.nic.rdap.db.spi.IpNetworkDAO;
-import mx.nic.rdap.db.struct.AddressBlock;
 
 public class IpNetworkDAOImpl implements IpNetworkDAO {
 

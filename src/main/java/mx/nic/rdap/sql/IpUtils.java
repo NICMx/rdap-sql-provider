@@ -7,17 +7,15 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 
-import mx.nic.rdap.db.exception.IpAddressFormatException;
+import mx.nic.rdap.core.ip.IpAddressFormatException;
 
 public class IpUtils {
-
-	private static final BigInteger FIRST_OCTECT_LIMIT = new BigInteger("4294967295"); // 0xFFFF_FFFF
 
 	private static final int IPV4_ADDRESS_ARRAY_SIZE = 4;
 	private static final int IPV6_ADDRESS_ARRAY_SIZE = 16;
 
 	private static final int IPV6_PART_SIZE = 8;
-	private static final BigInteger IPV4_MAX_VALUE = FIRST_OCTECT_LIMIT; // 0xFFFF_FFFF
+	private static final BigInteger IPV4_MAX_VALUE = new BigInteger("4294967295"); // 0xFFFF_FFFF
 
 	public static BigInteger addressToNumber(Inet4Address address) {
 		byte[] byteAddress = address.getAddress();
@@ -61,7 +59,7 @@ public class IpUtils {
 			upper = Long.parseUnsignedLong(upperPartNumber);
 			lower = Long.parseUnsignedLong(lowerPartNumber);
 		} catch (NumberFormatException e) {
-			throw new IpAddressFormatException("Invalid IPv6 address.", e);
+			throw new IpAddressFormatException("Invalid IPv6 address: " + upperPartNumber + "+" + lowerPartNumber, e);
 		}
 
 		ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES * 2);

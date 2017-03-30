@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.Event;
 import mx.nic.rdap.db.QueryGroup;
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
+import mx.nic.rdap.db.exception.IncompleteObjectException;
 import mx.nic.rdap.db.objects.EventDbObj;
 
 /**
@@ -63,15 +63,14 @@ public class EventModel {
 		return queryGroup;
 	}
 
-	private static void isValidForStore(Event event) throws RequiredValueNotFoundException {
+	private static void isValidForStore(Event event) throws IncompleteObjectException {
 		if (event.getEventAction() == null)
-			throw new RequiredValueNotFoundException("eventAction", "Event");
+			throw new IncompleteObjectException("eventAction", "Event");
 		if (event.getEventDate() == null)
-			throw new RequiredValueNotFoundException("eventDate", "Event");
+			throw new IncompleteObjectException("eventDate", "Event");
 	}
 
-	public static long storeToDatabase(Event event, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+	public static long storeToDatabase(Event event, Connection connection) throws SQLException {
 		isValidForStore(event);
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery("storeToDatabase"),
 				Statement.RETURN_GENERATED_KEYS)) {
@@ -88,42 +87,42 @@ public class EventModel {
 	}
 
 	public static void storeNameserverEventsToDatabase(List<Event> events, Long nameserverId, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+			throws SQLException {
 		storeRelationEventsToDatabase(events, nameserverId, connection, NAMESERVER_STORE_QUERY);
 	}
 
 	public static void storeEntityEventsToDatabase(List<Event> events, Long entityId, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+			throws SQLException {
 		storeRelationEventsToDatabase(events, entityId, connection, ENTITY_STORE_QUERY);
 	}
 
 	public static void storeDomainEventsToDatabase(List<Event> events, Long domainId, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+			throws SQLException {
 		storeRelationEventsToDatabase(events, domainId, connection, DOMAIN_STORE_QUERY);
 	}
 
 	public static void storeAutnumEventsToDatabase(List<Event> events, Long autnumId, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+			throws SQLException {
 		storeRelationEventsToDatabase(events, autnumId, connection, AUTNUM_STORE_QUERY);
 	}
 
 	public static void storeDsDataEventsToDatabase(List<Event> events, Long dsDataId, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+			throws SQLException {
 		storeRelationEventsToDatabase(events, dsDataId, connection, DS_DATA_STORE_QUERY);
 	}
 
 	public static void storeKeyDataEventsToDatabase(List<Event> events, Long keyDataId, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+			throws SQLException {
 		storeRelationEventsToDatabase(events, keyDataId, connection, KEY_DATA_STORE_QUERY);
 	}
 
 	public static void storeIpNetworkEventsToDatabase(List<Event> events, Long ipNetworkId, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+			throws SQLException {
 		storeRelationEventsToDatabase(events, ipNetworkId, connection, IP_NETWORK_STORE_QUERY);
 	}
 
 	private static void storeRelationEventsToDatabase(List<Event> events, Long id, Connection connection,
-			String storeQueryId) throws SQLException, RequiredValueNotFoundException {
+			String storeQueryId) throws SQLException {
 		if (events.isEmpty())
 			return;
 

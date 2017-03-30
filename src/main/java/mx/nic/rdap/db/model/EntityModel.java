@@ -21,7 +21,7 @@ import mx.nic.rdap.core.db.IpNetwork;
 import mx.nic.rdap.core.db.PublicId;
 import mx.nic.rdap.core.db.VCard;
 import mx.nic.rdap.db.QueryGroup;
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
+import mx.nic.rdap.db.exception.IncompleteObjectException;
 import mx.nic.rdap.db.objects.EntityDbObj;
 import mx.nic.rdap.db.struct.SearchResultStruct;
 
@@ -91,8 +91,7 @@ public class EntityModel {
 		return entId;
 	}
 
-	public static long storeToDatabase(Entity entity, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+	public static long storeToDatabase(Entity entity, Connection connection) throws SQLException {
 		Long entityId = getIdByHandle(entity.getHandle(), connection);
 		if (entityId != null) {
 			entity.setId(entityId);
@@ -116,13 +115,13 @@ public class EntityModel {
 		return entityId;
 	}
 
-	private static void isValidForStore(Entity entity) throws RequiredValueNotFoundException {
+	private static void isValidForStore(Entity entity) throws IncompleteObjectException {
 		if (entity.getHandle() == null || entity.getHandle().isEmpty())
-			throw new RequiredValueNotFoundException("handle", "Entity");
+			throw new IncompleteObjectException("handle", "Entity");
 	}
 
 	private static void storeNestedObjects(Entity entity, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+			throws SQLException {
 		isValidForStore(entity);
 		storeVcardList(entity, connection);
 

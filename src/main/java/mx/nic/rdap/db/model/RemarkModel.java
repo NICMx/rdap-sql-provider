@@ -15,7 +15,6 @@ import java.util.logging.Logger;
 import mx.nic.rdap.core.db.Remark;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.ObjectNotFoundException;
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.objects.RemarkDbObj;
 
 /**
@@ -59,8 +58,7 @@ public class RemarkModel {
 		return queryGroup;
 	}
 
-	public static long storeToDatabase(Remark remark, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+	public static long storeToDatabase(Remark remark, Connection connection) throws SQLException {
 
 		// The Remark's id is autoincremental, Statement.RETURN_GENERATED_KEYS
 		// give us the id generated for the object stored
@@ -81,7 +79,7 @@ public class RemarkModel {
 	}
 
 	private static void storeRelationRemarksToDatabase(List<Remark> remarks, Long id, Connection connection,
-			String queryId) throws SQLException, RequiredValueNotFoundException {
+			String queryId) throws SQLException {
 		if (remarks.isEmpty())
 			return;
 
@@ -98,27 +96,27 @@ public class RemarkModel {
 	}
 
 	public static void storeNameserverRemarksToDatabase(List<Remark> remarks, Long nameserverId, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+			throws SQLException {
 		storeRelationRemarksToDatabase(remarks, nameserverId, connection, NAMESERVER_STORE_QUERY);
 	}
 
 	public static void storeDomainRemarksToDatabase(List<Remark> remarks, Long domainId, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+			throws SQLException {
 		storeRelationRemarksToDatabase(remarks, domainId, connection, DOMAIN_STORE_QUERY);
 	}
 
 	public static void storeAutnumRemarksToDatabase(List<Remark> remarks, Long autnumId, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+			throws SQLException {
 		storeRelationRemarksToDatabase(remarks, autnumId, connection, AUTNUM_STORE_QUERY);
 	}
 
 	public static void storeEntityRemarksToDatabase(List<Remark> remarks, Long entityId, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+			throws SQLException {
 		storeRelationRemarksToDatabase(remarks, entityId, connection, ENTITY_STORE_QUERY);
 	}
 
 	public static void storeIpNetworkRemarksToDatabase(List<Remark> remarks, Long ipNetworkId, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+			throws SQLException {
 		storeRelationRemarksToDatabase(remarks, ipNetworkId, connection, IP_NETWORK_STORE_QUERY);
 	}
 

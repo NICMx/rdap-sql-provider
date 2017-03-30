@@ -1,7 +1,5 @@
 package mx.nic.rdap.db;
 
-import static org.junit.Assert.fail;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
@@ -24,7 +22,6 @@ import mx.nic.rdap.core.db.RemarkDescription;
 import mx.nic.rdap.core.db.VCard;
 import mx.nic.rdap.core.db.VCardPostalInfo;
 import mx.nic.rdap.core.db.struct.NameserverIpAddressesStruct;
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.DomainModel;
 import mx.nic.rdap.db.model.EntityModel;
 import mx.nic.rdap.db.model.NameserverModel;
@@ -48,44 +45,33 @@ public class DummyDataTest extends DatabaseTest {
 			'ア', 'イ', 'ウ', 'エ', 'オ', 'а', 'њ', 'ш', 'я', 'й', 'ж', 'ग', '-', '_', 'ब', 'ह', 'द', 'श' };
 	public static String[] zones = { "mx", "lat", "com", "lat.com", "com.mx", "org" };
 
-	public static void main(String[] args) throws RequiredValueNotFoundException {
+	public static void main(String[] args) throws SQLException, UnknownHostException {
 		DummyDataTest dummyDataTest = new DummyDataTest();
 		dummyDataTest.createDataDummy();
 	}
 
-	public void createDataDummy() throws RequiredValueNotFoundException {
-		int numberOfDomains = 2000;
-		try {
-			for (int index = 801; index < numberOfDomains; index++) {
-				String domainName = "DN" + index;
-				if (getRandomBoolean()) {
-					domainName = domainName
-							.concat("" + idnChars[ThreadLocalRandom.current().nextInt(0, idnChars.length)]);
-				}
-				createDomain(domainName, zones[ThreadLocalRandom.current().nextInt(0, zones.length)], "domain" + index,
-						getRandomBoolean(), getRandomBoolean(), getRandomBoolean(), getRandomBoolean(),
-						getRandomBoolean());
+	public void createDataDummy() throws SQLException, UnknownHostException {
+		for (int index = 801; index < 2000; index++) {
+			String domainName = "DN" + index;
+			if (getRandomBoolean()) {
+				domainName = domainName.concat("" + idnChars[ThreadLocalRandom.current().nextInt(0, idnChars.length)]);
 			}
-			connection.commit();
-		} catch (SQLException e) {
-			e.printStackTrace();
-			fail();
+			createDomain(domainName, zones[ThreadLocalRandom.current().nextInt(0, zones.length)], "domain" + index,
+					getRandomBoolean(), getRandomBoolean(), getRandomBoolean(), getRandomBoolean(), getRandomBoolean());
 		}
+		connection.commit();
 	}
 
 	private static void createDomain(String name, String zone, String handle, boolean hasEntities,
 			boolean hasNameservers, boolean hasRemarks, boolean hasLinks, boolean hasEvents)
-			throws RequiredValueNotFoundException, SQLException {
+			throws SQLException, UnknownHostException {
 		DomainDbObj domain = new DomainDbObj();
 		domain.setLdhName(name);
 		domain.setHandle(handle);
 		domain.setPort43("whois.mx");
-		try {
-			ZoneModel.storeToDatabase(zone, connection);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-			fail(e1.toString());
-		}
+
+		ZoneModel.storeToDatabase(zone, connection);
+
 		domain.setZone(zone);
 		if (hasNameservers) {
 			domain.setNameServers(createNameservers(domain.getLdhName() + zone, getRandomBoolean(), getRandomBoolean(),
@@ -107,7 +93,7 @@ public class DummyDataTest extends DatabaseTest {
 	}
 
 	private static List<Nameserver> createNameservers(String name, boolean hasEntities, boolean hasRemarks,
-			boolean hasLinks, boolean hasEvents) throws RequiredValueNotFoundException, SQLException {
+			boolean hasLinks, boolean hasEvents) throws SQLException, UnknownHostException {
 		List<Nameserver> nameservers = new ArrayList<Nameserver>();
 
 		int numberOfNameservers = ThreadLocalRandom.current().nextInt(1, 3);
@@ -129,11 +115,7 @@ public class DummyDataTest extends DatabaseTest {
 			int numberOfIp4 = ThreadLocalRandom.current().nextInt(0, 2);
 			for (int indexIP = 0; indexIP < numberOfIp4; indexIP++) {
 				IpAddress ipv41 = new IpAddressDbObj();
-				try {
-					ipv41.setAddress(InetAddress.getByName("192.0.2." + indexIP));
-				} catch (UnknownHostException e1) {
-					e1.printStackTrace();
-				}
+				ipv41.setAddress(InetAddress.getByName("192.0.2." + indexIP));
 				ipv41.setType(4);
 				ipAddresses.getIpv4Adresses().add(ipv41);
 			}
@@ -141,11 +123,7 @@ public class DummyDataTest extends DatabaseTest {
 			int numberOfIp6 = ThreadLocalRandom.current().nextInt(0, 2);
 			for (int indexIP = 0; indexIP < numberOfIp6; indexIP++) {
 				IpAddress ipv6 = new IpAddressDbObj();
-				try {
-					ipv6.setAddress(InetAddress.getByName("2001:db8::12" + indexIP));
-				} catch (UnknownHostException e1) {
-					e1.printStackTrace();
-				}
+				ipv6.setAddress(InetAddress.getByName("2001:db8::12" + indexIP));
 				ipv6.setType(6);
 				ipAddresses.getIpv6Adresses().add(ipv6);
 				nameserver.setIpAddresses(ipAddresses);
@@ -171,7 +149,7 @@ public class DummyDataTest extends DatabaseTest {
 	}
 
 	private static List<Entity> createRandomEntities(String name, boolean hasEntities, boolean hasRemarks,
-			boolean hasLinks, boolean hasEvents) throws RequiredValueNotFoundException, SQLException {
+			boolean hasLinks, boolean hasEvents) throws SQLException {
 		List<Entity> entities = new ArrayList<Entity>();
 		int numberOfEntities = ThreadLocalRandom.current().nextInt(1, 3);
 		for (int index = 0; index < numberOfEntities; index++) {

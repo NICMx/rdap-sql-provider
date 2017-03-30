@@ -1,7 +1,5 @@
 package mx.nic.rdap.db;
 
-import static org.junit.Assert.fail;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,7 +18,6 @@ import mx.nic.rdap.core.db.Event;
 import mx.nic.rdap.core.db.KeyData;
 import mx.nic.rdap.core.db.Link;
 import mx.nic.rdap.core.db.SecureDNS;
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.DomainModel;
 import mx.nic.rdap.db.model.EntityModel;
 import mx.nic.rdap.db.model.SecureDNSModel;
@@ -39,32 +36,19 @@ import mx.nic.rdap.db.objects.SecureDNSDbObj;
 public class SecureDnsTest extends DatabaseTest {
 
 	@Test
-	public void insertAndGetMinimum() {
+	public void insertAndGetMinimum() throws SQLException {
 		Domain dom = createSimpleDomain();
 		Long domainId = dom.getId();
 
 		SecureDNS secureDns = getSecureDns(null, domainId, true, false, null, null);
+		SecureDNSModel.storeToDatabase(secureDns, connection);
 
-		try {
-			SecureDNSModel.storeToDatabase(secureDns, connection);
-		} catch (SQLException | RequiredValueNotFoundException e) {
-			e.printStackTrace();
-			fail();
-		}
-
-		SecureDNS byDomain = null;
-		try {
-			byDomain = SecureDNSModel.getByDomain(domainId, connection);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			fail();
-		}
-
+		SecureDNS byDomain = SecureDNSModel.getByDomain(domainId, connection);
 		Assert.assertTrue("getByName fails", secureDns.equals(byDomain));
 	}
 
 	@Test
-	public void insertAndGetComplex() {
+	public void insertAndGetComplex() throws SQLException {
 		Domain dom = createSimpleDomain();
 		Long domainId = dom.getId();
 
@@ -152,22 +136,9 @@ public class SecureDnsTest extends DatabaseTest {
 		// -------------- ENDS KEY DATA INFO ----------
 
 		SecureDNS secureDns = getSecureDns(null, domainId, true, true, dsDataList, keyDataList);
+		SecureDNSModel.storeToDatabase(secureDns, connection);
 
-		try {
-			SecureDNSModel.storeToDatabase(secureDns, connection);
-		} catch (SQLException | RequiredValueNotFoundException e) {
-			e.printStackTrace();
-			fail();
-		}
-
-		SecureDNS byDomain = null;
-		try {
-			byDomain = SecureDNSModel.getByDomain(domainId, connection);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			fail();
-		}
-
+		SecureDNS byDomain = SecureDNSModel.getByDomain(domainId, connection);
 		Assert.assertTrue("getByDomainId fails", secureDns.equals(byDomain));
 
 	}
@@ -281,7 +252,7 @@ public class SecureDnsTest extends DatabaseTest {
 		return (SecureDNSDbObj) secureDns;
 	}
 
-	private static Domain createSimpleDomain() {
+	private static Domain createSimpleDomain() throws SQLException {
 
 		Entity registrar = new EntityDbObj();
 		registrar.setHandle("whois");
@@ -294,21 +265,11 @@ public class SecureDnsTest extends DatabaseTest {
 		ent.getRoles().add(Role.ADMINISTRATIVE);
 		ent.getRoles().add(Role.TECHNICAL);
 
-		try {
-			EntityModel.storeToDatabase(registrar, connection);
-			EntityModel.storeToDatabase(ent, connection);
-		} catch (SQLException | RequiredValueNotFoundException e1) {
-			e1.printStackTrace();
-			fail();
-		}
+		EntityModel.storeToDatabase(registrar, connection);
+		EntityModel.storeToDatabase(ent, connection);
 
-		try {
-			EntityModel.storeToDatabase(registrar, connection);
-			EntityModel.storeToDatabase(ent, connection);
-		} catch (SQLException | RequiredValueNotFoundException e1) {
-			e1.printStackTrace();
-			fail();
-		}
+		EntityModel.storeToDatabase(registrar, connection);
+		EntityModel.storeToDatabase(ent, connection);
 
 		Domain dom = new DomainDbObj();
 		dom.getEntities().add(ent);
@@ -317,24 +278,14 @@ public class SecureDnsTest extends DatabaseTest {
 		dom.setLdhName("mydomaintest.mx");
 
 		String zoneName = "mx";
-		try {
-			ZoneModel.storeToDatabase(zoneName, connection);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-			fail(e1.toString());
-		}
+		ZoneModel.storeToDatabase(zoneName, connection);
 		dom.setZone(zoneName);
 
 		// SecureDNSDAO secureDNS = SecureDnsTest.getSecureDns(null, null,
 		// false, false, null);
 		// dom.setSecureDNS(secureDNS);
 
-		try {
-			DomainModel.storeToDatabase(dom, false, connection);
-		} catch (SQLException | RequiredValueNotFoundException e) {
-			e.printStackTrace();
-			fail();
-		}
+		DomainModel.storeToDatabase(dom, false, connection);
 
 		return dom;
 	}

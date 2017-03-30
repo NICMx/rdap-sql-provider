@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mx.nic.rdap.db.QueryGroup;
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
+import mx.nic.rdap.db.exception.IncompleteObjectException;
 import mx.nic.rdap.db.objects.RdapUserRoleDbObj;
 
 /**
@@ -44,15 +44,15 @@ public class RdapUserRoleModel {
 	/**
 	 * Validate the required attributes for the rdapUserRole
 	 */
-	private static void isValidForStore(RdapUserRoleDbObj userRole) throws RequiredValueNotFoundException {
+	private static void isValidForStore(RdapUserRoleDbObj userRole) throws IncompleteObjectException {
 		if (userRole.getUserName() == null || userRole.getUserName().isEmpty())
-			throw new RequiredValueNotFoundException("userName", "RdapUserRole");
+			throw new IncompleteObjectException("userName", "RdapUserRole");
 		if (userRole.getRoleName() == null || userRole.getRoleName().isEmpty())
-			throw new RequiredValueNotFoundException("roleName", "RdapUserRole");
+			throw new IncompleteObjectException("roleName", "RdapUserRole");
 	}
 
 	public static void storeRdapUserRoleToDatabase(RdapUserRoleDbObj userRole, Connection connection)
-			throws RequiredValueNotFoundException, SQLException {
+			throws SQLException {
 		isValidForStore(userRole);
 		String query = getQueryGroup().getQuery(STORE_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {

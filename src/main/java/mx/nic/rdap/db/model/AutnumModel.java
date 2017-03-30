@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 import mx.nic.rdap.core.db.Autnum;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.db.QueryGroup;
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
+import mx.nic.rdap.db.exception.IncompleteObjectException;
 import mx.nic.rdap.db.objects.AutnumDbObj;
 
 /**
@@ -57,8 +57,7 @@ public class AutnumModel {
 	 * Stores Object autnum to database
 	 * 
 	 */
-	public static Long storeToDatabase(Autnum autnum, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+	public static Long storeToDatabase(Autnum autnum, Connection connection) throws SQLException {
 
 		isValidForStore(autnum);
 
@@ -90,13 +89,13 @@ public class AutnumModel {
 		return autnumId;
 	}
 
-	private static void isValidForStore(Autnum autnum) throws RequiredValueNotFoundException {
+	private static void isValidForStore(Autnum autnum) throws IncompleteObjectException {
 		if (autnum.getHandle() == null || autnum.getHandle().isEmpty())
-			throw new RequiredValueNotFoundException("handle", "Autnum");
+			throw new IncompleteObjectException("handle", "Autnum");
 		if (autnum.getStartAutnum() == null)
-			throw new RequiredValueNotFoundException("startAutnum", "Autnum");
+			throw new IncompleteObjectException("startAutnum", "Autnum");
 		if (autnum.getEndAutnum() == null)
-			throw new RequiredValueNotFoundException("endAutnum", "Autnum");
+			throw new IncompleteObjectException("endAutnum", "Autnum");
 		if (autnum.getStartAutnum() > autnum.getEndAutnum()) {
 			throw new RuntimeException("Starting ASN is greater than final ASN");
 		}

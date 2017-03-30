@@ -4,7 +4,6 @@ import java.sql.SQLException;
 
 import org.junit.Test;
 
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.RdapUserModel;
 import mx.nic.rdap.db.objects.RdapUserDbObj;
 import mx.nic.rdap.db.objects.RdapUserRoleDbObj;
@@ -21,51 +20,33 @@ public class RdapUserTest extends DatabaseTest {
 	private String roleName = "AUTHENTICATED";
 
 	@Test
-	public void storeToDatabase() {
-		try {
-			RdapUserDbObj user = new RdapUserDbObj();
-			user.setName(userName);
-			user.setPass(pass);
-			user.setMaxSearchResults(maxSearchResult);
-			RdapUserRoleDbObj role = new RdapUserRoleDbObj();
-			role.setRoleName(roleName);
-			user.setUserRole(role);
-			RdapUserModel.storeToDatabase(user, connection);
-			assert true;
-		} catch (RequiredValueNotFoundException | SQLException e) {
-			e.printStackTrace();
-			assert false;
-		}
+	public void storeToDatabase() throws SQLException {
+		RdapUserDbObj user = new RdapUserDbObj();
+		user.setName(userName);
+		user.setPass(pass);
+		user.setMaxSearchResults(maxSearchResult);
+		RdapUserRoleDbObj role = new RdapUserRoleDbObj();
+		role.setRoleName(roleName);
+		user.setUserRole(role);
+		RdapUserModel.storeToDatabase(user, connection);
 	}
 
 	@Test
-	public void getByName() {
-		try {
-			RdapUserDbObj user = new RdapUserDbObj();
-			user.setName(userName);
-			user.setPass(pass);
-			user.setMaxSearchResults(maxSearchResult);
-			RdapUserRoleDbObj role = new RdapUserRoleDbObj();
-			role.setRoleName(roleName);
-			user.setUserRole(role);
-			RdapUserModel.storeToDatabase(user, connection);
-			RdapUserModel.getByName(userName, connection);
-			assert true;
-		} catch (SQLException | RequiredValueNotFoundException e) {
-			e.printStackTrace();
-			assert false;
-		}
+	public void getByName() throws SQLException {
+		RdapUserDbObj user = new RdapUserDbObj();
+		user.setName(userName);
+		user.setPass(pass);
+		user.setMaxSearchResults(maxSearchResult);
+		RdapUserRoleDbObj role = new RdapUserRoleDbObj();
+		role.setRoleName(roleName);
+		user.setUserRole(role);
+		RdapUserModel.storeToDatabase(user, connection);
+		RdapUserModel.getByName(userName, connection);
 	}
 
 	@Test
-	public void cleanUsersTableTest() {
-		try {
-			RdapUserModel.cleanRdapUserDatabase(connection);
-			assert true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			assert false;
-		}
+	public void cleanUsersTableTest() throws SQLException {
+		RdapUserModel.cleanRdapUserDatabase(connection);
 	}
 
 }

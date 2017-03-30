@@ -23,7 +23,6 @@ import mx.nic.rdap.db.exception.ObjectNotFoundException;
 /**
  * Model for the Zone table, read all zones in the zone_table and keeps it in
  * memory for quickly access.
- *
  */
 public class ZoneModel {
 
@@ -62,10 +61,10 @@ public class ZoneModel {
 	}
 
 	/**
-	 * Validate if the configurated zones are in the database
+	 * Validates the configured zones exist in the database.
 	 */
-	public static void validateConfiguratedZones(Properties properties) throws ObjectNotFoundException {
-		List<String> configuratedZones;
+	public static void validateConfiguredZones(Properties properties) throws ObjectNotFoundException {
+		List<String> configuredZones;
 		if (properties.containsKey(ZONE_KEY)) {
 			String zones[] = properties.getProperty(ZONE_KEY).trim().split(",");
 			List<String> trimmedZones = new ArrayList<String>();
@@ -73,9 +72,9 @@ public class ZoneModel {
 				if (!zone.trim().isEmpty())
 					trimmedZones.add(zone.trim());
 			}
-			configuratedZones = trimmedZones;
+			configuredZones = trimmedZones;
 		} else {
-			configuratedZones = new ArrayList<>();
+			configuredZones = new ArrayList<>();
 		}
 		Map<Integer, String> zoneByIdForServer = new HashMap<Integer, String>();
 		Map<String, Integer> idByZoneForServer = new HashMap<String, Integer>();
@@ -90,7 +89,7 @@ public class ZoneModel {
 				logger.log(Level.WARNING, "Configured zone not found in database : " + zone);
 			}
 		}
-		configuratedZones.remove(ZoneModel.REVERSE_IP_V4);
+		configuredZones.remove(ZoneModel.REVERSE_IP_V4);
 
 		if (Boolean.parseBoolean(properties.getProperty(IS_REVERSE_IPV6_ENABLED_KEY))) {
 			String zone = ZoneModel.REVERSE_IP_V6;
@@ -101,9 +100,9 @@ public class ZoneModel {
 				logger.log(Level.WARNING, "Configured zone not found in database : " + zone);
 			}
 		}
-		configuratedZones.remove(ZoneModel.REVERSE_IP_V6);
+		configuredZones.remove(ZoneModel.REVERSE_IP_V6);
 
-		for (String zone : configuratedZones) {
+		for (String zone : configuredZones) {
 			if (ZoneModel.getIdByZone().get(zone) == null) {
 				logger.log(Level.SEVERE, "Configured zone not found in database:" + zone);
 				throw new ObjectNotFoundException("Configured zone not found in database:" + zone);
@@ -112,7 +111,7 @@ public class ZoneModel {
 			idByZoneForServer.put(zone, ZoneModel.getIdByZoneName(zone));
 		}
 
-		// Ovewrite the hashmaps to only use the configurated zones
+		// Ovewrite the hashmaps to only use the configured zones
 		ZoneModel.setZoneById(zoneByIdForServer);
 		ZoneModel.setIdByZone(idByZoneForServer);
 	}

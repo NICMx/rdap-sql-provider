@@ -44,7 +44,7 @@ public class SqlProviderImplementation implements DataAccessImplementation {
 		}
 
 		try {
-			ZoneModel.validateConfiguratedZones(properties);
+			ZoneModel.validateConfiguredZones(properties);
 		} catch (ObjectNotFoundException e) {
 			throw new InitializationException("Trouble found while validating zones.", e);
 		}

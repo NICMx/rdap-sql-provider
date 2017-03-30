@@ -11,11 +11,9 @@ import mx.nic.rdap.db.spi.AutnumDAO;
 
 public class AutnumDAOImpl implements AutnumDAO {
 
-	public Long storeToDatabase(Autnum autnum) throws RdapDataAccessException {
+	public Long storeToDatabase(Autnum autnum) throws SQLException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return AutnumModel.storeToDatabase(autnum, connection);
-		} catch (SQLException e) {
-			throw new RdapDataAccessException(e);
 		}
 	}
 

@@ -26,11 +26,9 @@ public class DomainDAOImpl implements DomainDAO {
 		this.useNsAsAttribute = useNsAsAttribute;
 	}
 
-	public Long storeToDatabase(Domain domain) throws RdapDataAccessException {
+	public Long storeToDatabase(Domain domain) throws SQLException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return DomainModel.storeToDatabase(domain, useNsAsAttribute, connection);
-		} catch (SQLException e) {
-			throw new RdapDataAccessException(e);
 		}
 	}
 

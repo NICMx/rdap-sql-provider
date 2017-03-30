@@ -97,7 +97,7 @@ public class SchemaConfiguration {
 		}
 
 		try {
-			ZoneModel.validateConfiguratedZones(serverProperties);
+			ZoneModel.validateConfiguredZones(serverProperties);
 		} catch (ObjectNotFoundException e) {
 			throw new RuntimeException("Trouble found while validating zones.", e);
 		}

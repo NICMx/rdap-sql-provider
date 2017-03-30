@@ -93,17 +93,20 @@ public class VCardModel {
 
 	/**
 	 * Get a {@link VCard} by its Id.
-	 * 
-	 * @throws ObjectNotFoundException
-	 * 
 	 */
-	public static VCard getById(Long vCardId, Connection connection) throws SQLException, ObjectNotFoundException {
+	public static VCard getById(Long vCardId, Connection connection) throws SQLException {
 		VCard vCardResult = null;
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_QUERY));) {
 			statement.setLong(1, vCardId);
+			
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();
-			vCardResult = processResultSet(resultSet, connection);
+			if (!resultSet.next()) {
+				return null;
+			}
+
+			VCardDbObj vCard = new VCardDbObj();
+			vCard.loadFromDatabase(resultSet);
 		}
 
 		setSonObjects(vCardResult, connection);
@@ -142,17 +145,6 @@ public class VCardModel {
 		} catch (ObjectNotFoundException e) {
 			// TODO: a VCard couldn't have postal info ?
 		}
-	}
-
-	private static VCard processResultSet(ResultSet resultSet, Connection connection)
-			throws SQLException, ObjectNotFoundException {
-		if (!resultSet.next()) {
-			throw new ObjectNotFoundException("Object not found");
-		}
-		VCardDbObj vCard = new VCardDbObj();
-		vCard.loadFromDatabase(resultSet);
-
-		return vCard;
 	}
 
 	/**

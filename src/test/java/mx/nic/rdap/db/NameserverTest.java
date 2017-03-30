@@ -1,7 +1,5 @@
 package mx.nic.rdap.db;
 
-import static org.junit.Assert.fail;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
@@ -20,7 +18,6 @@ import mx.nic.rdap.core.db.Nameserver;
 import mx.nic.rdap.core.db.Remark;
 import mx.nic.rdap.core.db.RemarkDescription;
 import mx.nic.rdap.core.db.struct.NameserverIpAddressesStruct;
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.NameserverModel;
 import mx.nic.rdap.db.objects.EventDbObj;
 import mx.nic.rdap.db.objects.IpAddressDbObj;
@@ -36,31 +33,20 @@ import mx.nic.rdap.db.objects.RemarkDescriptionDbObj;
 public class NameserverTest extends DatabaseTest {
 
 	@Test
-	public void insertMinimunNameServer() {
+	public void insertMinimunNameServer() throws SQLException {
 
-		try {
-			// Nameserver base data
-			Nameserver nameserver = new NameserverDbObj();
-			nameserver.setHandle("xx1");
-			nameserver.setPunycodeName("ns.xn--test-minumun.example");
-			NameserverModel.storeToDatabase(nameserver, connection);
-			System.out.println(nameserver);
+		// Nameserver base data
+		Nameserver nameserver = new NameserverDbObj();
+		nameserver.setHandle("xx1");
+		nameserver.setPunycodeName("ns.xn--test-minumun.example");
+		NameserverModel.storeToDatabase(nameserver, connection);
+		System.out.println(nameserver);
 
-			assert true;
-		} catch (RequiredValueNotFoundException | SQLException e) {
-			e.printStackTrace();
-			assert false;
-		}
-
-		try {
-			NameserverModel.findByName("ns.xn--test-minumun.example", connection);
-		} catch (SQLException s) {
-			fail("fail existByName");
-		}
+		NameserverModel.findByName("ns.xn--test-minumun.example", connection);
 	}
 
 	@Test
-	public void insert() {
+	public void insert() throws SQLException, UnknownHostException {
 
 		// Nameserver base data
 		Nameserver nameserver = new NameserverDbObj();
@@ -72,29 +58,17 @@ public class NameserverTest extends DatabaseTest {
 		NameserverIpAddressesStruct ipAddresses = new NameserverIpAddressesStruct();
 
 		IpAddress ipv41 = new IpAddressDbObj();
-		try {
-			ipv41.setAddress(InetAddress.getByName("192.0.2.1"));
-		} catch (UnknownHostException e1) {
-			e1.printStackTrace();
-		}
+		ipv41.setAddress(InetAddress.getByName("192.0.2.1"));
 		ipv41.setType(4);
 		ipAddresses.getIpv4Adresses().add(ipv41);
 
 		IpAddress ipv42 = new IpAddressDbObj();
-		try {
-			ipv42.setAddress(InetAddress.getByName("192.0.2.2"));
-		} catch (UnknownHostException e1) {
-			e1.printStackTrace();
-		}
+		ipv42.setAddress(InetAddress.getByName("192.0.2.2"));
 		ipv42.setType(4);
 		ipAddresses.getIpv4Adresses().add(ipv42);
 
 		IpAddress ipv6 = new IpAddressDbObj();
-		try {
-			ipv6.setAddress(InetAddress.getByName("2001:db8::123"));
-		} catch (UnknownHostException e1) {
-			e1.printStackTrace();
-		}
+		ipv6.setAddress(InetAddress.getByName("2001:db8::123"));
 		ipv6.setType(6);
 		ipAddresses.getIpv6Adresses().add(ipv6);
 		nameserver.setIpAddresses(ipAddresses);
@@ -161,27 +135,16 @@ public class NameserverTest extends DatabaseTest {
 		events.add(event1);
 		events.add(event2);
 		nameserver.setEvents(events);
-		try {
-			NameserverModel.storeToDatabase(nameserver, connection);
-		} catch (SQLException | RequiredValueNotFoundException e) {
-			e.printStackTrace();
-			fail();
-		}
+		NameserverModel.storeToDatabase(nameserver, connection);
 
 		assert true;
 	}
 
 	// @Test
-	public void getAll() {
-		try {
-			List<Nameserver> nameservers = NameserverModel.getAll(connection);
-			for (Nameserver nameserver : nameservers) {
-				System.out.println(nameserver.toString());
-			}
-			assert true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			assert false;
+	public void getAll() throws SQLException {
+		List<Nameserver> nameservers = NameserverModel.getAll(connection);
+		for (Nameserver nameserver : nameservers) {
+			System.out.println(nameserver.toString());
 		}
 	}
 

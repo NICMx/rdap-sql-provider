@@ -3,8 +3,6 @@
  */
 package mx.nic.rdap.db;
 
-import static org.junit.Assert.fail;
-
 import java.sql.SQLException;
 import java.util.Random;
 
@@ -24,20 +22,12 @@ public class ZoneTest extends DatabaseTest {
 	 * Creates a new Zone instance and stores it in the database, then it get an
 	 * instance with the id generated
 	 */
-	public void insertAndGetBy() {
+	public void insertAndGetBy() throws SQLException {
 		Random random = new Random();
 		int randomInt = random.nextInt();
 
 		String zoneName = "example" + randomInt + ".mx";
-		Integer zoneId = null;
-
-		try {
-			zoneId = ZoneModel.storeToDatabase(zoneName, connection);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			fail();
-		}
-
+		Integer zoneId = ZoneModel.storeToDatabase(zoneName, connection);
 		String byId = ZoneModel.getZoneNameById(zoneId);
 
 		Assert.assertTrue("Get by Id fails", zoneName.equals(byId));

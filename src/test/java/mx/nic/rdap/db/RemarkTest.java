@@ -9,7 +9,6 @@ import org.junit.Test;
 import mx.nic.rdap.core.db.Link;
 import mx.nic.rdap.core.db.Remark;
 import mx.nic.rdap.core.db.RemarkDescription;
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.RemarkModel;
 import mx.nic.rdap.db.objects.LinkDbObj;
 import mx.nic.rdap.db.objects.RemarkDbObj;
@@ -25,64 +24,50 @@ public class RemarkTest extends DatabaseTest {
 	/**
 	 * Test the insert of remarks and remark descriptions in the database
 	 */
-	public void insert() {
-		try {
-			RemarkDbObj remark = new RemarkDbObj();
-			Double testId = Math.random();
-			remark.setTitle("Test " + testId);
-			remark.setType("Test");
+	public void insert() throws SQLException {
+		RemarkDbObj remark = new RemarkDbObj();
+		Double testId = Math.random();
+		remark.setTitle("Test " + testId);
+		remark.setType("Test");
 
-			RemarkDescriptionDbObj description1 = new RemarkDescriptionDbObj();
-			description1.setDescription("First description of the remark " + testId);
-			description1.setRemarkId(remark.getId());
-			description1.setOrder(1);
+		RemarkDescriptionDbObj description1 = new RemarkDescriptionDbObj();
+		description1.setDescription("First description of the remark " + testId);
+		description1.setRemarkId(remark.getId());
+		description1.setOrder(1);
 
-			RemarkDescriptionDbObj description2 = new RemarkDescriptionDbObj();
-			description2.setDescription("Second description of the remark" + testId);
-			description2.setRemarkId(remark.getId());
-			description2.setOrder(2);
+		RemarkDescriptionDbObj description2 = new RemarkDescriptionDbObj();
+		description2.setDescription("Second description of the remark" + testId);
+		description2.setRemarkId(remark.getId());
+		description2.setOrder(2);
 
-			List<RemarkDescription> descriptions = new ArrayList<RemarkDescription>();
-			descriptions.add(description1);
-			descriptions.add(description2);
-			remark.setDescriptions(descriptions);
+		List<RemarkDescription> descriptions = new ArrayList<RemarkDescription>();
+		descriptions.add(description1);
+		descriptions.add(description2);
+		remark.setDescriptions(descriptions);
 
-			List<Link> links = new ArrayList<Link>();
-			Link link = new LinkDbObj();
-			link.setHref("remarkLink1");
-			link.setValue("remarkLink1.com");
+		List<Link> links = new ArrayList<Link>();
+		Link link = new LinkDbObj();
+		link.setHref("remarkLink1");
+		link.setValue("remarkLink1.com");
 
-			Link link2 = new LinkDbObj();
-			link2.setValue("remarkLink2.com");
-			link2.setHref("remarkLink2");
+		Link link2 = new LinkDbObj();
+		link2.setValue("remarkLink2.com");
+		link2.setHref("remarkLink2");
 
-			links.add(link);
-			links.add(link2);
+		links.add(link);
+		links.add(link2);
 
-			remark.setLinks(links);
-			RemarkModel.storeToDatabase(remark, connection);
-			System.out.println(remark);
-			assert true;
-		} catch (RequiredValueNotFoundException | SQLException e) {
-			e.printStackTrace();
-			assert false;
-		}
-
+		remark.setLinks(links);
+		RemarkModel.storeToDatabase(remark, connection);
+		System.out.println(remark);
 	}
 
 	// XXX Is this test necessary? @Test
-	public void getAll() {
-		try {
-			List<Remark> remarks = RemarkModel.getAll(connection);
-			for (Remark remark : remarks) {
-				System.out.println(remark.toString());
-			}
-			assert true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			assert false;
+	public void getAll() throws SQLException {
+		List<Remark> remarks = RemarkModel.getAll(connection);
+		for (Remark remark : remarks) {
+			System.out.println(remark.toString());
 		}
-
 	}
 
 }

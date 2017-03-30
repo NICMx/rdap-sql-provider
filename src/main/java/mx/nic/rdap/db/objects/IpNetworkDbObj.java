@@ -2,6 +2,7 @@ package mx.nic.rdap.db.objects;
 
 import java.net.Inet4Address;
 import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,7 +10,8 @@ import java.sql.Types;
 
 import mx.nic.rdap.core.catalog.IpVersion;
 import mx.nic.rdap.core.db.IpNetwork;
-import mx.nic.rdap.db.exception.IpAddressFormatException;
+import mx.nic.rdap.core.ip.AddressBlock;
+import mx.nic.rdap.core.ip.IpAddressFormatException;
 import mx.nic.rdap.db.model.CountryCodeModel;
 import mx.nic.rdap.sql.IpUtils;
 
@@ -43,21 +45,24 @@ public class IpNetworkDbObj extends IpNetwork implements DatabaseObject {
 		if (ipVersion == null) {
 			throw new SQLException("Table value for IP version is invalid: " + rs.getInt("ip_version_id"));
 		}
-		setIpVersion(ipVersion);
 
 		try {
+			InetAddress startAddress = null;
+			InetAddress endAddress = null;
 			switch (ipVersion) {
 			case V4:
-				setStartAddress(IpUtils.numberToInet4(rs.getString("ine_start_address_down")));
-				setEndAddress(IpUtils.numberToInet4(rs.getString("ine_end_address_down")));
+				startAddress = IpUtils.numberToInet4(rs.getString("ine_start_address_down"));
+				endAddress = IpUtils.numberToInet4(rs.getString("ine_end_address_down"));
 				break;
 			case V6:
-				setStartAddress(IpUtils.numberToInet6(rs.getString("ine_start_address_up"),
-						rs.getString("ine_start_address_down")));
-				setEndAddress(IpUtils.numberToInet6(rs.getString("ine_end_address_up"),
-						rs.getString("ine_end_address_down")));
+				startAddress = IpUtils.numberToInet6(rs.getString("ine_start_address_up"),
+						rs.getString("ine_start_address_down"));
+				endAddress = IpUtils.numberToInet6(rs.getString("ine_end_address_up"),
+						rs.getString("ine_end_address_down"));
 				break;
 			}
+			setAddressBlock(new AddressBlock(startAddress, endAddress));
+
 		} catch (IpAddressFormatException e) {
 			throw new SQLException(e);
 		}
@@ -66,24 +71,36 @@ public class IpNetworkDbObj extends IpNetwork implements DatabaseObject {
 		setType(rs.getString("ine_type"));
 		setCountry(CountryCodeModel.getCountryNameById(rs.getInt("ccd_id")));
 		setPort43(rs.getString("ine_port43"));
-		setCidr(rs.getInt("ine_cidr"));
+
+		int cidr = rs.getInt("ine_cidr");
+		
+		AddressBlock block = getAddressBlock();
+		if (cidr != block.getPrefix()) {
+			throw new SQLException("The database's address range does not match the prefix. " //
+					+ "start address: " + block.getAddress() //
+					+ ", end address: " + block.getLastAddress() //
+					+ ", prefix: " + cidr);
+		}
 	}
 
 	@Override
 	public void storeToDatabase(PreparedStatement preparedStatement) throws SQLException {
 		preparedStatement.setString(1, getHandle());
-		if (getStartAddress() instanceof Inet4Address) {
+
+		InetAddress startAddress = getAddressBlock().getAddress();
+		InetAddress endAddress = getAddressBlock().getLastAddress();
+		if (startAddress instanceof Inet4Address) {
 			preparedStatement.setNull(2, Types.BIGINT);
-			preparedStatement.setLong(3, IpUtils.addressToNumber((Inet4Address) getStartAddress()).longValueExact());
+			preparedStatement.setLong(3, IpUtils.addressToNumber((Inet4Address) startAddress).longValueExact());
 			preparedStatement.setNull(4, Types.BIGINT);
-			preparedStatement.setLong(5, IpUtils.addressToNumber((Inet4Address) getEndAddress()).longValueExact());
-		} else if (getStartAddress() instanceof Inet6Address) {
+			preparedStatement.setLong(5, IpUtils.addressToNumber((Inet4Address) endAddress).longValueExact());
+		} else if (startAddress instanceof Inet6Address) {
 			preparedStatement.setString(2,
-					IpUtils.inet6AddressToUpperPart((Inet6Address) getStartAddress()).toString());
+					IpUtils.inet6AddressToUpperPart((Inet6Address) startAddress).toString());
 			preparedStatement.setString(3,
-					IpUtils.inet6AddressToLowerPart((Inet6Address) getStartAddress()).toString());
-			preparedStatement.setString(4, IpUtils.inet6AddressToUpperPart((Inet6Address) getEndAddress()).toString());
-			preparedStatement.setString(5, IpUtils.inet6AddressToLowerPart((Inet6Address) getEndAddress()).toString());
+					IpUtils.inet6AddressToLowerPart((Inet6Address) startAddress).toString());
+			preparedStatement.setString(4, IpUtils.inet6AddressToUpperPart((Inet6Address) endAddress).toString());
+			preparedStatement.setString(5, IpUtils.inet6AddressToLowerPart((Inet6Address) endAddress).toString());
 		}
 
 		preparedStatement.setString(6, getName());
@@ -92,7 +109,7 @@ public class IpNetworkDbObj extends IpNetwork implements DatabaseObject {
 		preparedStatement.setInt(9, CountryCodeModel.getIdByCountryName(getCountry()));
 		preparedStatement.setInt(10, getIpVersion().getVersion());
 		preparedStatement.setString(11, getParentHandle());
-		preparedStatement.setInt(12, getCidr());
+		preparedStatement.setInt(12, getAddressBlock().getPrefix());
 	}
 
 	/**
@@ -101,18 +118,21 @@ public class IpNetworkDbObj extends IpNetwork implements DatabaseObject {
 	 */
 	public void updateInDatabase(PreparedStatement preparedStatement) throws SQLException {
 		preparedStatement.setString(1, getHandle());
-		if (getStartAddress() instanceof Inet4Address) {
+
+		InetAddress startAddress = getAddressBlock().getAddress();
+		InetAddress endAddress = getAddressBlock().getLastAddress();
+		if (startAddress instanceof Inet4Address) {
 			preparedStatement.setNull(2, Types.BIGINT);
-			preparedStatement.setLong(3, IpUtils.addressToNumber((Inet4Address) getStartAddress()).longValueExact());
+			preparedStatement.setLong(3, IpUtils.addressToNumber((Inet4Address) startAddress).longValueExact());
 			preparedStatement.setNull(4, Types.BIGINT);
-			preparedStatement.setLong(5, IpUtils.addressToNumber((Inet4Address) getEndAddress()).longValueExact());
-		} else if (getStartAddress() instanceof Inet6Address) {
+			preparedStatement.setLong(5, IpUtils.addressToNumber((Inet4Address) endAddress).longValueExact());
+		} else if (startAddress instanceof Inet6Address) {
 			preparedStatement.setString(2,
-					IpUtils.inet6AddressToUpperPart((Inet6Address) getStartAddress()).toString());
+					IpUtils.inet6AddressToUpperPart((Inet6Address) startAddress).toString());
 			preparedStatement.setString(3,
-					IpUtils.inet6AddressToLowerPart((Inet6Address) getStartAddress()).toString());
-			preparedStatement.setString(4, IpUtils.inet6AddressToUpperPart((Inet6Address) getEndAddress()).toString());
-			preparedStatement.setString(5, IpUtils.inet6AddressToLowerPart((Inet6Address) getEndAddress()).toString());
+					IpUtils.inet6AddressToLowerPart((Inet6Address) startAddress).toString());
+			preparedStatement.setString(4, IpUtils.inet6AddressToUpperPart((Inet6Address) endAddress).toString());
+			preparedStatement.setString(5, IpUtils.inet6AddressToLowerPart((Inet6Address) endAddress).toString());
 		}
 
 		preparedStatement.setString(6, getName());
@@ -121,7 +141,7 @@ public class IpNetworkDbObj extends IpNetwork implements DatabaseObject {
 		preparedStatement.setInt(9, CountryCodeModel.getIdByCountryName(getCountry()));
 		preparedStatement.setInt(10, getIpVersion().getVersion());
 		preparedStatement.setString(11, getParentHandle());
-		preparedStatement.setInt(12, getCidr());
+		preparedStatement.setInt(12, getAddressBlock().getPrefix());
 		preparedStatement.setLong(13, getId());
 
 	}

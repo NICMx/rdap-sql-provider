@@ -1,7 +1,5 @@
 package mx.nic.rdap.db;
 
-import static org.junit.Assert.fail;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -18,7 +16,6 @@ import mx.nic.rdap.core.db.Event;
 import mx.nic.rdap.core.db.Link;
 import mx.nic.rdap.core.db.Remark;
 import mx.nic.rdap.core.db.RemarkDescription;
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.AutnumModel;
 import mx.nic.rdap.db.model.EntityModel;
 import mx.nic.rdap.db.objects.AutnumDbObj;
@@ -35,18 +32,13 @@ import mx.nic.rdap.db.objects.RemarkDescriptionDbObj;
 public class AutnumTest extends DatabaseTest {
 
 	@Test
-	public void insertAndGetAutnum() {
+	public void insertAndGetAutnum() throws SQLException {
 		Entity registrant = new EntityDbObj();
 		registrant.setHandle("testHandler");
 		registrant.setPort43("testestestest");
 		registrant.getRoles().add(Role.REGISTRANT);
+		EntityModel.storeToDatabase(registrant, connection);
 
-		try {
-			EntityModel.storeToDatabase(registrant, connection);
-		} catch (RequiredValueNotFoundException | SQLException e) {
-			e.printStackTrace();
-			fail();
-		}
 		Link link = new LinkDbObj();
 		link.setHref("dummy.com.mx");
 		link.setValue("http://dummy.net/ASN");
@@ -89,37 +81,17 @@ public class AutnumTest extends DatabaseTest {
 		autnum.getEvents().add(event);
 		autnum.getRemarks().add(remark);
 		autnum.setHandle("dummyASN");
-		try {
-			AutnumModel.storeToDatabase(autnum, connection);
-		} catch (SQLException | RequiredValueNotFoundException e) {
-			e.printStackTrace();
-			fail();
-		}
+		AutnumModel.storeToDatabase(autnum, connection);
 
 		Autnum getById = null;
 		Autnum getByRange = null;
 
-		try {
-			getByRange = AutnumModel.getByRange(autnum.getStartAutnum(), connection);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			fail();
-		}
-
+		getByRange = AutnumModel.getByRange(autnum.getStartAutnum(), connection);
 		autnum.equals(getByRange);
 
-		try {
-			getById = AutnumModel.getAutnumById(autnum.getId(), connection);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			fail();
-		}
+		getById = AutnumModel.getAutnumById(autnum.getId(), connection);
 		autnum.equals(getById);
 
-		try {
-			AutnumModel.getByRange(101L, connection);
-		} catch (SQLException s) {
-			fail();
-		}
+		AutnumModel.getByRange(101L, connection);
 	}
 }

@@ -12,6 +12,8 @@ import mx.nic.rdap.db.exception.http.NotFoundException;
  * reaching the server's code, which is the reason why it doesn't extend from
  * {@link RdapDataAccessException}, and therefore cannot be thrown from the API.
  * 
+ * TODO this should probably extend from SQLException.
+ * 
  * @see NotFoundException
  */
 public class ObjectNotFoundException extends Exception {

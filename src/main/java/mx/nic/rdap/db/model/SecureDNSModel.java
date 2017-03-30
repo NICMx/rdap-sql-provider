@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.SecureDNS;
 import mx.nic.rdap.db.QueryGroup;
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.objects.SecureDNSDbObj;
 
 /**
@@ -45,8 +44,7 @@ public class SecureDNSModel {
 		return queryGroup;
 	}
 
-	public static Long storeToDatabase(SecureDNS secureDns, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+	public static Long storeToDatabase(SecureDNS secureDns, Connection connection) throws SQLException {
 		String query = getQueryGroup().getQuery(STORE_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 			((SecureDNSDbObj) secureDns).storeToDatabase(statement);

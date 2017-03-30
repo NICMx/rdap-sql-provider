@@ -1,7 +1,5 @@
 package mx.nic.rdap.db;
 
-import static org.junit.Assert.fail;
-
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -38,21 +36,12 @@ import mx.nic.rdap.db.objects.RemarkDescriptionDbObj;
 public class EntityTest extends DatabaseTest {
 
 	@Test
-	public void insertMinimunEntity() {
+	public void insertMinimunEntity() throws SQLException {
 		Entity entity = createEntity(null, "minimunEntity", "www.rardhfelix.mx");
-		try {
-			EntityModel.storeToDatabase(entity, connection);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		EntityModel.storeToDatabase(entity, connection);
 
 		// check if exists
-		try {
-			EntityModel.getByHandle("minimunEntity", connection);
-		} catch (SQLException s) {
-			fail();
-		}
+		EntityModel.getByHandle("minimunEntity", connection);
 	}
 
 	/**
@@ -61,7 +50,7 @@ public class EntityTest extends DatabaseTest {
 	 * first objects with the objects in the database
 	 */
 	@Test
-	public void insertAndGetSimpleEntity() {
+	public void insertAndGetSimpleEntity() throws SQLException {
 		Random random = new Random();
 		int randomInt = random.nextInt();
 
@@ -158,28 +147,18 @@ public class EntityTest extends DatabaseTest {
 		entity.getVCardList().add(vCard);
 
 		// Store it in the database
-		try {
-			EntityModel.storeToDatabase(entity, connection);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		EntityModel.storeToDatabase(entity, connection);
 
 		// Query the database
 		Entity byHandle = null;
-		try {
-			byHandle = EntityModel.getByHandle(entity.getHandle(), connection);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		byHandle = EntityModel.getByHandle(entity.getHandle(), connection);
 
 		// Compares the results
 		Assert.assertTrue("getByHandle fails", entity.equals(byHandle));
 	}
 
 	@Test
-	public void createAndInsertComplexObject() {
+	public void createAndInsertComplexObject() throws SQLException {
 		Random random = new Random();
 		int randomInt = random.nextInt();
 
@@ -376,24 +355,12 @@ public class EntityTest extends DatabaseTest {
 		// ----- END OF ENT 2 ------
 
 		// Store it in the database
-		try {
-			EntityModel.storeToDatabase(entity, connection);
-			EntityModel.storeToDatabase(entity2, connection);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		EntityModel.storeToDatabase(entity, connection);
+		EntityModel.storeToDatabase(entity2, connection);
 
 		// Query the database
-		Entity byHandle = null;
-		Entity byHandle2 = null;
-		try {
-			byHandle = EntityModel.getByHandle(entity.getHandle(), connection);
-			byHandle2 = EntityModel.getByHandle(entity2.getHandle(), connection);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		Entity byHandle = EntityModel.getByHandle(entity.getHandle(), connection);
+		Entity byHandle2 = EntityModel.getByHandle(entity2.getHandle(), connection);
 
 		// Compares the results
 		Assert.assertTrue("getByHandle fails", entity.equals(byHandle));
@@ -402,7 +369,7 @@ public class EntityTest extends DatabaseTest {
 	}
 
 	@Test
-	public void createAndInsertRegistrar() {
+	public void createAndInsertRegistrar() throws SQLException {
 		Entity entity = createEntity(null, "rar_test", "whois.rar_test.com");
 		// entity.getRoles().add(Role.REGISTRAR);
 
@@ -416,22 +383,10 @@ public class EntityTest extends DatabaseTest {
 		entity.getEntities().add(legal);
 
 		// Store it in the database
-		try {
-			EntityModel.storeToDatabase(entity, connection);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		EntityModel.storeToDatabase(entity, connection);
 
 		// Query the database
-		Entity byHandle = null;
-		try {
-			byHandle = EntityModel.getByHandle(entity.getHandle(), connection);
-		} catch (Exception e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
-
+		Entity byHandle = EntityModel.getByHandle(entity.getHandle(), connection);
 		// Compares the results
 		Assert.assertTrue("getByHandle fails", entity.equals(byHandle));
 
@@ -458,7 +413,7 @@ public class EntityTest extends DatabaseTest {
 		return e;
 	}
 
-	public static Entity createDefaultEntity(Connection connection) {
+	public static Entity createDefaultEntity(Connection connection) throws SQLException {
 		// Entity base data
 		Random random = new Random();
 		int randomInt = random.nextInt();
@@ -466,15 +421,10 @@ public class EntityTest extends DatabaseTest {
 		// Create local instances
 		Entity entity = createEntity(null, "ent_dhfelix", null);
 
-		try {
-			Entity byHandle = EntityModel.getByHandle(entity.getHandle(), connection);
-			if (byHandle != null)
-				return byHandle;
-			// if not found, continue;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			fail();
-		}
+		Entity byHandle = EntityModel.getByHandle(entity.getHandle(), connection);
+		if (byHandle != null)
+			return byHandle;
+		// if not found, continue;
 
 		VCard vCard = VCardTest.createVCardDao(null, "mi nombre" + randomInt, "company" + randomInt,
 				"www.companytest" + randomInt + ".com", "correo" + randomInt + "@correo.com", "818282569" + randomInt,

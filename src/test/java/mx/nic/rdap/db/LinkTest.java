@@ -6,7 +6,6 @@ import java.util.List;
 import org.junit.Test;
 
 import mx.nic.rdap.core.db.Link;
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.LinkModel;
 import mx.nic.rdap.db.objects.LinkDbObj;
 
@@ -20,32 +19,18 @@ public class LinkTest extends DatabaseTest {
 	/**
 	 * Store a link in the database
 	 */
-	public void insert() {
-		try {
-
-			Link link = new LinkDbObj();
-			link.setValue("spotify.com");
-			link.setHref("test");
-			LinkModel.storeToDatabase(link, connection);
-			assert true;
-		} catch (RequiredValueNotFoundException | SQLException e) {
-			e.printStackTrace();
-			assert false;
-		}
+	public void insert() throws SQLException {
+		Link link = new LinkDbObj();
+		link.setValue("spotify.com");
+		link.setHref("test");
+		LinkModel.storeToDatabase(link, connection);
 	}
 
 	// XXX Is this test necessary? @Test
-	public void getAll() {
-		try {
-			List<Link> links = LinkModel.getAll(connection);
-			for (Link link : links) {
-				System.out.println(link.toString());
-			}
-			assert true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			assert false;
+	public void getAll() throws SQLException {
+		List<Link> links = LinkModel.getAll(connection);
+		for (Link link : links) {
+			System.out.println(link.toString());
 		}
-
 	}
 }

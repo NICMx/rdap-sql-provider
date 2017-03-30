@@ -19,12 +19,12 @@ import java.util.logging.Logger;
 import mx.nic.rdap.core.catalog.Role;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.Nameserver;
+import mx.nic.rdap.core.ip.IpAddressFormatException;
+import mx.nic.rdap.core.ip.IpUtils;
 import mx.nic.rdap.db.QueryGroup;
-import mx.nic.rdap.db.exception.IpAddressFormatException;
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
+import mx.nic.rdap.db.exception.IncompleteObjectException;
 import mx.nic.rdap.db.exception.http.BadRequestException;
 import mx.nic.rdap.db.objects.NameserverDbObj;
-import mx.nic.rdap.db.struct.AddressBlock;
 import mx.nic.rdap.db.struct.SearchResultStruct;
 
 /**
@@ -74,21 +74,20 @@ public class NameserverModel {
 	}
 
 	private static void isValidForStore(Nameserver nameserver, boolean useNameserverAsAttribute)
-			throws RequiredValueNotFoundException {
+			throws IncompleteObjectException {
 		if (!useNameserverAsAttribute && (nameserver.getHandle() == null || nameserver.getHandle().isEmpty()))
-			throw new RequiredValueNotFoundException("handle", "Nameserver");
+			throw new IncompleteObjectException("handle", "Nameserver");
 		if (nameserver.getPunycodeName() == null || nameserver.getPunycodeName().isEmpty())
-			throw new RequiredValueNotFoundException("ldhName", "Nameserver");
+			throw new IncompleteObjectException("ldhName", "Nameserver");
 	}
 
 	// Store as object
-	public static void storeToDatabase(Nameserver nameserver, Connection connection)
-			throws RequiredValueNotFoundException, SQLException {
+	public static void storeToDatabase(Nameserver nameserver, Connection connection) throws SQLException {
 		storeToDatabase(nameserver, false, connection);
 	}
 
 	public static void storeToDatabase(Nameserver nameserver, boolean useNameserverAsAttribute, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+			throws SQLException {
 		isValidForStore(nameserver, useNameserverAsAttribute);
 		String query = getQueryGroup().getQuery(STORE_QUERY);
 		Long nameserverId = null;
@@ -105,8 +104,7 @@ public class NameserverModel {
 		storeNestedObjects(nameserver, connection);
 	}
 
-	public static void storeNestedObjects(Nameserver nameserver, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+	public static void storeNestedObjects(Nameserver nameserver, Connection connection) throws SQLException {
 		Long nameserverId = nameserver.getId();
 		IpAddressModel.storeToDatabase(nameserver.getIpAddresses(), nameserverId, connection);
 		StatusModel.storeNameserverStatusToDatabase(nameserver.getStatus(), nameserverId, connection);
@@ -231,9 +229,9 @@ public class NameserverModel {
 
 		InetAddress address;
 		try {
-			address = AddressBlock.parseAddress(ipaddressPattern);
+			address = IpUtils.parseAddress(ipaddressPattern);
 		} catch (IpAddressFormatException e) {
-			throw new BadRequestException(e.getMessage(), e);
+			throw new BadRequestException(e);
 		}
 
 		if (address instanceof Inet6Address) {
@@ -344,10 +342,9 @@ public class NameserverModel {
 		}
 	}
 
-	public static NameserverDbObj getByHandle(String handle, Connection rdapConnection)
-			throws SQLException, RequiredValueNotFoundException {
+	public static NameserverDbObj getByHandle(String handle, Connection rdapConnection) throws SQLException {
 		if (handle == null || handle.isEmpty()) {
-			throw new RequiredValueNotFoundException("handle", "Nameserver");
+			throw new IncompleteObjectException("handle", "Nameserver");
 		}
 		String query = getQueryGroup().getQuery(GET_BY_HANDLE_QUERY);
 		try (PreparedStatement statement = rdapConnection.prepareStatement(query)) {
@@ -365,7 +362,7 @@ public class NameserverModel {
 	}
 
 	public static void storeDomainNameserversAsAttributesToDatabase(List<Nameserver> nameservers, Long domainId,
-			Connection connection) throws RequiredValueNotFoundException, SQLException {
+			Connection connection) throws SQLException {
 		for (Nameserver ns : nameservers) {
 			NameserverModel.storeToDatabase(ns, true, connection);
 		}

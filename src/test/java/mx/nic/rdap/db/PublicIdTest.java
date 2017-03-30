@@ -1,7 +1,5 @@
 package mx.nic.rdap.db;
 
-import static org.junit.Assert.fail;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +11,6 @@ import mx.nic.rdap.core.catalog.Role;
 import mx.nic.rdap.core.db.Domain;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.PublicId;
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.model.DomainModel;
 import mx.nic.rdap.db.model.EntityModel;
 import mx.nic.rdap.db.model.PublicIdModel;
@@ -30,7 +27,7 @@ import mx.nic.rdap.db.objects.SecureDNSDbObj;
 public class PublicIdTest extends DatabaseTest {
 
 	@Test
-	public void insertAndGetByDomain() {
+	public void insertAndGetByDomain() throws SQLException {
 		Long domainId = createSimpleDomain().getId();
 
 		Random random = new Random();
@@ -38,19 +35,9 @@ public class PublicIdTest extends DatabaseTest {
 		List<PublicId> publicIds = new ArrayList<PublicId>();
 		PublicIdDbObj publicId = createPublicId("dummy" + rndPublicId, "dummy IETF");
 		publicIds.add(publicId);
-		try {
-			PublicIdModel.storePublicIdByDomain(publicIds, domainId, connection);
-		} catch (SQLException e) {
-			e.printStackTrace();
-			fail(e.getMessage());
-		}
+		PublicIdModel.storePublicIdByDomain(publicIds, domainId, connection);
 
-		List<PublicId> byDomainId = new ArrayList<PublicId>();
-		try {
-			byDomainId = PublicIdModel.getByDomain(domainId, connection);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		List<PublicId> byDomainId = PublicIdModel.getByDomain(domainId, connection);
 		publicId.equals(byDomainId.get(byDomainId.size() - 1));
 	}
 
@@ -61,7 +48,7 @@ public class PublicIdTest extends DatabaseTest {
 		return pi;
 	}
 
-	private static Domain createSimpleDomain() {
+	private static Domain createSimpleDomain() throws SQLException {
 
 		Entity registrar = new EntityDbObj();
 		registrar.setHandle("whois");
@@ -74,21 +61,11 @@ public class PublicIdTest extends DatabaseTest {
 		ent.getRoles().add(Role.ADMINISTRATIVE);
 		ent.getRoles().add(Role.TECHNICAL);
 
-		try {
-			EntityModel.storeToDatabase(registrar, connection);
-			EntityModel.storeToDatabase(ent, connection);
-		} catch (SQLException | RequiredValueNotFoundException e1) {
-			e1.printStackTrace();
-			fail();
-		}
+		EntityModel.storeToDatabase(registrar, connection);
+		EntityModel.storeToDatabase(ent, connection);
 
-		try {
-			EntityModel.storeToDatabase(registrar, connection);
-			EntityModel.storeToDatabase(ent, connection);
-		} catch (SQLException | RequiredValueNotFoundException e1) {
-			e1.printStackTrace();
-			fail();
-		}
+		EntityModel.storeToDatabase(registrar, connection);
+		EntityModel.storeToDatabase(ent, connection);
 
 		Domain dom = new DomainDbObj();
 		dom.getEntities().add(ent);
@@ -97,23 +74,13 @@ public class PublicIdTest extends DatabaseTest {
 		dom.setLdhName("mydomaintest.mx");
 
 		String zoneName = "mx";
-		try {
-			ZoneModel.storeToDatabase(zoneName, connection);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-			fail(e1.toString());
-		}
+		ZoneModel.storeToDatabase(zoneName, connection);
 		dom.setZone(zoneName);
 
 		SecureDNSDbObj secureDNS = SecureDnsTest.getSecureDns(null, null, false, false, null, null);
 		dom.setSecureDNS(secureDNS);
 
-		try {
-			DomainModel.storeToDatabase(dom, false, connection);
-		} catch (SQLException | RequiredValueNotFoundException e) {
-			e.printStackTrace();
-			fail();
-		}
+		DomainModel.storeToDatabase(dom, false, connection);
 
 		return dom;
 	}

@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.KeyData;
 import mx.nic.rdap.db.QueryGroup;
-import mx.nic.rdap.db.exception.RequiredValueNotFoundException;
 import mx.nic.rdap.db.objects.KeyDataDbObj;
 
 public class KeyDataModel {
@@ -44,8 +43,7 @@ public class KeyDataModel {
 		return queryGroup;
 	}
 
-	public static long storeToDatabase(KeyData keyData, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+	public static long storeToDatabase(KeyData keyData, Connection connection) throws SQLException {
 		String query = getQueryGroup().getQuery(STORE_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 			((KeyDataDbObj) keyData).storeToDatabase(statement);
@@ -65,7 +63,7 @@ public class KeyDataModel {
 	}
 
 	public static void storeAllToDatabase(List<KeyData> keyDataList, Long secureDnsId, Connection connection)
-			throws SQLException, RequiredValueNotFoundException {
+			throws SQLException {
 		if (keyDataList.isEmpty()) {
 			return;
 		}
