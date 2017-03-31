@@ -1,5 +1,7 @@
 package mx.nic.rdap.db.exception;
 
+import java.sql.SQLException;
+
 import mx.nic.rdap.db.exception.http.NotFoundException;
 
 /**
@@ -11,8 +13,10 @@ import mx.nic.rdap.db.exception.http.NotFoundException;
  * example) but wasn't. This exception needs to be catched and dealt with before
  * reaching the server's code, which is the reason why it doesn't extend from
  * {@link RdapDataAccessException}, and therefore cannot be thrown from the API.
- * 
- * TODO this should probably extend from SQLException.
+ * <p>
+ * Also, the reason why this doesn't extend from {@link SQLException} is because
+ * it often has to be catched really early and we don't want to accidentally mix
+ * them.
  * 
  * @see NotFoundException
  */

@@ -16,6 +16,7 @@ import mx.nic.rdap.core.db.Link;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.Util;
 import mx.nic.rdap.db.exception.IncompleteObjectException;
+import mx.nic.rdap.db.exception.InvalidObjectException;
 import mx.nic.rdap.db.objects.LinkDbObj;
 
 /**
@@ -81,7 +82,7 @@ public class LinkModel {
 	 * Validate the required attributes for the link
 	 * 
 	 */
-	private static void isValidForStore(Link link) throws IncompleteObjectException {
+	private static void isValidForStore(Link link) throws InvalidObjectException {
 		if (link.getValue() == null || link.getValue().isEmpty())
 			throw new IncompleteObjectException("value", "Link");
 		if (link.getHref() == null || link.getHref().isEmpty())

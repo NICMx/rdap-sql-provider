@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.RdapUserRole;
 import mx.nic.rdap.db.exception.IncompleteObjectException;
+import mx.nic.rdap.db.exception.InvalidObjectException;
 import mx.nic.rdap.db.objects.RdapUserDbObj;
 import mx.nic.rdap.db.objects.RdapUserRoleDbObj;
 
@@ -51,7 +52,7 @@ public class RdapUserModel {
 	 * Validate the required attributes for the rdapuser
 	 * 
 	 */
-	private static void isValidForStore(RdapUserDbObj user) throws IncompleteObjectException {
+	private static void isValidForStore(RdapUserDbObj user) throws InvalidObjectException {
 		if (user.getName() == null || user.getName().isEmpty())
 			throw new IncompleteObjectException("name", "RdapUser");
 		if (user.getPass() == null || user.getPass().isEmpty())

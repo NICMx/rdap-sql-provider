@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import mx.nic.rdap.core.db.Event;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.IncompleteObjectException;
+import mx.nic.rdap.db.exception.InvalidObjectException;
 import mx.nic.rdap.db.objects.EventDbObj;
 
 /**
@@ -63,7 +64,7 @@ public class EventModel {
 		return queryGroup;
 	}
 
-	private static void isValidForStore(Event event) throws IncompleteObjectException {
+	private static void isValidForStore(Event event) throws InvalidObjectException {
 		if (event.getEventAction() == null)
 			throw new IncompleteObjectException("eventAction", "Event");
 		if (event.getEventDate() == null)

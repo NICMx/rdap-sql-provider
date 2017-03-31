@@ -177,7 +177,7 @@ public class RemarkModel {
 			} catch (ObjectNotFoundException e) {
 				// Descriptions are supposed to be mandatory; looks like we're
 				// dealing with a corrupted database.
-				// It's not our fault though, so ignore it and continue.
+				// It's not our fault though, so just log it and continue.
 				logger.log(Level.WARNING, "Some remark lacks descriptions.", e);
 				continue;
 			}

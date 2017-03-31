@@ -16,11 +16,14 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import mx.nic.rdap.core.catalog.IpVersion;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.IpNetwork;
 import mx.nic.rdap.core.ip.AddressBlock;
+import mx.nic.rdap.core.ip.IpAddressFormatException;
 import mx.nic.rdap.db.QueryGroup;
 import mx.nic.rdap.db.exception.IncompleteObjectException;
+import mx.nic.rdap.db.exception.InvalidObjectException;
 import mx.nic.rdap.db.objects.IpNetworkDbObj;
 import mx.nic.rdap.sql.IpUtils;
 
@@ -60,20 +63,43 @@ public class IpNetworkModel {
 		return queryGroup;
 	}
 
-	private static void isValidForStore(IpNetwork ipNetwork) throws IncompleteObjectException {
+	private static void isValidForStore(IpNetwork ipNetwork) throws InvalidObjectException {
 		if (ipNetwork.getHandle() == null)
 			throw new IncompleteObjectException("handle", "IpNetwork");
 
-		if (ipNetwork.getAddressBlock() == null) {
-			throw new IncompleteObjectException("addressBlock", "IpNetwork");
+		if (ipNetwork.getStartAddress() == null) {
+			throw new IncompleteObjectException("startAddress", "IpNetwork");
+		}
+
+		if (ipNetwork.getEndAddress() == null) {
+			throw new IncompleteObjectException("endAddress", "IpNetwork");
 		}
 
 		if (ipNetwork.getIpVersion() == null) {
 			throw new IncompleteObjectException("ipVersion", "IpNetwork");
 		}
 
-		if (ipNetwork.getIpVersion() != ipNetwork.getAddressBlock().getIpVersion()) {
-			throw new RuntimeException("IP version doesn't match with the IpVersion set to the object");
+		if (ipNetwork.getIpVersion() == IpVersion.V4) {
+			if (ipNetwork.getStartAddress() instanceof Inet6Address
+					|| ipNetwork.getEndAddress() instanceof Inet6Address) {
+				throw new RuntimeException("IP version doesn't match with the IpVersion set to the object");
+			}
+		} else {
+			if (ipNetwork.getStartAddress() instanceof Inet4Address
+					|| ipNetwork.getEndAddress() instanceof Inet4Address) {
+				throw new RuntimeException("IP version doesn't match with the IpVersion set to the object");
+			}
+
+		}
+
+		AddressBlock block;
+		try {
+			block = new AddressBlock(ipNetwork.getStartAddress(), ipNetwork.getCidr());
+		} catch (IpAddressFormatException e) {
+			throw new InvalidObjectException(e.getMessage(), e);
+		}
+		if (!block.getLastAddress().equals(ipNetwork.getEndAddress())) {
+			throw new InvalidObjectException(ipNetwork.getEndAddress() + " is not the last address of " + block);
 		}
 	}
 

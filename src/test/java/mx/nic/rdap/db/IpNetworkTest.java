@@ -238,13 +238,17 @@ public class IpNetworkTest extends DatabaseTest {
 			String parentHandle, String handle)
 			throws IpAddressFormatException {
 		IpNetwork ipNetwork = new IpNetworkDbObj();
-
+		AddressBlock block = new AddressBlock(IpUtils.parseAddress(startAddress));
+		
 		ipNetwork.setHandle(handle);
-		ipNetwork.setAddressBlock(new AddressBlock(IpUtils.parseAddress(startAddress), cidr));
+		ipNetwork.setIpVersion(block.getIpVersion());
+		ipNetwork.setStartAddress(block.getAddress());
+		ipNetwork.setEndAddress(block.getLastAddress());
 		ipNetwork.setName(name);
 		ipNetwork.setType(type);
 		ipNetwork.setCountry(country);
 		ipNetwork.setParentHandle(parentHandle);
+		ipNetwork.setCidr(block.getPrefix());
 		return ipNetwork;
 	}
 

@@ -1,11 +1,9 @@
 package mx.nic.rdap.db.exception;
 
-import java.sql.SQLException;
-
 /**
  * An object cannot be stored in the database because it has missing fields.
  */
-public class IncompleteObjectException extends SQLException {
+public class IncompleteObjectException extends InvalidObjectException {
 
 	/** Shut up, Java... */
 	private static final long serialVersionUID = 1L;
