@@ -1,1 +1,1 @@
-mx.nic.rdap.db.impl.SqlProviderImplementation
+mx.nic.rdap.sql.impl.SqlProviderImplementation
