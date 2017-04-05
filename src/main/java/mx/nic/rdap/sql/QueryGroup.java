@@ -28,10 +28,6 @@ public class QueryGroup {
 	 * @throws IOException
 	 *             Problems reading the <code>file</code> file.
 	 */
-	public QueryGroup(String file) throws IOException {
-		this(file, null);
-	}
-
 	public QueryGroup(String file, String schema) throws IOException {
 		file = "META-INF/sql/" + file + ".sql";
 		try (BufferedReader reader = new BufferedReader(

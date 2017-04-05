@@ -24,7 +24,7 @@ public class StatusModel {
 
 	private final static String QUERY_GROUP = "Status";
 
-	protected static QueryGroup queryGroup = null;
+	private static QueryGroup queryGroup = null;
 
 	private static final String NAMESERVER_STORE_QUERY = "storeNameserverStatusToDatabase";
 	private static final String DOMAIN_STORE_QUERY = "storeDomainStatusToDatabase";
@@ -116,7 +116,8 @@ public class StatusModel {
 		return getByRelationsId(ipNetworkId, connection, IP_NETWORK_GET_QUERY);
 	}
 
-	public static List<Status> getByRelationsId(Long id, Connection connection, String getQueryId) throws SQLException {
+	private static List<Status> getByRelationsId(Long id, Connection connection, String getQueryId)
+			throws SQLException {
 		List<Status> result = null;
 		String query = getQueryGroup().getQuery(getQueryId);
 

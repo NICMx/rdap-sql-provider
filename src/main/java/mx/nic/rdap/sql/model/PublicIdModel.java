@@ -29,7 +29,6 @@ public class PublicIdModel {
 	private static QueryGroup queryGroup = null;
 
 	private static final String STORE_QUERY = "storeToDatabase";
-	private static final String GET_ALL_QUERY = "getAll";
 	private static final String ENTITY_GET_QUERY = "getByEntity";
 	private static final String DOMAIN_GET_QUERY = "getByDomain";
 	private static final String ENTITY_STORE_QUERY = "storeEntityPublicIdsToDatabase";
@@ -52,13 +51,7 @@ public class PublicIdModel {
 		return queryGroup;
 	}
 
-	public static void storeAllToDatabase(List<PublicId> publicIds, Connection connection) throws SQLException {
-		for (PublicId publicId : publicIds) {
-			PublicIdModel.storeToDatabase(publicId, connection);
-		}
-	}
-
-	public static Long storeToDatabase(PublicId publicId, Connection connection) throws SQLException {
+	private static Long storeToDatabase(PublicId publicId, Connection connection) throws SQLException {
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_QUERY),
 				Statement.RETURN_GENERATED_KEYS);) {
 			((PublicIdDbObj) publicId).storeToDatabase(statement);
@@ -107,14 +100,6 @@ public class PublicIdModel {
 			try (ResultSet resultSet = statement.executeQuery()) {
 				return processResultSet(resultSet);
 			}
-		}
-	}
-
-	public static List<PublicId> getAll(Connection connection) throws SQLException {
-		try (PreparedStatement statement = connection.prepareStatement(GET_ALL_QUERY)) {
-			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
-			ResultSet resultSet = statement.executeQuery();
-			return processResultSet(resultSet);
 		}
 	}
 

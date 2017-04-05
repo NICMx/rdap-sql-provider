@@ -95,35 +95,4 @@ public class IpNetworkDbObj extends IpNetwork implements DatabaseObject {
 		preparedStatement.setInt(12, getPrefix());
 	}
 
-	/**
-	 * Same as storeToDatabase,but using different order and should use the
-	 * object id as criteria
-	 */
-	public void updateInDatabase(PreparedStatement preparedStatement) throws SQLException {
-		preparedStatement.setString(1, getHandle());
-		if (getStartAddress() instanceof Inet4Address) {
-			preparedStatement.setNull(2, Types.BIGINT);
-			preparedStatement.setLong(3, IpUtils.addressToNumber((Inet4Address) getStartAddress()).longValueExact());
-			preparedStatement.setNull(4, Types.BIGINT);
-			preparedStatement.setLong(5, IpUtils.addressToNumber((Inet4Address) getEndAddress()).longValueExact());
-		} else if (getStartAddress() instanceof Inet6Address) {
-			preparedStatement.setString(2,
-					IpUtils.inet6AddressToUpperPart((Inet6Address) getStartAddress()).toString());
-			preparedStatement.setString(3,
-					IpUtils.inet6AddressToLowerPart((Inet6Address) getStartAddress()).toString());
-			preparedStatement.setString(4, IpUtils.inet6AddressToUpperPart((Inet6Address) getEndAddress()).toString());
-			preparedStatement.setString(5, IpUtils.inet6AddressToLowerPart((Inet6Address) getEndAddress()).toString());
-		}
-
-		preparedStatement.setString(6, getName());
-		preparedStatement.setString(7, getType());
-		preparedStatement.setString(8, getPort43());
-		preparedStatement.setInt(9, CountryCodeModel.getIdByCountryName(getCountry()));
-		preparedStatement.setInt(10, getIpVersion().getVersion());
-		preparedStatement.setString(11, getParentHandle());
-		preparedStatement.setInt(12, getPrefix());
-		preparedStatement.setLong(13, getId());
-
-	}
-
 }

@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import junit.framework.TestCase;
 import mx.nic.rdap.core.catalog.EventAction;
 import mx.nic.rdap.core.catalog.Role;
 import mx.nic.rdap.core.catalog.Status;
@@ -83,15 +84,9 @@ public class AutnumTest extends DatabaseTest {
 		autnum.setHandle("dummyASN");
 		AutnumModel.storeToDatabase(autnum, connection);
 
-		Autnum getById = null;
-		Autnum getByRange = null;
+		Autnum getByRange = AutnumModel.getByRange(autnum.getStartAutnum(), connection);
+		TestCase.assertTrue(autnum.equals(getByRange));
 
-		getByRange = AutnumModel.getByRange(autnum.getStartAutnum(), connection);
-		autnum.equals(getByRange);
-
-		getById = AutnumModel.getAutnumById(autnum.getId(), connection);
-		autnum.equals(getById);
-
-		AutnumModel.getByRange(101L, connection);
+		AutnumModel.getByRange(101L, connection); // TODO assert?
 	}
 }

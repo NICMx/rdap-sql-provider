@@ -140,12 +140,4 @@ public class NameserverTest extends DatabaseTest {
 		assert true;
 	}
 
-	// @Test
-	public void getAll() throws SQLException {
-		List<Nameserver> nameservers = NameserverModel.getAll(connection);
-		for (Nameserver nameserver : nameservers) {
-			System.out.println(nameserver.toString());
-		}
-	}
-
 }

@@ -62,19 +62,4 @@ public class AutnumDbObj extends Autnum implements DatabaseObject {
 		preparedStatement.setInt(7, CountryCodeModel.getIdByCountryName(this.getCountryCode()));
 	}
 
-	/**
-	 * Same as storeToDatabase,but using different order and should use the
-	 * object id as criteria
-	 */
-	public void updateInDatabase(PreparedStatement preparedStatement) throws SQLException {
-		preparedStatement.setLong(1, this.getStartAutnum());
-		preparedStatement.setLong(2, this.getEndAutnum());
-		preparedStatement.setString(3, this.getName());
-		preparedStatement.setString(4, this.getType());
-		preparedStatement.setString(5, this.getPort43());
-		preparedStatement.setInt(6, CountryCodeModel.getIdByCountryName(this.getCountryCode()));
-		preparedStatement.setLong(7, this.getId());
-
-	}
-
 }

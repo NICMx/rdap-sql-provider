@@ -69,14 +69,13 @@ public class DomainTest extends DatabaseTest {
 
 		DomainModel.storeToDatabase(dom, false, connection);
 
-		Domain domainByHandle = DomainModel.getByHandle(dom.getHandle(), false, connection);
 		Domain findByLdhName = DomainModel.findByLdhName(dom.getLdhName(), zoneId, false, connection);
 		System.out.println(findByLdhName.getLdhName());
 
 		// Compares the results
-		Assert.assertTrue("getByHandle fails", dom.equals(domainByHandle));
 		Assert.assertTrue("findByLdhName fails", dom.equals(findByLdhName));
 
+		// TODO assert?
 		DomainModel.findByLdhName(dom.getLdhName(), zoneId, false, connection);
 	}
 
@@ -274,11 +273,8 @@ public class DomainTest extends DatabaseTest {
 			resultSet.next();
 		}
 
-		Domain domainByHandle = DomainModel.getByHandle(domain.getHandle(), false, connection);
 		Domain findByLdhName = DomainModel.findByLdhName(domain.getLdhName(), zoneId, false, connection);
-
 		// Compares the results
-		Assert.assertTrue("getByHandle fails", domain.equals(domainByHandle));
 		Assert.assertTrue("findByLdhName fails", domain.equals(findByLdhName));
 
 	}

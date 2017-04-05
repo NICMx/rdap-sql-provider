@@ -11,10 +11,6 @@ public class InvalidObjectException extends SQLException {
 		super(message);
 	}
 
-	public InvalidObjectException(Throwable cause) {
-		super(cause);
-	}
-
 	public InvalidObjectException(String message, Throwable cause) {
 		super(message, cause);
 	}

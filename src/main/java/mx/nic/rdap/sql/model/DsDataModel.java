@@ -28,7 +28,7 @@ public class DsDataModel {
 	private final static String STORE_QUERY = "storeToDatabase";
 	private final static String GET_QUERY = "getBySecureDns";
 
-	protected static QueryGroup queryGroup = null;
+	private static QueryGroup queryGroup = null;
 
 	public static void loadQueryGroup(String schema) {
 		try {
@@ -47,7 +47,7 @@ public class DsDataModel {
 		return queryGroup;
 	}
 
-	public static long storeToDatabase(DsData dsData, Connection connection)
+	private static long storeToDatabase(DsData dsData, Connection connection)
 			throws SQLException {
 		String query = getQueryGroup().getQuery(STORE_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {

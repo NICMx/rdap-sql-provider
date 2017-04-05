@@ -13,15 +13,6 @@ import mx.nic.rdap.sql.model.NameserverModel;
 
 public class NameserverDAOImpl implements NameserverDAO {
 
-	public void storeToDatabase(Nameserver nameserver) throws RdapDataAccessException {
-		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			NameserverModel.storeToDatabase(nameserver, connection);
-		} catch (SQLException e) {
-			throw new RdapDataAccessException(e);
-		}
-
-	}
-
 	@Override
 	public Nameserver getByName(String name) throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {

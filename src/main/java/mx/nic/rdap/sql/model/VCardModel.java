@@ -28,11 +28,10 @@ public class VCardModel {
 
 	private static final String QUERY_GROUP = "VCard";
 
-	protected static QueryGroup queryGroup = null;
+	private static QueryGroup queryGroup = null;
 
 	private final static String STORE_QUERY = "storeToDatabase";
 	private final static String STORE_ENTITY_CONTACT_QUERY = "storeEntityContact";
-	private final static String GET_QUERY = "getById";
 	private final static String GET_BY_ENTITY_QUERY = "getByEntityId";
 
 	public static void loadQueryGroup(String schema) {
@@ -89,29 +88,6 @@ public class VCardModel {
 				statement.executeUpdate();
 			}
 		}
-	}
-
-	/**
-	 * Get a {@link VCard} by its Id.
-	 */
-	public static VCard getById(Long vCardId, Connection connection) throws SQLException {
-		VCard vCardResult = null;
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_QUERY));) {
-			statement.setLong(1, vCardId);
-			
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			ResultSet resultSet = statement.executeQuery();
-			if (!resultSet.next()) {
-				return null;
-			}
-
-			VCardDbObj vCard = new VCardDbObj();
-			vCard.loadFromDatabase(resultSet);
-		}
-
-		setSonObjects(vCardResult, connection);
-
-		return vCardResult;
 	}
 
 	/**

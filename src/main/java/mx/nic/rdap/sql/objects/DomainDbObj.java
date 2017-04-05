@@ -74,27 +74,4 @@ public class DomainDbObj extends Domain implements DatabaseObject {
 
 	}
 
-	/**
-	 * Same as storeToDatabase,but using different order and should use the
-	 * object id as criteria
-	 */
-	public void updateInDatabase(PreparedStatement preparedStatement) throws SQLException {
-
-		String domName = this.getLdhName();
-		String ldhName = IDN.toASCII(domName);
-		String unicodeName = IDN.toUnicode(domName);
-		if (ldhName.equals(unicodeName)) {
-			preparedStatement.setString(1, ldhName);
-			preparedStatement.setNull(2, Types.VARCHAR);
-		} else {
-			preparedStatement.setString(1, ldhName);
-			preparedStatement.setString(2, unicodeName);
-		}
-		preparedStatement.setString(1, this.getLdhName());
-
-		preparedStatement.setString(3, this.getPort43());
-		preparedStatement.setInt(4, ZoneModel.getIdByZoneName(this.getZone()));
-		preparedStatement.setLong(5, this.getId());
-	}
-
 }

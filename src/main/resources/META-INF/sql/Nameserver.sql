@@ -28,9 +28,6 @@ SELECT DISTINCT(nse.nse_id), nse.nse_handle,nse.nse_ldh_name, nse.nse_port43, ns
 #searchByIp6
 SELECT DISTINCT(nse.nse_id), nse.nse_handle,nse.nse_ldh_name, nse.nse_port43, nse.nse_unicode_name FROM {schema}.nameserver nse join {schema}.ip_address ipa on ipa.nse_id=nse.nse_id WHERE ipa.iad_value=INET6_ATON(?) ORDER BY 1 LIMIT ?;
 
-#getAll
-SELECT * FROM {schema}.nameserver nse;
-
 #deleteDomainNameserversRelation
 DELETE FROM {schema}.domain_nameservers WHERE dom_id=?;
 

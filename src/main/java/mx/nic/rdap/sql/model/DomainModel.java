@@ -46,7 +46,6 @@ public class DomainModel {
 
 	private static final String STORE_IP_NETWORK_RELATION_QUERY = "storeDomainIpNetworkRelation";
 	private static final String GET_BY_LDH_QUERY = "getByLdhName";
-	private static final String GET_BY_HANDLE_QUERY = "getByHandle";
 	private static final String SEARCH_BY_PARTIAL_NAME_WITH_PARTIAL_ZONE_QUERY = "searchByPartialNameWPartialZone";
 	private static final String SEARCH_BY_NAME_WITH_PARTIAL_ZONE_QUERY = "searchByNameWPartialZone";
 	private static final String SEARCH_BY_PARTIAL_NAME_WITH_ZONE_QUERY = "searchByPartialNameWZone";
@@ -96,7 +95,7 @@ public class DomainModel {
 		return domainId;
 	}
 
-	public static void storeNestedObjects(Domain domain, boolean useNameserverAsAttribute, Connection connection)
+	private static void storeNestedObjects(Domain domain, boolean useNameserverAsAttribute, Connection connection)
 			throws SQLException {
 		Long domainId = domain.getId();
 		RemarkModel.storeDomainRemarksToDatabase(domain.getRemarks(), domainId, connection);
@@ -187,22 +186,6 @@ public class DomainModel {
 			statement.setString(1, IDN.toASCII(name));
 			statement.setString(2, IDN.toUnicode(name));
 			statement.setInt(3, zoneId);
-			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
-			try (ResultSet resultSet = statement.executeQuery()) {
-				if (!resultSet.next()) {
-					return null;
-				}
-				DomainDbObj domain = new DomainDbObj(resultSet);
-				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
-				return domain;
-			}
-		}
-	}
-
-	public static DomainDbObj getByHandle(String handle, boolean useNameserverAsDomainAttribute, Connection connection)
-			throws SQLException {
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_HANDLE_QUERY))) {
-			statement.setString(1, handle);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (!resultSet.next()) {
@@ -530,7 +513,7 @@ public class DomainModel {
 	 *            if false, load all the nameserver object
 	 * 
 	 */
-	public static void loadNestedObjects(Domain domain, boolean useNameserverAsDomainAttribute, Connection connection)
+	private static void loadNestedObjects(Domain domain, boolean useNameserverAsDomainAttribute, Connection connection)
 			throws SQLException {
 		Long domainId = domain.getId();
 
@@ -564,33 +547,6 @@ public class DomainModel {
 
 		// Retrieve the ipNetwork
 		domain.setIpNetwork(IpNetworkModel.getByDomainId(domainId, connection));
-	}
-
-	/**
-	 * Validate if the zone of the request domain is managed by the server
-	 * 
-	 */
-	public static void validateDomainZone(String domainName) throws NotFoundException {
-		String domainZone;
-
-		if (ZoneModel.isReverseAddress(domainName)) {
-			domainZone = ZoneModel.getArpaZoneNameFromAddress(domainName);
-			if (domainZone == null) {
-				throw new NotFoundException("Zone not found.");
-			}
-		} else {
-			int indexOf = domainName.indexOf('.');
-			if (indexOf <= 0) {
-				throw new NotFoundException("Zone not found.");
-			}
-
-			domainZone = domainName.substring(indexOf + 1, domainName.length());
-
-		}
-
-		if (!ZoneModel.existsZone(domainZone)) {
-			throw new NotFoundException("Zone not found.");
-		}
 	}
 
 }

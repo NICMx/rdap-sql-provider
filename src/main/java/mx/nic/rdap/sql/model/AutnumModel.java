@@ -32,8 +32,6 @@ public class AutnumModel {
 
 	private static final String STORE_QUERY = "storeToDatabase";
 	private static final String GET_BY_RANGE = "getByRange";
-	private static final String GET_BY_ID = "getAutnumById";
-	private static final String GET_BY_HANDLE = "getAutnumByHandle";
 	private static final String GET_BY_ENTITY = "getAutnumByEntity";
 
 	public static void loadQueryGroup(String schema) {
@@ -101,41 +99,10 @@ public class AutnumModel {
 		}
 	}
 
-	public static AutnumDbObj getAutnumById(Long autnumId, Connection connection)
-			throws SQLException {
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_ID))) {
-			statement.setLong(1, autnumId);
-			logger.log(Level.INFO, "Executing query: " + statement.toString());
-			try (ResultSet resultSet = statement.executeQuery()) {
-				if (!resultSet.next()) {
-					return null;
-				}
-				AutnumDbObj autnum = new AutnumDbObj(resultSet);
-				loadNestedObjects(autnum, connection);
-				return autnum;
-			}
-		}
-	}
-
 	public static AutnumDbObj getByRange(long autnumValue, Connection connection) throws SQLException {
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_RANGE))) {
 			statement.setLong(1, autnumValue);
 			statement.setLong(2, autnumValue);
-			logger.log(Level.INFO, "Executing query: " + statement.toString());
-			try (ResultSet resultSet = statement.executeQuery()) {
-				if (!resultSet.next()) {
-					return null;
-				}
-				AutnumDbObj autnum = new AutnumDbObj(resultSet);
-				loadNestedObjects(autnum, connection);
-				return autnum;
-			}
-		}
-	}
-
-	public static AutnumDbObj getByHandle(String handle, Connection connection) throws SQLException {
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_HANDLE))) {
-			statement.setString(1, handle);
 			logger.log(Level.INFO, "Executing query: " + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (!resultSet.next()) {
@@ -156,11 +123,6 @@ public class AutnumModel {
 		autnum.getLinks().addAll(LinkModel.getByAutnumId(autnumId, connection));
 		autnum.getEvents().addAll(EventModel.getByAutnumId(autnumId, connection));
 		autnum.getEntities().addAll(EntityModel.getEntitiesByAutnumId(autnumId, connection));
-	}
-
-	public static void storeAutnumEntities(Autnum autnum, Connection connection) throws SQLException {
-		EntityModel.validateParentEntities(autnum.getEntities(), connection);
-		RoleModel.storeAutnumEntityRoles(autnum.getEntities(), autnum.getId(), connection);
 	}
 
 	public static List<Autnum> getByEntityId(Long entityId, Connection connection) throws SQLException {

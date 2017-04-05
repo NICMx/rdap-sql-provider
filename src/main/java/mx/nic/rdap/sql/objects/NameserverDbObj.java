@@ -72,24 +72,4 @@ public class NameserverDbObj extends Nameserver implements DatabaseObject {
 		preparedStatement.setString(4, this.getPort43());
 	}
 
-	/**
-	 * Same as storeToDatabase,but using different order and should use the
-	 * object id as criteria
-	 */
-	public void updateInDatabase(PreparedStatement preparedStatement) throws SQLException {
-		String nsName = this.getLdhName();
-		String ldhName = IDN.toASCII(nsName);
-		String unicodeName = IDN.toUnicode(nsName);
-		if (ldhName.equals(unicodeName)) {
-			preparedStatement.setString(1, ldhName);
-			preparedStatement.setNull(2, Types.VARCHAR);
-		} else {
-			preparedStatement.setString(1, ldhName);
-			preparedStatement.setString(2, unicodeName);
-		}
-
-		preparedStatement.setString(3, this.getPort43());
-		preparedStatement.setLong(4, this.getId());
-	}
-
 }

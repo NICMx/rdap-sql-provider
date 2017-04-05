@@ -57,30 +57,3 @@ INSERT INTO {schema}.ip_network_links VALUES (?, ?);
 
 #storeKeyDataLinksToDatabase
 INSERT INTO {schema}.key_links VALUES(?,?);
-
-#deleteEntityLinksRelation
-DELETE FROM {schema}.entity_links WHERE lin_id IN (?);
-
-#deleteNameserverLinksRelation
-DELETE FROM {schema}.nameserver_links WHERE lin_id IN (?);
-
-#deleteDSLinksRelation
-DELETE FROM {schema}.ds_links WHERE lin_id IN (?);
-
-#deleteDomainLinksRelation
-DELETE FROM {schema}.domain_links WHERE lin_id IN (?);
-
-#deleteIpNetworkLinksRelation
-DELETE FROM {schema}.ip_network_links WHERE lin_id IN (?);
-
-#deleteAutnumLinksRelation
-DELETE FROM {schema}.asn_links WHERE lin_id IN (?);
-
-#deleteEventLinksRelation
-DELETE FROM {schema}.event_links WHERE lin_id IN (?);
-
-#deleteRemarkLinksRelation
-DELETE FROM {schema}.remark_links WHERE lin_id IN (?);
-
-#deleteLinksById
-DELETE FROM {schema}.link WHERE lin_id IN (?);

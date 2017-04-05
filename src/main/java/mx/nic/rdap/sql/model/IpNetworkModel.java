@@ -37,7 +37,7 @@ public class IpNetworkModel {
 
 	private final static String QUERY_GROUP = "IpNetwork";
 
-	protected static QueryGroup queryGroup = null;
+	private static QueryGroup queryGroup = null;
 
 	private static final String GET_BY_IPV4 = "getByIPv4";
 	private static final String GET_BY_IPV6 = "getByIPv6";
@@ -185,8 +185,7 @@ public class IpNetworkModel {
 				return null;
 			}
 
-			ipDao = new IpNetworkDbObj();
-			ipDao.loadFromDatabase(rs);
+			ipDao = new IpNetworkDbObj(rs);
 		}
 
 		return ipDao;
@@ -218,8 +217,7 @@ public class IpNetworkModel {
 				return null;
 			}
 
-			ipDao = new IpNetworkDbObj();
-			ipDao.loadFromDatabase(rs);
+			ipDao = new IpNetworkDbObj(rs);
 		}
 
 		return ipDao;
@@ -250,8 +248,7 @@ public class IpNetworkModel {
 				return null;
 			}
 
-			result = new IpNetworkDbObj();
-			result.loadFromDatabase(rs);
+			result = new IpNetworkDbObj(rs);
 			loadSimpleNestedObjects(result, connection);
 		}
 
@@ -277,9 +274,7 @@ public class IpNetworkModel {
 			results = new ArrayList<IpNetwork>();
 
 			do {
-				IpNetworkDbObj ipNetwork = new IpNetworkDbObj();
-				ipNetwork.loadFromDatabase(rs);
-				results.add(ipNetwork);
+				results.add(new IpNetworkDbObj(rs));
 			} while (rs.next());
 		}
 
@@ -301,8 +296,7 @@ public class IpNetworkModel {
 				return null;
 			}
 
-			result = new IpNetworkDbObj();
-			result.loadFromDatabase(rs);
+			result = new IpNetworkDbObj(rs);
 		}
 
 		loadNestedObjects(result, connection);

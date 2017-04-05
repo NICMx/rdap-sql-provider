@@ -12,14 +12,6 @@ import mx.nic.rdap.sql.model.IpNetworkModel;
 
 public class IpNetworkDAOImpl implements IpNetworkDAO {
 
-	public Long storeToDatabase(IpNetwork ipNetwork) throws RdapDataAccessException {
-		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			return IpNetworkModel.storeToDatabase(ipNetwork, connection);
-		} catch (SQLException e) {
-			throw new RdapDataAccessException(e);
-		}
-	}
-
 	@Override
 	public IpNetwork getByAddressBlock(AddressBlock block) throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {

@@ -160,11 +160,6 @@ public class ZoneModel {
 		}
 	}
 
-	public static void cleanZoneTables() {
-		zoneById = new HashMap<Integer, String>();
-		idByZone = new HashMap<String, Integer>();
-	}
-
 	/**
 	 * Get zoneName from an id
 	 * 
@@ -194,14 +189,6 @@ public class ZoneModel {
 	}
 
 	/**
-	 * @param zoneId
-	 * @return Checks if the id is related to a zone.
-	 */
-	public static boolean existsZoneById(Integer zoneId) {
-		return zoneById.containsKey(zoneId);
-	}
-
-	/**
 	 * validate if a address is in reverse lookup
 	 * 
 	 */
@@ -221,18 +208,6 @@ public class ZoneModel {
 		return address;
 	}
 
-	public static Integer getZoneIdForArpaZone(String address) {
-		if (address.endsWith(REVERSE_IP_V4)) {
-			return getIdByZoneName(REVERSE_IP_V4);
-		}
-
-		if (address.endsWith(REVERSE_IP_V6)) {
-			return getIdByZoneName(REVERSE_IP_V6);
-		}
-
-		return null;
-	}
-
 	public static String getArpaZoneNameFromAddress(String address) {
 		if (address.endsWith(REVERSE_IP_V4)) {
 			return REVERSE_IP_V4;
@@ -246,24 +221,17 @@ public class ZoneModel {
 	}
 
 	/**
-	 * @return the zoneById
-	 */
-	public static Map<Integer, String> getZoneById() {
-		return zoneById;
-	}
-
-	/**
 	 * @param zoneById
 	 *            the zoneById to set
 	 */
-	public static void setZoneById(Map<Integer, String> zoneById) {
+	private static void setZoneById(Map<Integer, String> zoneById) {
 		ZoneModel.zoneById = zoneById;
 	}
 
 	/**
 	 * @return the idByZone
 	 */
-	public static Map<String, Integer> getIdByZone() {
+	private static Map<String, Integer> getIdByZone() {
 		return idByZone;
 	}
 
@@ -271,7 +239,7 @@ public class ZoneModel {
 	 * @param idByZone
 	 *            the idByZone to set
 	 */
-	public static void setIdByZone(Map<String, Integer> idByZone) {
+	private static void setIdByZone(Map<String, Integer> idByZone) {
 		ZoneModel.idByZone = idByZone;
 	}
 
