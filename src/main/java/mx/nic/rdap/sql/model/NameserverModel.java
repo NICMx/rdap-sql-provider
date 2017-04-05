@@ -1,7 +1,6 @@
 package mx.nic.rdap.sql.model;
 
 import java.io.IOException;
-import java.net.IDN;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -17,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mx.nic.rdap.core.catalog.Role;
+import mx.nic.rdap.core.db.DomainLabel;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.Nameserver;
 import mx.nic.rdap.core.ip.IpAddressFormatException;
@@ -41,7 +41,6 @@ public class NameserverModel {
 
 	private static final String STORE_QUERY = "storeToDatabase";
 
-	private static final String GET_ALL_QUERY = "getAll";
 	private static final String GET_BY_HANDLE_QUERY = "getByHandle";
 
 	private static final String FIND_BY_NAME_QUERY = "findByName";
@@ -77,7 +76,7 @@ public class NameserverModel {
 			throws IncompleteObjectException {
 		if (!useNameserverAsAttribute && (nameserver.getHandle() == null || nameserver.getHandle().isEmpty()))
 			throw new IncompleteObjectException("handle", "Nameserver");
-		if (nameserver.getPunycodeName() == null || nameserver.getPunycodeName().isEmpty())
+		if (nameserver.getLdhName() == null || nameserver.getLdhName().isEmpty())
 			throw new IncompleteObjectException("ldhName", "Nameserver");
 	}
 
@@ -86,7 +85,7 @@ public class NameserverModel {
 		storeToDatabase(nameserver, false, connection);
 	}
 
-	public static void storeToDatabase(Nameserver nameserver, boolean useNameserverAsAttribute, Connection connection)
+	private static void storeToDatabase(Nameserver nameserver, boolean useNameserverAsAttribute, Connection connection)
 			throws SQLException {
 		isValidForStore(nameserver, useNameserverAsAttribute);
 		String query = getQueryGroup().getQuery(STORE_QUERY);
@@ -104,7 +103,7 @@ public class NameserverModel {
 		storeNestedObjects(nameserver, connection);
 	}
 
-	public static void storeNestedObjects(Nameserver nameserver, Connection connection) throws SQLException {
+	private static void storeNestedObjects(Nameserver nameserver, Connection connection) throws SQLException {
 		Long nameserverId = nameserver.getId();
 		IpAddressModel.storeToDatabase(nameserver.getIpAddresses(), nameserverId, connection);
 		StatusModel.storeNameserverStatusToDatabase(nameserver.getStatus(), nameserverId, connection);
@@ -114,7 +113,7 @@ public class NameserverModel {
 		storeNameserverEntities(nameserver, connection);
 	}
 
-	public static void storeNameserverEntities(Nameserver nameserver, Connection connection) throws SQLException {
+	private static void storeNameserverEntities(Nameserver nameserver, Connection connection) throws SQLException {
 		if (nameserver.getEntities().size() > 0) {
 			EntityModel.validateParentEntities(nameserver.getEntities(), connection);
 			RoleModel.storeNameserverEntityRoles(nameserver.getEntities(), nameserver.getId(), connection);
@@ -145,12 +144,11 @@ public class NameserverModel {
 		}
 	}
 
-	public static NameserverDbObj findByName(String name, Connection connection)
-			throws SQLException {
+	public static NameserverDbObj findByName(DomainLabel name, Connection connection) throws SQLException {
 		String query = getQueryGroup().getQuery(FIND_BY_NAME_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, IDN.toASCII(name));
-			statement.setString(2, IDN.toUnicode(name));
+			statement.setString(1, name.getALabel());
+			statement.setString(2, name.getULabel());
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (!resultSet.next()) {
@@ -320,25 +318,6 @@ public class NameserverModel {
 		for (Entity entity : entities) {
 			List<Role> roles = RoleModel.getNameserverEntityRol(nameserver.getId(), entity.getId(), connection);
 			entity.setRoles(roles);
-		}
-	}
-
-	public static List<Nameserver> getAll(Connection connection) throws SQLException {
-		String query = getQueryGroup().getQuery(GET_ALL_QUERY);
-		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
-			try (ResultSet resultSet = statement.executeQuery()) {
-				if (!resultSet.next()) {
-					return Collections.emptyList();
-				}
-				List<Nameserver> nameservers = new ArrayList<Nameserver>();
-				do {
-					Nameserver nameserver = new NameserverDbObj(resultSet);
-					NameserverModel.loadNestedObjects(nameserver, connection);
-					nameservers.add(nameserver);
-				} while (resultSet.next());
-				return nameservers;
-			}
 		}
 	}
 

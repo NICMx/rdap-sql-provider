@@ -54,13 +54,4 @@ public class EntityDbObj extends Entity implements DatabaseObject {
 		preparedStatement.setString(2, getPort43());
 	}
 
-	/**
-	 * Same as storeToDatabase,but using different order and should use the
-	 * object id as criteria
-	 */
-	public void updateInDatabase(PreparedStatement preparedStatement) throws SQLException {
-		preparedStatement.setString(1, getPort43());
-		preparedStatement.setLong(2, getId());
-	}
-
 }

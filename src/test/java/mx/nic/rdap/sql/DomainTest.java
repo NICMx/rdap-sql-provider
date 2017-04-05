@@ -69,14 +69,13 @@ public class DomainTest extends DatabaseTest {
 
 		DomainModel.storeToDatabase(dom, false, connection);
 
-		Domain domainByHandle = DomainModel.getByHandle(dom.getHandle(), false, connection);
 		Domain findByLdhName = DomainModel.findByLdhName(dom.getLdhName(), zoneId, false, connection);
 		System.out.println(findByLdhName.getLdhName());
 
 		// Compares the results
-		Assert.assertTrue("getByHandle fails", dom.equals(domainByHandle));
 		Assert.assertTrue("findByLdhName fails", dom.equals(findByLdhName));
 
+		// TODO assert?
 		DomainModel.findByLdhName(dom.getLdhName(), zoneId, false, connection);
 	}
 
@@ -274,11 +273,8 @@ public class DomainTest extends DatabaseTest {
 			resultSet.next();
 		}
 
-		Domain domainByHandle = DomainModel.getByHandle(domain.getHandle(), false, connection);
 		Domain findByLdhName = DomainModel.findByLdhName(domain.getLdhName(), zoneId, false, connection);
-
 		// Compares the results
-		Assert.assertTrue("getByHandle fails", domain.equals(domainByHandle));
 		Assert.assertTrue("findByLdhName fails", domain.equals(findByLdhName));
 
 	}
@@ -287,7 +283,7 @@ public class DomainTest extends DatabaseTest {
 		List<Nameserver> nameservers = new ArrayList<Nameserver>();
 		Nameserver nameserver = new NameserverDbObj();
 		nameserver.setHandle("XXXX73532" + randomInt);
-		nameserver.setPunycodeName("ns1.xn--fo-5ja" + randomInt + ".example");
+		nameserver.setLdhName("ns1.myns" + randomInt + ".example");
 		nameserver.setPort43("whois.example.net");
 
 		// IpAddressStruct data
@@ -493,9 +489,9 @@ public class DomainTest extends DatabaseTest {
 		return variant;
 	}
 
-	public static VariantName createVariantName(String punycode) {
+	public static VariantName createVariantName(String ldhName) {
 		VariantName variantName = new VariantName();
-		variantName.setLdhName(punycode);
+		variantName.setLdhName(ldhName);
 		return variantName;
 	}
 

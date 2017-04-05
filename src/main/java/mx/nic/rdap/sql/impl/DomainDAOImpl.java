@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import mx.nic.rdap.core.db.Domain;
+import mx.nic.rdap.core.db.DomainLabel;
 import mx.nic.rdap.db.exception.RdapDataAccessException;
 import mx.nic.rdap.db.exception.http.BadRequestException;
 import mx.nic.rdap.db.exception.http.NotFoundException;
@@ -26,18 +27,13 @@ public class DomainDAOImpl implements DomainDAO {
 		this.useNsAsAttribute = useNsAsAttribute;
 	}
 
-	public Long storeToDatabase(Domain domain) throws SQLException {
-		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			return DomainModel.storeToDatabase(domain, useNsAsAttribute, connection);
-		}
-	}
-
 	@Override
-	public Domain getByName(String domainName) throws RdapDataAccessException {
+	public Domain getByName(DomainLabel domainLabel) throws RdapDataAccessException {
 
 		String name;
 		String zone;
 
+		String domainName = domainLabel.getULabel();
 		// TODO validations shouls be done by the server.
 		if (!domainName.contains("."))
 			throw new BadRequestException("Invalid fqdn");
@@ -63,7 +59,10 @@ public class DomainDAOImpl implements DomainDAO {
 	}
 
 	@Override
-	public SearchResultStruct<Domain> searchByName(String domainName, int resultLimit) throws RdapDataAccessException {
+	public SearchResultStruct<Domain> searchByName(DomainLabel domainLabel, int resultLimit)
+			throws RdapDataAccessException {
+
+		String domainName = domainLabel.getULabel();
 		if (domainName.contains("*")) {
 			List<String> labels = Arrays.asList(domainName.split("\\."));
 			for (String label : labels) {
@@ -87,7 +86,9 @@ public class DomainDAOImpl implements DomainDAO {
 	}
 
 	@Override
-	public SearchResultStruct<Domain> searchByNsName(String nsName, int resultLimit) throws RdapDataAccessException {
+	public SearchResultStruct<Domain> searchByNsLDHName(DomainLabel domainLabel, int resultLimit)
+			throws RdapDataAccessException {
+		String nsName = domainLabel.getULabel();
 		if (nsName.contains("*")) {
 			List<String> labels = Arrays.asList(nsName.split("\\."));
 			for (String label : labels) {
@@ -131,9 +132,9 @@ public class DomainDAOImpl implements DomainDAO {
 		}
 		return domains;
 	}
-	
+
 	@Override
-	public SearchResultStruct<Domain> searchByRegexNsName(String regexNsName, int resultLimit)
+	public SearchResultStruct<Domain> searchByRegexNsLDHName(String regexNsName, int resultLimit)
 			throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return DomainModel.searchByRegexNsLdhName(regexNsName, resultLimit, useNsAsAttribute, connection);

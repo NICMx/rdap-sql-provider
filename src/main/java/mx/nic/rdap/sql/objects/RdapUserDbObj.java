@@ -55,17 +55,4 @@ public class RdapUserDbObj extends RdapUser implements DatabaseObject {
 			preparedStatement.setNull(3, java.sql.Types.INTEGER);
 	}
 
-	/**
-	 * Same as storeToDatabase,but using different order and should use the
-	 * object id as criteria
-	 */
-	public void updateInDatabase(PreparedStatement preparedStatement) throws SQLException {
-		preparedStatement.setString(1, this.getPass());
-		if (this.getMaxSearchResults() != null)
-			preparedStatement.setInt(2, this.getMaxSearchResults());
-		else
-			preparedStatement.setNull(2, java.sql.Types.INTEGER);
-		preparedStatement.setLong(3, this.getId());
-	}
-
 }

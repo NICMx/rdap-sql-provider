@@ -45,7 +45,7 @@ public class IpNetworkTest extends DatabaseTest {
 		IpNetworkModel.storeToDatabase(ipNetwork, connection);
 
 		// Query the database
-		IpNetwork byIp = IpNetworkModel.getByAddressBlock(new AddressBlock("192.168.1.1", 26), connection);
+		IpNetwork byIp = IpNetworkModel.getByAddressBlock(new AddressBlock("192.168.1.0", 26), connection);
 
 		// Compares the results
 		Assert.assertTrue("getByIp fails", ipNetwork.equals(byIp));
@@ -149,7 +149,7 @@ public class IpNetworkTest extends DatabaseTest {
 		IpNetworkModel.storeToDatabase(ipNetwork, connection);
 
 		// Query the database
-		IpNetwork byIp = IpNetworkModel.getByAddressBlock(new AddressBlock("192.168.1.1", 26), connection);
+		IpNetwork byIp = IpNetworkModel.getByAddressBlock(new AddressBlock("192.168.1.0", 26), connection);
 
 		// Compares the results
 		Assert.assertTrue("getByIp fails", ipNetwork.equals(byIp));
@@ -235,11 +235,10 @@ public class IpNetworkTest extends DatabaseTest {
 	}
 
 	private static IpNetwork createInstance(String startAddress, Integer cidr, String name, String type, String country,
-			String parentHandle, String handle)
-			throws IpAddressFormatException {
+			String parentHandle, String handle) throws IpAddressFormatException {
 		IpNetwork ipNetwork = new IpNetworkDbObj();
-		AddressBlock block = new AddressBlock(IpUtils.parseAddress(startAddress));
-		
+		AddressBlock block = new AddressBlock(IpUtils.parseAddress(startAddress), cidr);
+
 		ipNetwork.setHandle(handle);
 		ipNetwork.setIpVersion(block.getIpVersion());
 		ipNetwork.setStartAddress(block.getAddress());

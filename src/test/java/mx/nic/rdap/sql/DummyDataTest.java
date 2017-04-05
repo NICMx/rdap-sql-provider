@@ -100,7 +100,7 @@ public class DummyDataTest extends DatabaseTest {
 		for (int index = 0; index < numberOfNameservers; index++) {
 			Nameserver nameserver = new NameserverDbObj();
 			String nsName = ("NS-" + index + "-").concat(name);
-			nameserver.setPunycodeName(nsName + index);
+			nameserver.setLdhName(nsName + index);
 			nameserver.setHandle(nsName + "-handle");
 			nameserver.setPort43("whois.mx");
 
@@ -130,7 +130,7 @@ public class DummyDataTest extends DatabaseTest {
 			}
 
 			if (hasEntities) {
-				nameserver.setEntities(createRandomEntities(nameserver.getPunycodeName(), getRandomBoolean(),
+				nameserver.setEntities(createRandomEntities(nameserver.getLdhName(), getRandomBoolean(),
 						getRandomBoolean(), getRandomBoolean(), getRandomBoolean()));
 			}
 			if (hasRemarks) {

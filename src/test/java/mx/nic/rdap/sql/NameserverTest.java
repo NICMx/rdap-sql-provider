@@ -11,6 +11,8 @@ import org.junit.Test;
 
 import mx.nic.rdap.core.catalog.EventAction;
 import mx.nic.rdap.core.catalog.Status;
+import mx.nic.rdap.core.db.DomainLabel;
+import mx.nic.rdap.core.db.DomainLabelException;
 import mx.nic.rdap.core.db.Event;
 import mx.nic.rdap.core.db.IpAddress;
 import mx.nic.rdap.core.db.Link;
@@ -33,16 +35,17 @@ import mx.nic.rdap.sql.objects.RemarkDescriptionDbObj;
 public class NameserverTest extends DatabaseTest {
 
 	@Test
-	public void insertMinimunNameServer() throws SQLException {
+	public void insertMinimunNameServer() throws SQLException, DomainLabelException {
 
 		// Nameserver base data
 		Nameserver nameserver = new NameserverDbObj();
 		nameserver.setHandle("xx1");
-		nameserver.setPunycodeName("ns.xn--test-minumun.example");
+		nameserver.setLdhName("ns.xn--test-minumun.example");
 		NameserverModel.storeToDatabase(nameserver, connection);
 		System.out.println(nameserver);
 
-		NameserverModel.findByName("ns.xn--test-minumun.example", connection);
+		DomainLabel label = new DomainLabel("ns.xn--test-minumun.example");
+		NameserverModel.findByName(label, connection);
 	}
 
 	@Test
@@ -51,7 +54,7 @@ public class NameserverTest extends DatabaseTest {
 		// Nameserver base data
 		Nameserver nameserver = new NameserverDbObj();
 		nameserver.setHandle("XXX13");
-		nameserver.setPunycodeName("ns1.xn--fo-5ja.example");
+		nameserver.setLdhName("ns1.xn--fo-5ja.example");
 		nameserver.setPort43("whois.example.net");
 
 		// IpAddressStruct data
@@ -138,14 +141,6 @@ public class NameserverTest extends DatabaseTest {
 		NameserverModel.storeToDatabase(nameserver, connection);
 
 		assert true;
-	}
-
-	// @Test
-	public void getAll() throws SQLException {
-		List<Nameserver> nameservers = NameserverModel.getAll(connection);
-		for (Nameserver nameserver : nameservers) {
-			System.out.println(nameserver.toString());
-		}
 	}
 
 }
