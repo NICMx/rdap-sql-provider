@@ -29,7 +29,7 @@ public class EventModel {
 
 	private final static String QUERY_GROUP = "Event";
 
-	protected static QueryGroup queryGroup = null;
+	private static QueryGroup queryGroup = null;
 
 	private static final String NAMESERVER_GET_QUERY = "getByNameServerId";
 	private static final String DS_DATA_GET_QUERY = "getByDsDataId";
@@ -71,7 +71,7 @@ public class EventModel {
 			throw new IncompleteObjectException("eventDate", "Event");
 	}
 
-	public static long storeToDatabase(Event event, Connection connection) throws SQLException {
+	private static long storeToDatabase(Event event, Connection connection) throws SQLException {
 		isValidForStore(event);
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery("storeToDatabase"),
 				Statement.RETURN_GENERATED_KEYS)) {
@@ -173,28 +173,6 @@ public class EventModel {
 
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setLong(1, id);
-			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
-			try (ResultSet resultSet = statement.executeQuery()) {
-				if (!resultSet.next()) {
-					return Collections.emptyList();
-				}
-				List<Event> events = new ArrayList<Event>();
-				do {
-					EventDbObj event = new EventDbObj(resultSet);
-					event.getLinks().addAll(LinkModel.getByEventId(event.getId(), connection));
-					events.add(event);
-				} while (resultSet.next());
-				result = events;
-			}
-		}
-
-		return result;
-	}
-
-	public static List<Event> getAll(Connection connection) throws SQLException {
-		String query = getQueryGroup().getQuery("getAll");
-		List<Event> result = null;
-		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (!resultSet.next()) {

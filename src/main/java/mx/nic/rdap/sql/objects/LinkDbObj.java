@@ -27,17 +27,6 @@ public class LinkDbObj extends Link implements DatabaseObject {
 		loadFromDatabase(resultSet);
 	}
 
-	/**
-	 * Construct a "self" Link
-	 * 
-	 */
-	public LinkDbObj(String header, String contextPath, String objectClassName, String query) {
-		this.setValue(header + contextPath + "/" + objectClassName + "/" + query);
-		this.setRel("self");
-		this.setHref(header + contextPath + "/" + objectClassName + "/" + query);
-		this.setType("application/rdap+json");
-	}
-
 	/*
 	 * (non-Javadoc)
 	 * 

@@ -4,9 +4,6 @@ INSERT INTO {schema}.domain(dom_handle,dom_ldh_name,dom_unicode_name,dom_port43,
 #updateInDatabase
 UPDATE {schema}.domain SET dom_ldh_name=?,dom_unicode_name=?,dom_port43=?,zone_id=? WHERE dom_id=?;
 
-#getByHandle
-SELECT * FROM {schema}.domain WHERE dom_handle=?;
-
 #getByLdhName
 SELECT * FROM {schema}.domain WHERE (dom_ldh_name=? OR dom_unicode_name=?) AND zone_id = ?;
 

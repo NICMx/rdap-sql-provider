@@ -30,8 +30,4 @@ public class ObjectNotFoundException extends Exception {
 		super(msg);
 	}
 
-	public ObjectNotFoundException(String msg, Throwable cause) {
-		super(msg, cause);
-	}
-
 }

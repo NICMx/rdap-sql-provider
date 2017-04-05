@@ -28,7 +28,7 @@ public class RemarkDescriptionModel {
 	private static final String GET_QUERY = "getByRemarkId";
 	private static final String INSERT_QUERY = "storeToDatabase";
 
-	protected static QueryGroup queryGroup = null;
+	private static QueryGroup queryGroup = null;
 
 	public static void loadQueryGroup(String schema) {
 		try {
@@ -55,7 +55,8 @@ public class RemarkDescriptionModel {
 		}
 	}
 
-	public static void storeToDatabase(RemarkDescription remarkDescription, Connection connection) throws SQLException {
+	private static void storeToDatabase(RemarkDescription remarkDescription, Connection connection)
+			throws SQLException {
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(INSERT_QUERY))) {
 			((RemarkDescriptionDbObj) remarkDescription).storeToDatabase(statement);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());

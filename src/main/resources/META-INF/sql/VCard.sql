@@ -4,9 +4,6 @@ INSERT INTO {schema}.vcard VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?);
 #storeEntityContact
 INSERT INTO {schema}.entity_contact VALUES (?, ?);
 
-#getById
-SELECT * FROM {schema}.vcard v WHERE v.vca_id = ?;
-
 #getAll
 SELECT * FROM {schema}.vcard ORDER BY 1 ASC;
 

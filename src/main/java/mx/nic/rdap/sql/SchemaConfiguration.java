@@ -69,7 +69,7 @@ public class SchemaConfiguration {
 	 * @param initialDbSchema
 	 *            The initial database schema
 	 */
-	public static synchronized void createTimerSchema(String initialDbSchema) {
+	private static synchronized void createTimerSchema(String initialDbSchema) {
 		// If for some reason this function is called two or more times, we
 		// don't want to create lot of timers.
 		if (isTimerActive) {

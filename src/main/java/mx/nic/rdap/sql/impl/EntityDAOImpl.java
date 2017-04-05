@@ -12,12 +12,6 @@ import mx.nic.rdap.sql.model.EntityModel;
 
 public class EntityDAOImpl implements EntityDAO {
 
-	public long storeToDatabase(Entity entity) throws SQLException {
-		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			return EntityModel.storeToDatabase(entity, connection);
-		}
-	}
-
 	@Override
 	public Entity getByHandle(String entityHandle) throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {

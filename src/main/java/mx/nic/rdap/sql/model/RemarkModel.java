@@ -39,7 +39,7 @@ public class RemarkModel {
 	private static final String AUTNUM_GET_QUERY = "getByAutnumId";
 	private static final String IP_NETWORK_GET_QUERY = "getByIpNetworkId";
 
-	protected static QueryGroup queryGroup = null;
+	private static QueryGroup queryGroup = null;
 
 	public static void loadQueryGroup(String schema) {
 		try {
@@ -58,7 +58,7 @@ public class RemarkModel {
 		return queryGroup;
 	}
 
-	public static long storeToDatabase(Remark remark, Connection connection) throws SQLException {
+	private static long storeToDatabase(Remark remark, Connection connection) throws SQLException {
 
 		// The Remark's id is autoincremental, Statement.RETURN_GENERATED_KEYS
 		// give us the id generated for the object stored
@@ -149,13 +149,6 @@ public class RemarkModel {
 
 	public static List<Remark> getByIpNetworkId(Long ipNetworkId, Connection connection) throws SQLException {
 		return getByRelationId(ipNetworkId, connection, IP_NETWORK_GET_QUERY);
-	}
-
-	public static List<Remark> getAll(Connection connection) throws SQLException {
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery("getAll"));
-				ResultSet resultSet = statement.executeQuery();) {
-			return processResultSet(resultSet, connection);
-		}
 	}
 
 	/**

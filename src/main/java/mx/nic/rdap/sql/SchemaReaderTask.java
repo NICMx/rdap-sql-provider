@@ -11,7 +11,7 @@ import mx.nic.rdap.sql.model.DBConfigurationModel;
 
 public class SchemaReaderTask extends TimerTask {
 
-	Logger logger = Logger.getLogger(SchemaReaderTask.class.getName());
+	private static final Logger logger = Logger.getLogger(SchemaReaderTask.class.getName());
 
 	private String lastSchemaName;
 

@@ -26,7 +26,7 @@ public class IpAddressModel {
 	private static final String STORE_QUERY = "storeToDatabase";
 	private static final String GET_QUERY = "getByNameserverId";
 
-	protected static QueryGroup queryGroup = null;
+	private static QueryGroup queryGroup = null;
 
 	public static void loadQueryGroup(String schema) {
 		try {

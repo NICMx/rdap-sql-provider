@@ -25,7 +25,7 @@ public class SecureDNSModel {
 	private final static String STORE_QUERY = "storeToDatabase";
 	private final static String GET_QUERY = "getByDomain";
 
-	protected static QueryGroup queryGroup = null;
+	private static QueryGroup queryGroup = null;
 
 	public static void loadQueryGroup(String schema) {
 		try {

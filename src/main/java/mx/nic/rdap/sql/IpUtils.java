@@ -12,7 +12,6 @@ import mx.nic.rdap.core.ip.IpAddressFormatException;
 public class IpUtils {
 
 	private static final int IPV4_ADDRESS_ARRAY_SIZE = 4;
-	private static final int IPV6_ADDRESS_ARRAY_SIZE = 16;
 
 	private static final int IPV6_PART_SIZE = 8;
 	private static final BigInteger IPV4_MAX_VALUE = new BigInteger("4294967295"); // 0xFFFF_FFFF
@@ -21,13 +20,6 @@ public class IpUtils {
 		byte[] byteAddress = address.getAddress();
 		byte[] number = new byte[IPV4_ADDRESS_ARRAY_SIZE + 1];
 		System.arraycopy(byteAddress, 0, number, 1, IPV4_ADDRESS_ARRAY_SIZE);
-		return new BigInteger(number);
-	}
-
-	public static BigInteger inet6AddressToNumber(Inet6Address address) {
-		byte[] byteAddress = address.getAddress();
-		byte[] number = new byte[IPV6_ADDRESS_ARRAY_SIZE + 1];
-		System.arraycopy(byteAddress, 0, number, 1, IPV6_ADDRESS_ARRAY_SIZE);
 		return new BigInteger(number);
 	}
 

@@ -35,7 +35,7 @@ public class VariantModel {
 	private static final String GET_RELATION_BY_VARIANT_QUERY = "getVariantRelationsByVariantId";
 	private static final String GET_NAMES_BY_VARIANT_QUERY = "getVariantNamesByVariantId";
 
-	protected static QueryGroup queryGroup = null;
+	private static QueryGroup queryGroup = null;
 
 	public static void loadQueryGroup(String schema) {
 		try {
@@ -62,7 +62,7 @@ public class VariantModel {
 		}
 	}
 
-	public static Long storeToDatabase(Variant variant, Connection connection) throws SQLException {
+	private static Long storeToDatabase(Variant variant, Connection connection) throws SQLException {
 		Long variantInsertedId = null;
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_QUERY),
 				Statement.RETURN_GENERATED_KEYS)) {

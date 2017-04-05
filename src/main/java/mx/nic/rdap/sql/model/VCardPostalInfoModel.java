@@ -27,7 +27,7 @@ public class VCardPostalInfoModel {
 
 	private final static String STORE_QUERY = "storeToDatabase";
 	private final static String GET_BY_VCARD_QUERY = "getByVCardId";
-	protected static QueryGroup queryGroup = null;
+	private static QueryGroup queryGroup = null;
 
 	public static void loadQueryGroup(String schema) {
 		try {

@@ -35,7 +35,7 @@ public class EntityModel {
 
 	private final static String QUERY_GROUP = "Entity";
 
-	protected static QueryGroup queryGroup = null;
+	private static QueryGroup queryGroup = null;
 
 	private final static String STORE_QUERY = "storeToDatabase";
 	private final static String GET_ID_BY_HANDLE_QUERY = "getIdByHandle";
@@ -207,13 +207,10 @@ public class EntityModel {
 			return null;
 		}
 
-		EntityDbObj entity = new EntityDbObj();
-		entity.loadFromDatabase(resultSet);
-
-		return entity;
+		return new EntityDbObj(resultSet);
 	}
 
-	public static List<Entity> getEntitiesByEntityId(Long entityId, Connection connection) throws SQLException {
+	private static List<Entity> getEntitiesByEntityId(Long entityId, Connection connection) throws SQLException {
 		List<Entity> entitiesById = getEntitiesById(entityId, connection, GET_ENTITY_ENTITY_QUERY);
 		for (Entity ent : entitiesById) {
 			List<Role> entityEntityRol = RoleModel.getEntityEntityRol(entityId, ent.getId(), connection);
@@ -232,7 +229,8 @@ public class EntityModel {
 		return entitiesById;
 	}
 
-	public static List<Entity> getEntitiesByNameserverId(Long nameserverId, Connection connection) throws SQLException {
+	public static List<Entity> getEntitiesByNameserverId(Long nameserverId, Connection connection)
+			throws SQLException {
 		List<Entity> entitiesById = getEntitiesById(nameserverId, connection, GET_NS_ENTITY_QUERY);
 		for (Entity ent : entitiesById) {
 			List<Role> entityEntityRol = RoleModel.getNameserverEntityRol(nameserverId, ent.getId(), connection);
@@ -272,9 +270,7 @@ public class EntityModel {
 			result = new ArrayList<>();
 
 			do {
-				EntityDbObj dao = new EntityDbObj();
-				dao.loadFromDatabase(rs);
-				result.add(dao);
+				result.add(new EntityDbObj(rs));
 			} while (rs.next());
 		}
 
@@ -359,9 +355,7 @@ public class EntityModel {
 			}
 
 			do {
-				EntityDbObj ent = new EntityDbObj();
-				ent.loadFromDatabase(rs);
-				entities.add(ent);
+				entities.add(new EntityDbObj(rs));
 			} while (rs.next());
 			resultLimit = resultLimit - 1;// Back to the original limit
 			if (entities.size() > resultLimit) {

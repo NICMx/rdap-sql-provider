@@ -24,7 +24,7 @@ public class KeyDataModel {
 	private final static String STORE_QUERY = "storeToDatabase";
 	private final static String GET_QUERY = "getBySecureDns";
 
-	protected static QueryGroup queryGroup = null;
+	private static QueryGroup queryGroup = null;
 
 	public static void loadQueryGroup(String schema) {
 		try {
@@ -43,7 +43,7 @@ public class KeyDataModel {
 		return queryGroup;
 	}
 
-	public static long storeToDatabase(KeyData keyData, Connection connection) throws SQLException {
+	private static long storeToDatabase(KeyData keyData, Connection connection) throws SQLException {
 		String query = getQueryGroup().getQuery(STORE_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
 			((KeyDataDbObj) keyData).storeToDatabase(statement);
