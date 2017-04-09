@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 
-import junit.framework.TestCase;
 import mx.nic.rdap.core.catalog.EventAction;
 import mx.nic.rdap.core.catalog.Role;
 import mx.nic.rdap.core.catalog.Status;
@@ -85,8 +85,7 @@ public class AutnumTest extends DatabaseTest {
 		AutnumModel.storeToDatabase(autnum, connection);
 
 		Autnum getByRange = AutnumModel.getByRange(autnum.getStartAutnum(), connection);
-		TestCase.assertTrue(autnum.equals(getByRange));
+		Assert.assertTrue("AutnumModel#getByRange fails", autnum.equals(getByRange));
 
-		AutnumModel.getByRange(101L, connection); // TODO assert?
 	}
 }

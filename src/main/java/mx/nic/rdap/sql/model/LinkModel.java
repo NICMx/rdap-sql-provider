@@ -39,6 +39,7 @@ public class LinkModel {
 	private static final String AUTNUM_GET_QUERY = "getByAutnumId";
 	private static final String IP_NETWORK_GET_QUERY = "getByIpNetworkId";
 	private static final String KEY_DATA_GET_QUERY = "getByKeyDataId";
+	private static final String HREFLANG_GET_QUERY = "getLinkHreflangs";
 
 	private static final String NAMESERVER_STORE_QUERY = "storeNameserverLinksToDatabase";
 	private static final String EVENT_STORE_QUERY = "storeEventLinksToDatabase";
@@ -49,6 +50,7 @@ public class LinkModel {
 	private static final String AUTNUM_STORE_QUERY = "storeAutnumLinksToDatabase";
 	private static final String IP_NETWORK_STORE_QUERY = "storeIpNetworkLinksToDatabase";
 	private static final String KEY_DATA_STORE_QUERY = "storeKeyDataLinksToDatabase";
+	private static final String HREFLANG_STORE_QUERY = "storeLinkHreflangs";
 
 	public static void loadQueryGroup(String schema) {
 		try {
@@ -84,6 +86,7 @@ public class LinkModel {
 	 */
 	private static Long storeToDatabase(Link link, Connection connection) throws SQLException {
 		isValidForStore(link);
+		Long linkId = null;
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery("storeToDatabase"),
 				Statement.RETURN_GENERATED_KEYS)) {
 			((LinkDbObj) link).storeToDatabase(statement);
@@ -91,10 +94,12 @@ public class LinkModel {
 			statement.executeUpdate();
 			ResultSet result = statement.getGeneratedKeys();
 			result.next();
-			Long linkId = result.getLong(1);// The id of the link inserted
+			linkId = result.getLong(1);// The id of the link inserted
 			link.setId(linkId);
-			return linkId;
 		}
+
+		storeLinkHreflang(link, connection);
+		return linkId;
 	}
 
 	public static void storeNameserverLinksToDatabase(List<Link> links, Long nameserverId, Connection connection)
@@ -217,7 +222,42 @@ public class LinkModel {
 			}
 		}
 
+		for (Link link : result) {
+			List<String> linkHreflangs = getLinkHreflangs(link.getId(), connection);
+			link.getHreflang().addAll(linkHreflangs);
+		}
 		return result;
 	}
 
+	private static void storeLinkHreflang(Link link, Connection connection) throws SQLException {
+		if (link.getHreflang().isEmpty()) {
+			return;
+		}
+		String query = getQueryGroup().getQuery(HREFLANG_STORE_QUERY);
+		try (PreparedStatement statement = connection.prepareStatement(query)) {
+			for (String lang : link.getHreflang()) {
+				statement.setLong(1, link.getId());
+				statement.setString(2, lang);
+				statement.executeUpdate();
+			}
+		}
+	}
+
+	private static List<String> getLinkHreflangs(Long linkId, Connection connection) throws SQLException {
+		List<String> result;
+		String query = getQueryGroup().getQuery(HREFLANG_GET_QUERY);
+		try (PreparedStatement statement = connection.prepareStatement(query)) {
+			statement.setLong(1, linkId);
+			ResultSet rs = statement.executeQuery();
+			if (!rs.next()) {
+				return Collections.emptyList();
+			}
+			result = new ArrayList<>();
+			do {
+				result.add(rs.getString("lan_hreflang"));
+			} while (rs.next());
+		}
+
+		return result;
+	}
 }

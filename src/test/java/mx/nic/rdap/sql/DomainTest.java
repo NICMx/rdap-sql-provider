@@ -74,9 +74,6 @@ public class DomainTest extends DatabaseTest {
 
 		// Compares the results
 		Assert.assertTrue("findByLdhName fails", dom.equals(findByLdhName));
-
-		// TODO assert?
-		DomainModel.findByLdhName(dom.getLdhName(), zoneId, false, connection);
 	}
 
 	@Test

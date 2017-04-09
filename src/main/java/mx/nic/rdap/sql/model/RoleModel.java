@@ -30,13 +30,14 @@ public class RoleModel {
 	private static final String NAMESERVER_STORE_QUERY = "storeNSEntityRol";
 	private static final String AUTNUM_STORE_QUERY = "storeAutnumEntityRol";
 	private static final String IP_NETWORK_STORE_ROLES = "storeIpNetworkEntityRol";
+	private static final String MAIN_ENTITY_STORE_QUERY = "storeMainEntityRole";
 
 	private static final String DOMAIN_GET_QUERY = "getDomainRol";
 	private static final String ENTITY_GET_QUERY = "getEntityRol";
 	private static final String NAMESERVER_GET_QUERY = "getNSRol";
 	private static final String AUTNUM_GET_QUERY = "getAutnumRol";
 	private static final String IP_NETWORK_GET_QUERY = "getIpNetworkRol";
-	// private static final String MAIN_ENTITY_GET_QUERY = "getMainEntityRol";
+	private static final String MAIN_ENTITY_GET_QUERY = "getMainEntityRole";
 
 	private static QueryGroup queryGroup = null;
 
@@ -152,29 +153,43 @@ public class RoleModel {
 		}
 	}
 
-	public static void storeMainEntityRol(List<Entity> nestedEntities, Entity mainEntity, Connection connection)
-			throws SQLException {
-		if (nestedEntities.isEmpty() || mainEntity.getRoles().isEmpty()) {
+	public static void storeMainEntityRol(Entity mainEntity, Connection connection) throws SQLException {
+		if (mainEntity.getRoles().isEmpty()) {
 			return;
 		}
 
-		String query = getQueryGroup().getQuery(ENTITY_STORE_QUERY);
+		String query = getQueryGroup().getQuery(MAIN_ENTITY_STORE_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
+			statement.setLong(1, mainEntity.getId());
 			for (Role role : mainEntity.getRoles()) {
-				for (Entity nestedEntity : nestedEntities) {
-					statement.setLong(1, nestedEntity.getId());
-					statement.setLong(2, mainEntity.getId());
-					statement.setInt(3, role.getId());
-					logger.log(Level.INFO, "Executing QUERY" + statement.toString());
-					statement.execute();
-				}
+				statement.setInt(2, role.getId());
+				logger.log(Level.INFO, "Executing QUERY" + statement.toString());
+				statement.execute();
 			}
 		}
-
 	}
 
-	// TODO create a getRoles function for the main entity object requested from
-	// other table other than entityEntityRol
-	// https://mailarchive.ietf.org/arch/msg/weirds/UYlSy0WCKGp_pxy7DMRAxIhi0n0
+	public static List<Role> getMainEntityRol(Long entId, Connection connection) throws SQLException {
+		List<Role> result = null;
+		String query = getQueryGroup().getQuery(MAIN_ENTITY_GET_QUERY);
+		try (PreparedStatement statement = connection.prepareStatement(query)) {
+			statement.setLong(1, entId);
+			logger.log(Level.FINE, "Executing QUERY: " + statement.toString());
+			ResultSet rs = statement.executeQuery();
+			if (!rs.next()) {
+				return Collections.emptyList();
+			}
+
+			result = new ArrayList<>();
+			do {
+				int rolId = rs.getInt(1);
+				if (rs.wasNull()) {
+					throw new NullPointerException("Role id was null");
+				}
+				result.add(Role.getById(rolId));
+			} while (rs.next());
+		}
+		return result;
+	}
 
 }

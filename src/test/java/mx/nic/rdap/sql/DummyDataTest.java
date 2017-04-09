@@ -1,5 +1,6 @@
 package mx.nic.rdap.sql;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
@@ -22,6 +23,7 @@ import mx.nic.rdap.core.db.RemarkDescription;
 import mx.nic.rdap.core.db.VCard;
 import mx.nic.rdap.core.db.VCardPostalInfo;
 import mx.nic.rdap.core.db.struct.NameserverIpAddressesStruct;
+import mx.nic.rdap.db.exception.InitializationException;
 import mx.nic.rdap.sql.model.DomainModel;
 import mx.nic.rdap.sql.model.EntityModel;
 import mx.nic.rdap.sql.model.NameserverModel;
@@ -42,17 +44,34 @@ import mx.nic.rdap.sql.objects.RemarkDescriptionDbObj;
 public class DummyDataTest extends DatabaseTest {
 
 	public static char[] idnChars = { 'á', 'á', 'è', 'í', 'ö', 'â', 'ñ', 'ç', '明', '行', '極', '珠', '度', '雄', '熊', '強',
-			'ア', 'イ', 'ウ', 'エ', 'オ', 'а', 'њ', 'ш', 'я', 'й', 'ж', 'ग', '-', '_', 'ब', 'ह', 'द', 'श' };
+			'ア', 'イ', 'ウ', 'エ', 'オ', 'а', 'њ', 'ш', 'я', 'й', 'ж', 'ग', 'ब', 'ह', 'द', 'श' };
 	public static String[] zones = { "mx", "lat", "com", "lat.com", "com.mx", "org" };
 
-	public static void main(String[] args) throws SQLException, UnknownHostException {
+	public static String[] domainNames = { "dn", "midominio", "mipagina", "tienda", "ong" };
+
+	public static void main(String[] args) throws SQLException, InitializationException, IOException {
 		DummyDataTest dummyDataTest = new DummyDataTest();
-		dummyDataTest.createDataDummy();
+		DummyDataTest.init();
+		dummyDataTest.before();
+		try {
+			dummyDataTest.createDataDummy();
+		} catch (Exception e) {
+			System.out.println("Error");
+			e.printStackTrace();
+			connection.rollback();
+		}
+		dummyDataTest.after();
+		DummyDataTest.end();
+	}
+
+	public String getRandomDomainName() {
+		int nextInt = ThreadLocalRandom.current().nextInt(0, domainNames.length);
+		return domainNames[nextInt];
 	}
 
 	public void createDataDummy() throws SQLException, UnknownHostException {
-		for (int index = 801; index < 2000; index++) {
-			String domainName = "DN" + index;
+		for (int index = 200; index < 500; index++) {
+			String domainName = getRandomDomainName() + index;
 			if (getRandomBoolean()) {
 				domainName = domainName.concat("" + idnChars[ThreadLocalRandom.current().nextInt(0, idnChars.length)]);
 			}

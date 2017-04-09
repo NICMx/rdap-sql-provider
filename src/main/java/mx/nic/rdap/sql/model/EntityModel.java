@@ -92,6 +92,11 @@ public class EntityModel {
 	}
 
 	public static long storeToDatabase(Entity entity, Connection connection) throws SQLException {
+		return storeToDatabase(entity, connection, true);
+	}
+
+	private static long storeToDatabase(Entity entity, Connection connection, boolean isParentEntity)
+			throws SQLException {
 		Long entityId = getIdByHandle(entity.getHandle(), connection);
 		if (entityId != null) {
 			entity.setId(entityId);
@@ -110,6 +115,9 @@ public class EntityModel {
 			entity.setId(entityId);
 		}
 
+		if (isParentEntity && !entity.getRoles().isEmpty()) {
+			RoleModel.storeMainEntityRol(entity, connection);
+		}
 		storeNestedObjects(entity, connection);
 
 		return entityId;
@@ -120,8 +128,7 @@ public class EntityModel {
 			throw new IncompleteObjectException("handle", "Entity");
 	}
 
-	private static void storeNestedObjects(Entity entity, Connection connection)
-			throws SQLException {
+	private static void storeNestedObjects(Entity entity, Connection connection) throws SQLException {
 		isValidForStore(entity);
 		storeVcardList(entity, connection);
 
@@ -131,12 +138,10 @@ public class EntityModel {
 		LinkModel.storeEntityLinksToDatabase(entity.getLinks(), entity.getId(), connection);
 		EventModel.storeEntityEventsToDatabase(entity.getEvents(), entity.getId(), connection);
 		for (Entity ent : entity.getEntities()) {
-			storeToDatabase(ent, connection);
+			storeToDatabase(ent, connection, false);
 		}
 		RoleModel.storeEntityEntityRoles(entity.getEntities(), entity.getId(), connection);
 
-		if (!entity.getRoles().isEmpty() && !entity.getEntities().isEmpty())
-			RoleModel.storeMainEntityRol(entity.getEntities(), entity, connection);
 	}
 
 	private static void storeVcardList(Entity entity, Connection connection) throws SQLException {
@@ -149,8 +154,7 @@ public class EntityModel {
 		}
 	}
 
-	public static EntityDbObj getByHandle(String entityHandle, Connection connection)
-			throws SQLException {
+	public static EntityDbObj getByHandle(String entityHandle, Connection connection) throws SQLException {
 		EntityDbObj entResult = null;
 		try (PreparedStatement statement = connection
 				.prepareStatement(getQueryGroup().getQuery(GET_BY_HANDLE_QUERY));) {
@@ -200,6 +204,10 @@ public class EntityModel {
 		// retrieve the autnums
 		List<Autnum> autnums = AutnumModel.getByEntityId(entityId, connection);
 		entity.getAutnums().addAll(autnums);
+
+		// retrieve the entity roles
+		List<Role> mainEntityRol = RoleModel.getMainEntityRol(entityId, connection);
+		entity.getRoles().addAll(mainEntityRol);
 	}
 
 	private static EntityDbObj processResultSet(ResultSet resultSet, Connection connection) throws SQLException {
@@ -229,8 +237,7 @@ public class EntityModel {
 		return entitiesById;
 	}
 
-	public static List<Entity> getEntitiesByNameserverId(Long nameserverId, Connection connection)
-			throws SQLException {
+	public static List<Entity> getEntitiesByNameserverId(Long nameserverId, Connection connection) throws SQLException {
 		List<Entity> entitiesById = getEntitiesById(nameserverId, connection, GET_NS_ENTITY_QUERY);
 		for (Entity ent : entitiesById) {
 			List<Role> entityEntityRol = RoleModel.getNameserverEntityRol(nameserverId, ent.getId(), connection);
@@ -283,7 +290,7 @@ public class EntityModel {
 
 		for (Entity entity : entities) {
 			Long entityId = entity.getId();
-			
+
 			List<VCard> vCardList = VCardModel.getByEntityId(entityId, connection);
 			entity.getVCardList().addAll(vCardList);
 
@@ -313,8 +320,8 @@ public class EntityModel {
 		return searchBy(handle, resultLimit, connection, query);
 	}
 
-	public static SearchResultStruct<Entity> searchByVCardName(String vcardName, int resultLimit,
-			Connection connection) throws SQLException {
+	public static SearchResultStruct<Entity> searchByVCardName(String vcardName, int resultLimit, Connection connection)
+			throws SQLException {
 		String query = null;
 		if (vcardName.contains("*")) {
 			vcardName = vcardName.replace("*", "%");
@@ -331,8 +338,8 @@ public class EntityModel {
 		return searchBy(regexHandle, resultLimit, connection, getQueryGroup().getQuery(SEARCH_BY_HANDLE_REGEX_QUERY));
 	}
 
-	public static SearchResultStruct<Entity> searchByRegexName(String regexName, int resultLimit,
-			Connection connection) throws SQLException {
+	public static SearchResultStruct<Entity> searchByRegexName(String regexName, int resultLimit, Connection connection)
+			throws SQLException {
 		return searchBy(regexName, resultLimit, connection, getQueryGroup().getQuery(SEARCH_BY_NAME_REGEX_QUERY));
 	}
 

@@ -1,5 +1,5 @@
 #storeToDatabase
-INSERT INTO {schema}.link VALUES(null,?,?,?,?,?,?,?);
+INSERT INTO {schema}.link VALUES(null,?,?,?,?,?,?);
 
 #getAll
 SELECT lin.* FROM {schema}.link lin ORDER BY 1 ASC;
@@ -57,3 +57,9 @@ INSERT INTO {schema}.ip_network_links VALUES (?, ?);
 
 #storeKeyDataLinksToDatabase
 INSERT INTO {schema}.key_links VALUES(?,?);
+
+#getLinkHreflangs
+SELECT lan_hreflang FROM {schema}.link_lang lan WHERE lan.lin_id = ?;
+
+#storeLinkHreflangs
+INSERT INTO {schema}.link_lang VALUES (?,?);

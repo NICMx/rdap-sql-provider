@@ -13,6 +13,12 @@ INSERT INTO {schema}.asn_entity_roles VALUES (?,?,?);
 #storeIpNetworkEntityRol
 INSERT INTO {schema}.ip_network_entity_roles VALUES (?, ?, ?);
 
+#storeMainEntityRole
+INSERT INTO {schema}.entity_role VALUES (?, ?);
+
+#getMainEntityRole
+SELECT rol.rol_id FROM {schema}.entity_role rol WHERE rol.ent_id = ?;
+
 #getDomainRol
 SELECT rol.rol_id FROM {schema}.domain_entity_roles rol WHERE rol.dom_id = ? AND rol.ent_id = ?;
 
@@ -28,20 +34,3 @@ SELECT rol.rol_id FROM {schema}.asn_entity_roles rol WHERE rol.asn_id = ? AND ro
 #getIpNetworkRol
 SELECT rol.rol_id FROM {schema}.ip_network_entity_roles rol WHERE rol.ine_id = ? AND rol.ent_id = ?;
 
-#deleteEntityEntityRoles
-DELETE FROM {schema}.entity_entity_roles  WHERE ent_id=?;
-
-#deleteNameserverEntityRoles
-DELETE FROM {schema}.nameserver_entity_roles  WHERE nse_id=?;
-
-#deleteDomainEntityRoles
-DELETE FROM {schema}.domain_entity_roles  WHERE dom_id=?;
-
-#deleteAutnumEntityRoles
-DELETE FROM {schema}.asn_entity_roles  WHERE asn_id=?;
-
-#deleteIpNetworkEntityRoles
-DELETE FROM {schema}.ip_network_entity_roles  WHERE ine_id=?;
-
-#deleteMainEntityRelation
-DELETE FROM {schema}.entity_entity_roles  WHERE main_ent_id=?;
