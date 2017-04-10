@@ -70,10 +70,13 @@ public class DatabaseSession {
 		 * with what works.
 		 */
 
+		// In some servers, the string is "java:comp/env/jdbc/rdap".
+		// In other servers, the string is "java:/comp/env/jdbc/rdap"
+		// In other servers, it doesn't matter.
+		String dbResourceName = config.getProperty("db_resource_name", "java:comp/env/jdbc/rdap");
 		try {
 			Context initContext = new InitialContext();
-			// TODO Make the string lookup a property variable
-			rdapDataSource = (DataSource) initContext.lookup("java:comp/env/jdbc/rdap");
+			rdapDataSource = (DataSource) initContext.lookup(dbResourceName);
 			logger.info("Found a data source in the context.");
 			return;
 		} catch (NamingException e) {
