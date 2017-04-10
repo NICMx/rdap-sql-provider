@@ -41,41 +41,52 @@ import mx.nic.rdap.sql.objects.VCardDbObj;
 import mx.nic.rdap.sql.objects.VCardPostalInfoDbObj;
 import mx.nic.rdap.sql.objects.VariantDbObj;
 
-public class DummyDataTestV2 extends DatabaseTest {
+public class DummyDataBatch extends DatabaseTest {
 
 	private static final String[] countryNames = { "mx", "us", "jp", "co", "cl", "kr", "ca", "es", "uk", "fr", "br" };
+	private static String[] zones = { "mx", "lat", "com", "example", "org" };
+	private static String[] domainNames = { "domain", "hol", "foo", "bar", "store" };
+	private static final String[] IDNS = { "á", "é", "í", "ó", "ú", "ア", "イ", "ウ", "エ", "オ" };
 
-	public static String[] zones = { "mx", "lat", "com", "example", "org" };
+	private static final String[] variantsA = { "ä", "à", "â" };
+	private static final String[] variantsE = { "ë", "è", "ê" };
+	private static final String[] variantsI = { "ï", "ì", "î" };
+	private static final String[] variantsO = { "ö", "ò", "ô" };
+	private static final String[] variantsU = { "ü", "ù", "û" };
 
-	public static String[] domainNames = { "domain", "hol", "foo", "bar", "store" };
-
-	public DummyDataTestV2() {
-		// no code
+	private static Map<String, String[]> variants;
+	static {
+		variants = new HashMap<>();
+		variants.put("á", variantsA);
+		variants.put("é", variantsE);
+		variants.put("í", variantsI);
+		variants.put("ó", variantsO);
+		variants.put("ú", variantsU);
 	}
 
 	public static void main(String[] args) throws SQLException, InitializationException, IOException {
-		DummyDataTestV2 test = new DummyDataTestV2();
+		DummyDataBatch batch = new DummyDataBatch();
 
-		DummyDataTestV2.init();
-		test.before();
+		DummyDataBatch.init();
+		batch.before();
 		for (String zone : zones) {
 			ZoneModel.storeToDatabase(zone, connection);
 		}
 		try {
-			test.start();
+			batch.start();
 		} catch (Exception e) {
 			System.out.println("Error");
 			e.printStackTrace();
 			connection.rollback();
 		}
 		connection.commit();
-		test.after();
-		DummyDataTestV2.end();
+		batch.after();
+		DummyDataBatch.end();
 	}
 
-	private int entitiesIndex = 100;
-	private int domainIndex = 100;
-	private int RegistrarsIndex = 100;
+	private int entitiesIndex = 10;
+	private int domainIndex = 10;
+	private int RegistrarsIndex = 10;
 
 	public void start() throws SQLException, UnknownHostException {
 
@@ -85,8 +96,8 @@ public class DummyDataTestV2 extends DatabaseTest {
 		}
 	}
 
-	public void createRegistrarData() throws SQLException, UnknownHostException {
-		int registrantPerSponsor = 60;
+	private void createRegistrarData() throws SQLException, UnknownHostException {
+		int registrantPerSponsor = 40;
 		int domainPerRegistrant = 4;
 
 		String zone = zones[ThreadLocalRandom.current().nextInt(zones.length)];
@@ -103,7 +114,7 @@ public class DummyDataTestV2 extends DatabaseTest {
 		}
 	}
 
-	public Entity createRegistrants(Entity sponsor, Integer index) throws SQLException {
+	private Entity createRegistrants(Entity sponsor, Integer index) throws SQLException {
 		EntityDbObj entity = new EntityDbObj();
 		String country = getRandomCountry();
 
@@ -162,7 +173,8 @@ public class DummyDataTestV2 extends DatabaseTest {
 
 	private void createDomains(String domainName, String tld, Entity registrant, Entity sponsor, Integer index)
 			throws UnknownHostException, SQLException {
-		boolean isIDN = ThreadLocalRandom.current().nextBoolean();
+		boolean isIDN = getRandomBoolean();
+
 		DomainDbObj domain = new DomainDbObj();
 		domain.getEntities().add(registrant);
 		domain.getEntities().add(sponsor);
@@ -259,25 +271,7 @@ public class DummyDataTestV2 extends DatabaseTest {
 		return nameservers;
 	}
 
-	private static final String[] IDNS = { "á", "é", "í", "ó", "ú", "ア", "イ", "ウ", "エ", "オ" };
-
-	private static final String[] variantsA = { "ä", "à", "â" };
-	private static final String[] variantsE = { "ë", "è", "ê" };
-	private static final String[] variantsI = { "ï", "ì", "î" };
-	private static final String[] variantsO = { "ö", "ò", "ô" };
-	private static final String[] variantsU = { "ü", "ù", "û" };
-
-	private static Map<String, String[]> variants;
-	static {
-		variants = new HashMap<>();
-		variants.put("á", variantsA);
-		variants.put("é", variantsE);
-		variants.put("í", variantsI);
-		variants.put("ó", variantsO);
-		variants.put("ú", variantsU);
-	}
-
-	public Entity createRegistrarsEntities(Integer index, String tld) throws SQLException {
+	private Entity createRegistrarsEntities(Integer index, String tld) throws SQLException {
 		EntityDbObj registrar = new EntityDbObj();
 
 		// HANDLE
@@ -438,7 +432,7 @@ public class DummyDataTestV2 extends DatabaseTest {
 		return first + "." + second + "." + third + "." + fourth;
 	}
 
-	public String getRandomCountry() {
+	private String getRandomCountry() {
 		return countryNames[ThreadLocalRandom.current().nextInt(0, countryNames.length)];
 	}
 
