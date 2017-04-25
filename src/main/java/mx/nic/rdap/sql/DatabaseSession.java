@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.naming.Context;
@@ -70,23 +71,54 @@ public class DatabaseSession {
 		 * with what works.
 		 */
 
-		// In some servers, the string is "java:comp/env/jdbc/rdap".
-		// In other servers, the string is "java:/comp/env/jdbc/rdap"
-		// In other servers, it doesn't matter.
-		String dbResourceName = config.getProperty("db_resource_name", "java:comp/env/jdbc/rdap");
-		try {
-			Context initContext = new InitialContext();
-			rdapDataSource = (DataSource) initContext.lookup(dbResourceName);
-			logger.info("Found a data source in the context.");
+		rdapDataSource = findRdapDataSource(config);
+		if (rdapDataSource != null) {
+			logger.info("Data source found.");
 			return;
-		} catch (NamingException e) {
-			logger.info("I could not find the RDAP data source in the context. "
-					+ "This won't be a problem if I can find it in the configuration. Attempting that now... ");
 		}
-
+		
+		logger.info("I could not find the RDAP data source in the context. "
+				+ "This won't be a problem if I can find it in the configuration. Attempting that now... ");
 		rdapDataSource = loadDataSourceFromProperties(config);
 	}
+	
+	private static DataSource findRdapDataSource(Properties config) {
+		Context context;
+		try {
+			context = new InitialContext();
+		} catch (NamingException e) {
+			logger.log(Level.INFO, "I could not instance an initial context. "
+					+ "I will not be able to find the data source by JDNI name.", e);
+			return null;
+		}
+		
+		String jdniName = config.getProperty("db_resource_name");
+		if (jdniName != null) {
+			return findRdapDataSource(context, jdniName);
+		}
 
+		// Try the default string.
+		// In some server containers (such as Wildfly), the default string is "java:/comp/env/jdbc/rdap".
+		// In other server containers (such as Payara), the string is "java:comp/env/jdbc/rdap".
+		// In other server containers (such as Tomcat), it doesn't matter.
+		DataSource result = findRdapDataSource(context, "java:/comp/env/jdbc/rdap");
+		if (result != null) {
+			return result;
+		}
+		
+		return findRdapDataSource(context, "java:comp/env/jdbc/rdap");
+	}
+	
+	private static DataSource findRdapDataSource(Context context, String jdniName) {
+		logger.info("Attempting to find data source '" + jdniName + "'...");
+		try {
+			return (DataSource) context.lookup(jdniName);
+		} catch (NamingException e) {
+			logger.info("Data source not found. Attempting something else...");
+			return null;
+		}
+	}
+	
 	public static void initOriginConnection(Properties config) throws InitializationException {
 		originDataSource = loadDataSourceFromProperties(config);
 	}
