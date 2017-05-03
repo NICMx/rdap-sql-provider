@@ -8,7 +8,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,8 +38,6 @@ public class NameserverModel {
 
 	private static QueryGroup queryGroup = null;
 
-	private static final String STORE_QUERY = "storeToDatabase";
-
 	private static final String GET_BY_HANDLE_QUERY = "getByHandle";
 
 	private static final String FIND_BY_NAME_QUERY = "findByName";
@@ -51,7 +48,6 @@ public class NameserverModel {
 	private static final String SEARCH_BY_IP4_QUERY = "searchByIp4";
 
 	private static final String DOMAIN_GET_QUERY = "getByDomainId";
-	private static final String DOMAIN_STORE_QUERY = "storeDomainNameserversToDatabase";
 
 	private static final String SEARCH_BY_NAME_REGEX_QUERY = "searchByRegexName";
 
@@ -70,78 +66,6 @@ public class NameserverModel {
 
 	private static QueryGroup getQueryGroup() {
 		return queryGroup;
-	}
-
-	private static void isValidForStore(Nameserver nameserver, boolean useNameserverAsAttribute)
-			throws IncompleteObjectException {
-		if (!useNameserverAsAttribute && (nameserver.getHandle() == null || nameserver.getHandle().isEmpty()))
-			throw new IncompleteObjectException("handle", "Nameserver");
-		if (nameserver.getLdhName() == null || nameserver.getLdhName().isEmpty())
-			throw new IncompleteObjectException("ldhName", "Nameserver");
-	}
-
-	// Store as object
-	public static void storeToDatabase(Nameserver nameserver, Connection connection) throws SQLException {
-		storeToDatabase(nameserver, false, connection);
-	}
-
-	private static void storeToDatabase(Nameserver nameserver, boolean useNameserverAsAttribute, Connection connection)
-			throws SQLException {
-		isValidForStore(nameserver, useNameserverAsAttribute);
-		String query = getQueryGroup().getQuery(STORE_QUERY);
-		Long nameserverId = null;
-		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-			((NameserverDbObj) nameserver).storeToDatabase(statement);
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			statement.executeUpdate();
-			ResultSet result = statement.getGeneratedKeys();
-			result.next();
-			nameserverId = result.getLong(1);// The id of the nameserver
-												// inserted
-			nameserver.setId(nameserverId);
-		}
-		storeNestedObjects(nameserver, connection);
-	}
-
-	private static void storeNestedObjects(Nameserver nameserver, Connection connection) throws SQLException {
-		Long nameserverId = nameserver.getId();
-		IpAddressModel.storeToDatabase(nameserver.getIpAddresses(), nameserverId, connection);
-		StatusModel.storeNameserverStatusToDatabase(nameserver.getStatus(), nameserverId, connection);
-		RemarkModel.storeNameserverRemarksToDatabase(nameserver.getRemarks(), nameserverId, connection);
-		LinkModel.storeNameserverLinksToDatabase(nameserver.getLinks(), nameserverId, connection);
-		EventModel.storeNameserverEventsToDatabase(nameserver.getEvents(), nameserverId, connection);
-		storeNameserverEntities(nameserver, connection);
-	}
-
-	private static void storeNameserverEntities(Nameserver nameserver, Connection connection) throws SQLException {
-		if (nameserver.getEntities().size() > 0) {
-			EntityModel.validateParentEntities(nameserver.getEntities(), connection);
-			RoleModel.storeNameserverEntityRoles(nameserver.getEntities(), nameserver.getId(), connection);
-		}
-
-	}
-
-	/**
-	 * Store a list of nameservers that belong from a domain
-	 * 
-	 */
-	public static void storeDomainNameserversToDatabase(List<Nameserver> nameservers, Long domainId,
-			Connection connection) throws SQLException {
-		if (nameservers.isEmpty()) {
-			return;
-		}
-
-		String query = getQueryGroup().getQuery(DOMAIN_STORE_QUERY);
-		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			Long nameserverId;
-			for (Nameserver nameserver : nameservers) {
-				statement.setLong(1, domainId);
-				nameserverId = nameserver.getId();
-				statement.setLong(2, nameserverId);
-				logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-				statement.executeUpdate();
-			}
-		}
 	}
 
 	public static NameserverDbObj findByName(DomainLabel name, Connection connection) throws SQLException {
@@ -340,12 +264,4 @@ public class NameserverModel {
 		}
 	}
 
-	public static void storeDomainNameserversAsAttributesToDatabase(List<Nameserver> nameservers, Long domainId,
-			Connection connection) throws SQLException {
-		for (Nameserver ns : nameservers) {
-			NameserverModel.storeToDatabase(ns, true, connection);
-		}
-		storeDomainNameserversToDatabase(nameservers, domainId, connection);
-
-	}
 }

@@ -1,9 +1,7 @@
 package mx.nic.rdap.sql.objects;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 
 import mx.nic.rdap.core.db.SecureDNS;
 
@@ -44,25 +42,6 @@ public class SecureDNSDbObj extends SecureDNS implements DatabaseObject {
 			this.setMaxSigLife(maxSigLife);
 		}
 		this.setDomainId(resultSet.getLong("dom_id"));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see mx.nic.rdap.server.db.DatabaseObject#storeToDatabase(java.sql.
-	 * PreparedStatement)
-	 */
-	@Override
-	public void storeToDatabase(PreparedStatement preparedStatement) throws SQLException {
-		preparedStatement.setBoolean(1, this.getZoneSigned());
-		preparedStatement.setBoolean(2, this.getDelegationSigned());
-		if (this.getMaxSigLife() == null) {
-			preparedStatement.setNull(3, Types.INTEGER);
-		} else {
-			preparedStatement.setInt(3, this.getMaxSigLife());
-		}
-		preparedStatement.setLong(4, this.getDomainId());
-
 	}
 
 }

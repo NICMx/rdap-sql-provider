@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,9 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.Autnum;
-import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.sql.QueryGroup;
-import mx.nic.rdap.sql.exception.IncompleteObjectException;
 import mx.nic.rdap.sql.objects.AutnumDbObj;
 
 /**
@@ -30,7 +27,6 @@ public class AutnumModel {
 
 	private static QueryGroup queryGroup = null;
 
-	private static final String STORE_QUERY = "storeToDatabase";
 	private static final String GET_BY_RANGE = "getByRange";
 	private static final String GET_BY_ENTITY = "getAutnumByEntity";
 
@@ -49,54 +45,6 @@ public class AutnumModel {
 
 	private static QueryGroup getQueryGroup() {
 		return queryGroup;
-	}
-
-	/**
-	 * Stores Object autnum to database
-	 * 
-	 */
-	public static Long storeToDatabase(Autnum autnum, Connection connection) throws SQLException {
-
-		isValidForStore(autnum);
-
-		Long autnumId;
-		String query = getQueryGroup().getQuery(STORE_QUERY);
-		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-			((AutnumDbObj) autnum).storeToDatabase(statement);
-			logger.log(Level.INFO, "Executing query:" + statement.toString());
-			statement.executeUpdate();
-			ResultSet resultSet = statement.getGeneratedKeys();
-			resultSet.next();
-			autnumId = resultSet.getLong(1);
-			autnum.setId(autnumId);
-		}
-		StatusModel.storeAutnumStatusToDatabase(autnum.getStatus(), autnumId, connection);
-		RemarkModel.storeAutnumRemarksToDatabase(autnum.getRemarks(), autnumId, connection);
-		LinkModel.storeAutnumLinksToDatabase(autnum.getLinks(), autnumId, connection);
-		EventModel.storeAutnumEventsToDatabase(autnum.getEvents(), autnumId, connection);
-		for (Entity ent : autnum.getEntities()) {
-			Long entId = EntityModel.getIdByHandle(ent.getHandle(), connection);
-			if (entId == null) {
-				throw new NullPointerException(
-						"Entity: " + ent.getHandle() + "was not inserted previously to the database");
-			}
-			ent.setId(entId);
-		}
-		RoleModel.storeAutnumEntityRoles(autnum.getEntities(), autnumId, connection);
-
-		return autnumId;
-	}
-
-	private static void isValidForStore(Autnum autnum) throws IncompleteObjectException {
-		if (autnum.getHandle() == null || autnum.getHandle().isEmpty())
-			throw new IncompleteObjectException("handle", "Autnum");
-		if (autnum.getStartAutnum() == null)
-			throw new IncompleteObjectException("startAutnum", "Autnum");
-		if (autnum.getEndAutnum() == null)
-			throw new IncompleteObjectException("endAutnum", "Autnum");
-		if (autnum.getStartAutnum() > autnum.getEndAutnum()) {
-			throw new RuntimeException("Starting ASN is greater than final ASN");
-		}
 	}
 
 	public static AutnumDbObj getByRange(long autnumValue, Connection connection) throws SQLException {

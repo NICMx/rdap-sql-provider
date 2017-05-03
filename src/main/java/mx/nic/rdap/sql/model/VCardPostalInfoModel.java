@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -25,7 +24,6 @@ public class VCardPostalInfoModel {
 
 	private static final String QUERY_GROUP = "VCardPostalInfo";
 
-	private final static String STORE_QUERY = "storeToDatabase";
 	private final static String GET_BY_VCARD_QUERY = "getByVCardId";
 	private static QueryGroup queryGroup = null;
 
@@ -44,28 +42,6 @@ public class VCardPostalInfoModel {
 
 	private static QueryGroup getQueryGroup() {
 		return queryGroup;
-	}
-
-	/**
-	 * Store a VCardPostalInfo
-	 * 
-	 */
-	public static long storeToDatabase(VCardPostalInfo vCardPostalInfo, Connection connection) throws SQLException {
-		long insertedId;
-
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_QUERY),
-				Statement.RETURN_GENERATED_KEYS);) {
-			((VCardPostalInfoDbObj) vCardPostalInfo).storeToDatabase(statement);
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			statement.executeUpdate();
-
-			ResultSet resultSet = statement.getGeneratedKeys();
-			resultSet.next();
-			insertedId = resultSet.getLong(1);
-			vCardPostalInfo.setId(insertedId);
-		}
-
-		return insertedId;
 	}
 
 	/**

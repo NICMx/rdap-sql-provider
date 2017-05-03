@@ -1,6 +1,3 @@
-#storeToDatabase
-INSERT INTO {schema}.event VALUES(null,?,?,?);
-
 #getByNameServerId
 SELECT eve.eve_id,eve.eac_id,eve.eve_actor,eve.eve_date FROM {schema}.event eve JOIN {schema}.nameserver_events nse ON nse.eve_id=eve.eve_id WHERE nse.nse_id=?;
 
@@ -22,47 +19,6 @@ SELECT eve.eve_id, eve.eac_id, eve.eve_actor, eve.eve_date FROM {schema}.event e
 #getByKeyDataId
 SELECT eve.eve_id,eve.eac_id,eve.eve_actor,eve.eve_date FROM {schema}.event eve JOIN {schema}.key_events kde ON kde.eve_id=eve.eve_id WHERE kde.kd_id=?;
 
-#storeNameserverEventsToDatabase
-INSERT INTO {schema}.nameserver_events values (?,?);
-
-#storeDomainEventsToDatabase
-INSERT INTO {schema}.domain_events VALUES (?,?);
-
-#storeDsDataEventsToDatabase
-INSERT INTO {schema}.ds_events values (?,?);
-
-#storeEntityEventsToDatabase
-INSERT INTO {schema}.entity_events values (?,?);
-
-#storeAutnumEventsToDatabase
-INSERT INTO {schema}.asn_events VALUES (?,?);
-
-#storeIpNetworkEventsToDatabase
-INSERT INTO {schema}.ip_network_events VALUES (?,?);
-
-#storeKeyDataEventsToDatabase
-INSERT INTO {schema}.key_events VALUES (?,?);
-
 #getAll
 SELECT * FROM {schema}.event;
 
-#deleteEventById
-DELETE FROM {schema}.event WHERE eve_id IN (?);
-
-#deleteNameserverEventsRelation
-DELETE FROM {schema}.nameserver_events WHERE eve_id IN (?);
-
-#deleteEntityEventsRelation
-DELETE FROM {schema}.entity_events WHERE eve_id IN (?);
-
-#deleteDsEventsRelation
-DELETE FROM {schema}.ds_events WHERE eve_id IN (?);
-
-#deleteDomainEventsRelation
-DELETE FROM {schema}.domain_events WHERE eve_id IN (?);
-
-#deleteAutnumEventsRelation
-DELETE FROM {schema}.asn_events WHERE eve_id IN (?);
-
-#deleteIpNetworkEventsRelation
-DELETE FROM {schema}.ip_network_events WHERE eve_id IN (?);

@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,8 +29,6 @@ public class VCardModel {
 
 	private static QueryGroup queryGroup = null;
 
-	private final static String STORE_QUERY = "storeToDatabase";
-	private final static String STORE_ENTITY_CONTACT_QUERY = "storeEntityContact";
 	private final static String GET_BY_ENTITY_QUERY = "getByEntityId";
 
 	public static void loadQueryGroup(String schema) {
@@ -49,45 +46,6 @@ public class VCardModel {
 
 	private static QueryGroup getQueryGroup() {
 		return queryGroup;
-	}
-
-	public static long storeToDatabase(VCard vCard, Connection connection) throws SQLException {
-		long vCardId;
-
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_QUERY),
-				Statement.RETURN_GENERATED_KEYS);) {
-			((VCardDbObj) vCard).storeToDatabase(statement);
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			statement.executeUpdate();
-
-			ResultSet resultSet = statement.getGeneratedKeys();
-			resultSet.next();
-			vCardId = resultSet.getLong(1);
-			vCard.setId(vCardId);
-		}
-
-		for (VCardPostalInfo postalInfo : vCard.getPostalInfo()) {
-			postalInfo.setVCardId(vCardId);
-			VCardPostalInfoModel.storeToDatabase(postalInfo, connection);
-		}
-
-		return vCardId;
-	}
-
-	public static void storeRegistrarContactToDatabase(List<VCard> vCardList, Long registrarId, Connection connection)
-			throws SQLException {
-		if (vCardList.isEmpty())
-			return;
-
-		try (PreparedStatement statement = connection.prepareStatement(
-				getQueryGroup().getQuery(STORE_ENTITY_CONTACT_QUERY), Statement.RETURN_GENERATED_KEYS);) {
-			for (VCard vCard : vCardList) {
-				statement.setLong(1, registrarId);
-				statement.setLong(2, vCard.getId());
-				logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-				statement.executeUpdate();
-			}
-		}
 	}
 
 	/**

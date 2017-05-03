@@ -1,6 +1,5 @@
 package mx.nic.rdap.sql.objects;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -19,11 +18,4 @@ public interface DatabaseObject {
 	 */
 	public void loadFromDatabase(ResultSet resultSet) throws SQLException;
 
-	/**
-	 * Puts the information contained in the object inside a PreparedStatement
-	 * 
-	 * @param preparedStatement
-	 *            PreparedStatement where all the information is saved
-	 */
-	public void storeToDatabase(PreparedStatement preparedStatement) throws SQLException;
 }

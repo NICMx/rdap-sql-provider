@@ -26,7 +26,6 @@ public class RemarkDescriptionModel {
 	private final static String QUERY_GROUP = "RemarkDescription";
 
 	private static final String GET_QUERY = "getByRemarkId";
-	private static final String INSERT_QUERY = "storeToDatabase";
 
 	private static QueryGroup queryGroup = null;
 
@@ -45,23 +44,6 @@ public class RemarkDescriptionModel {
 
 	private static QueryGroup getQueryGroup() {
 		return queryGroup;
-	}
-
-	public static void storeAllToDatabase(List<RemarkDescription> descriptions, Long remarkInsertedId,
-			Connection connection) throws SQLException {
-		for (RemarkDescription remarkDescription : descriptions) {
-			remarkDescription.setRemarkId(remarkInsertedId);
-			RemarkDescriptionModel.storeToDatabase(remarkDescription, connection);
-		}
-	}
-
-	private static void storeToDatabase(RemarkDescription remarkDescription, Connection connection)
-			throws SQLException {
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(INSERT_QUERY))) {
-			((RemarkDescriptionDbObj) remarkDescription).storeToDatabase(statement);
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			statement.executeUpdate();
-		}
 	}
 
 	/**

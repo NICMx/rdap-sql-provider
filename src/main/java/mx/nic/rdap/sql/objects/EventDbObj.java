@@ -1,9 +1,7 @@
 package mx.nic.rdap.sql.objects;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.Date;
 
 import mx.nic.rdap.core.catalog.EventAction;
@@ -42,19 +40,6 @@ public class EventDbObj extends Event implements DatabaseObject {
 		this.setEventActor(resultSet.getString("eve_actor"));
 		this.setEventDate(new Date(resultSet.getTimestamp("eve_date").getTime()));
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see mx.nic.rdap.core.db.DatabaseObject#storeToDatabase(java.sql.
-	 * PreparedStatement)
-	 */
-	@Override
-	public void storeToDatabase(PreparedStatement preparedStatement) throws SQLException {
-		preparedStatement.setLong(1, this.getEventAction().getId());
-		preparedStatement.setString(2, this.getEventActor());
-		preparedStatement.setTimestamp(3, new Timestamp(this.getEventDate().getTime()));
 	}
 
 }

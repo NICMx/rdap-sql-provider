@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,7 +24,6 @@ public class DsDataModel {
 	private final static Logger logger = Logger.getLogger(DsDataModel.class.getName());
 
 	private final static String QUERY_GROUP = "DsData";
-	private final static String STORE_QUERY = "storeToDatabase";
 	private final static String GET_QUERY = "getBySecureDns";
 
 	private static QueryGroup queryGroup = null;
@@ -45,39 +43,6 @@ public class DsDataModel {
 
 	private static QueryGroup getQueryGroup() {
 		return queryGroup;
-	}
-
-	private static long storeToDatabase(DsData dsData, Connection connection)
-			throws SQLException {
-		String query = getQueryGroup().getQuery(STORE_QUERY);
-		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-			((DsDataDbObj) dsData).storeToDatabase(statement);
-			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
-			statement.executeUpdate();
-			ResultSet resultSet = statement.getGeneratedKeys();
-			resultSet.next();
-			Long dsDataId = resultSet.getLong(1);
-
-			dsData.setId(dsDataId);
-		}
-
-		EventModel.storeDsDataEventsToDatabase(dsData.getEvents(), dsData.getId(), connection);
-		LinkModel.storeDsDataLinksToDatabase(dsData.getLinks(), dsData.getId(), connection);
-
-		return dsData.getId();
-	}
-
-	public static void storeAllToDatabase(List<DsData> dsDataList, Long secureDnsId, Connection connection)
-			throws SQLException {
-		if (dsDataList.isEmpty()) {
-			return;
-		}
-
-		for (DsData dsData : dsDataList) {
-			dsData.setSecureDNSId(secureDnsId);
-			storeToDatabase(dsData, connection);
-		}
-
 	}
 
 	/**

@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +21,6 @@ import mx.nic.rdap.core.db.PublicId;
 import mx.nic.rdap.core.db.VCard;
 import mx.nic.rdap.db.struct.SearchResultStruct;
 import mx.nic.rdap.sql.QueryGroup;
-import mx.nic.rdap.sql.exception.IncompleteObjectException;
 import mx.nic.rdap.sql.objects.EntityDbObj;
 
 /**
@@ -37,7 +35,6 @@ public class EntityModel {
 
 	private static QueryGroup queryGroup = null;
 
-	private final static String STORE_QUERY = "storeToDatabase";
 	private final static String GET_ID_BY_HANDLE_QUERY = "getIdByHandle";
 	private final static String GET_BY_HANDLE_QUERY = "getByHandle";
 
@@ -89,69 +86,6 @@ public class EntityModel {
 		}
 
 		return entId;
-	}
-
-	public static long storeToDatabase(Entity entity, Connection connection) throws SQLException {
-		return storeToDatabase(entity, connection, true);
-	}
-
-	private static long storeToDatabase(Entity entity, Connection connection, boolean isParentEntity)
-			throws SQLException {
-		Long entityId = getIdByHandle(entity.getHandle(), connection);
-		if (entityId != null) {
-			entity.setId(entityId);
-			return entityId;
-		}
-
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_QUERY),
-				Statement.RETURN_GENERATED_KEYS);) {
-			((EntityDbObj) entity).storeToDatabase(statement);
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			statement.executeUpdate();
-
-			ResultSet resultSet = statement.getGeneratedKeys();
-			resultSet.next();
-			entityId = resultSet.getLong(1);
-			entity.setId(entityId);
-		}
-
-		if (isParentEntity && !entity.getRoles().isEmpty()) {
-			RoleModel.storeMainEntityRol(entity, connection);
-		}
-		storeNestedObjects(entity, connection);
-
-		return entityId;
-	}
-
-	private static void isValidForStore(Entity entity) throws IncompleteObjectException {
-		if (entity.getHandle() == null || entity.getHandle().isEmpty())
-			throw new IncompleteObjectException("handle", "Entity");
-	}
-
-	private static void storeNestedObjects(Entity entity, Connection connection) throws SQLException {
-		isValidForStore(entity);
-		storeVcardList(entity, connection);
-
-		PublicIdModel.storePublicIdByEntity(entity.getPublicIds(), entity.getId(), connection);
-		StatusModel.storeEntityStatusToDatabase(entity.getStatus(), entity.getId(), connection);
-		RemarkModel.storeEntityRemarksToDatabase(entity.getRemarks(), entity.getId(), connection);
-		LinkModel.storeEntityLinksToDatabase(entity.getLinks(), entity.getId(), connection);
-		EventModel.storeEntityEventsToDatabase(entity.getEvents(), entity.getId(), connection);
-		for (Entity ent : entity.getEntities()) {
-			storeToDatabase(ent, connection, false);
-		}
-		RoleModel.storeEntityEntityRoles(entity.getEntities(), entity.getId(), connection);
-
-	}
-
-	private static void storeVcardList(Entity entity, Connection connection) throws SQLException {
-		List<VCard> vCardList = entity.getVCardList();
-		if (!vCardList.isEmpty()) {
-			for (VCard vCard : vCardList) {
-				VCardModel.storeToDatabase(vCard, connection);
-			}
-			VCardModel.storeRegistrarContactToDatabase(vCardList, entity.getId(), connection);
-		}
 	}
 
 	public static EntityDbObj getByHandle(String entityHandle, Connection connection) throws SQLException {

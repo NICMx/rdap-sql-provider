@@ -19,45 +19,15 @@ public class SQLProviderConfiguration {
 	// Keys for the configuration file
 	private final static String SCHEMA_KEY = "schema";
 
-	private final static String MIGRATION_SCHEMA_KEY = "migration_schema";
-
-	private final static String DYNAMIC_SCHEMA_KEY = "is_dynamic_schema";
-
-	private final static String SCHEMA_TIMER_KEY = "schema_timer_time";
-
-	private static void commonInit(Properties properties) {
+	public static void initForServer(Properties serverProperties) {
 		init();
 
-		String schemaKey = properties.getProperty(SCHEMA_KEY);
+		String schemaKey = serverProperties.getProperty(SCHEMA_KEY);
 		if (schemaKey != null) {
 			configuration.setProperty(SCHEMA_KEY, schemaKey);
 		}
 
-		String dynamicSchemaKey = properties.getProperty(DYNAMIC_SCHEMA_KEY);
-		if (dynamicSchemaKey != null) {
-			configuration.setProperty(DYNAMIC_SCHEMA_KEY, dynamicSchemaKey);
-		}
-	}
-
-	public static void initForServer(Properties serverProperties) {
-		commonInit(serverProperties);
-
-		String schemaTimer = serverProperties.getProperty(SCHEMA_TIMER_KEY);
-		if (schemaTimer != null) {
-			configuration.setProperty(SCHEMA_TIMER_KEY, schemaTimer);
-		}
-		validateConfigurationForServer();
-	}
-
-	public static void initForMigrator(Properties migratorProperties) {
-		commonInit(migratorProperties);
-
-		String secondSchemaName = migratorProperties.getProperty(MIGRATION_SCHEMA_KEY);
-		if (secondSchemaName != null) {
-			configuration.setProperty(MIGRATION_SCHEMA_KEY, secondSchemaName);
-		}
-
-		validateConfigurationForMigrator();
+		validateRequiredProperty(SCHEMA_KEY);
 	}
 
 	private static void init() {
@@ -73,45 +43,6 @@ public class SQLProviderConfiguration {
 		configuration = p;
 	}
 
-	private static void commonValidation() {
-		validateRequiredProperty(SCHEMA_KEY);
-		validateRequiredProperty(DYNAMIC_SCHEMA_KEY);
-		validateBooleanValue(DYNAMIC_SCHEMA_KEY, configuration.getProperty(DYNAMIC_SCHEMA_KEY));
-	}
-
-	private static void validateConfigurationForServer() {
-		commonValidation();
-		if (isDynamicSchemaOn()) {
-			validateRequiredProperty(SCHEMA_TIMER_KEY);
-			validateLongValue(SCHEMA_TIMER_KEY, configuration.getProperty(SCHEMA_TIMER_KEY));
-		}
-
-	}
-
-	private static void validateConfigurationForMigrator() {
-		commonValidation();
-		validateRequiredProperty(MIGRATION_SCHEMA_KEY);
-		if (getDefaultSchema().equalsIgnoreCase(getMigrationSchema())) {
-			throw new InvalidConfigurationException(SCHEMA_KEY + " and " + MIGRATION_SCHEMA_KEY
-					+ "have the same values, please provide diferent schema names");
-		}
-	}
-
-	private static void validateLongValue(String key, String longValue) {
-		try {
-			Long.parseLong(longValue);
-		} catch (NumberFormatException e) {
-			throw new InvalidConfigurationException("Invalid value in " + key, e);
-		}
-	}
-
-	private static void validateBooleanValue(String key, String booleanValue) {
-		String bValue = booleanValue.toUpperCase();
-		if (!(bValue.equals("TRUE") || bValue.equals("FALSE"))) {
-			throw new InvalidConfigurationException("Invalid boolean value '" + key + "' : " + booleanValue);
-		}
-	}
-
 	private static void validateRequiredProperty(String key) {
 		if (configuration.getProperty(key) == null) {
 			throw new InvalidConfigurationException("Required property not found : " + key);
@@ -120,18 +51,6 @@ public class SQLProviderConfiguration {
 
 	public static String getDefaultSchema() {
 		return configuration.getProperty(SCHEMA_KEY).trim();
-	}
-
-	public static String getMigrationSchema() {
-		return configuration.getProperty(MIGRATION_SCHEMA_KEY).trim();
-	}
-
-	public static Boolean isDynamicSchemaOn() {
-		return Boolean.parseBoolean(configuration.getProperty(DYNAMIC_SCHEMA_KEY));
-	}
-
-	public static long getSchemaTimer() {
-		return Long.parseLong(configuration.getProperty(SCHEMA_TIMER_KEY));
 	}
 
 }

@@ -1,6 +1,5 @@
 package mx.nic.rdap.sql.objects;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -40,20 +39,6 @@ public class RemarkDescriptionDbObj extends RemarkDescription implements Databas
 		int rdeOrder = resultSet.getInt("rde_order");
 		if (!resultSet.wasNull())
 			this.setOrder(rdeOrder);
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see mx.nic.rdap.core.db.DatabaseObject#storeToDatabase(java.sql.
-	 * PreparedStatement)
-	 */
-	@Override
-	public void storeToDatabase(PreparedStatement preparedStatement) throws SQLException {
-		preparedStatement.setInt(1, this.getOrder());
-		preparedStatement.setLong(2, this.getRemarkId());
-		preparedStatement.setString(3, this.getDescription());
-
 	}
 
 }

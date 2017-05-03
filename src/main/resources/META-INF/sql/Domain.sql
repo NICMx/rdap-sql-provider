@@ -1,9 +1,3 @@
-#storeToDatabase
-INSERT INTO {schema}.domain(dom_handle,dom_ldh_name,dom_unicode_name,dom_port43,zone_id) VALUES (?,?,?,?,?);
-
-#updateInDatabase
-UPDATE {schema}.domain SET dom_ldh_name=?,dom_unicode_name=?,dom_port43=?,zone_id=? WHERE dom_id=?;
-
 #getByLdhName
 SELECT * FROM {schema}.domain WHERE (dom_ldh_name=? OR dom_unicode_name=?) AND zone_id = ?;
 
@@ -36,12 +30,6 @@ SELECT EXISTS(SELECT 1 FROM {schema}.domain dom JOIN {schema}.domain_nameservers
 
 #existByNsIp
 SELECT EXISTS(SELECT 1 FROM {schema}.domain dom JOIN {schema}.domain_nameservers dom_ns ON dom_ns.dom_id = dom.dom_id JOIN {schema}.nameserver ns ON ns.nse_id = dom_ns.nse_id JOIN {schema}.ip_address ip	ON ip.nse_id = ns.nse_id WHERE IF(?=4, INET_ATON(?),INET6_ATON(?)) = ip.iad_value);
-
-#storeDomainIpNetworkRelation
-INSERT INTO {schema}.domain_networks VALUES (?, ?);
-
-#deleteDomainIpNetworkRelation
-DELETE FROM {schema}.domain_networks WHERE dom_id=?;
 
 #searchByRegexNameWithZone
 SELECT DISTINCT(d.dom_id), d.dom_handle, d.dom_ldh_name, d.dom_port43, d.zone_id, d.dom_unicode_name FROM {schema}.domain d JOIN {schema}.zone z on d.zone_id = z.zone_id AND z.zone_id IN (?) WHERE (d.dom_ldh_name REGEXP ? OR d.dom_unicode_name REGEXP ?) AND z.zone_name REGEXP ? LIMIT ?;

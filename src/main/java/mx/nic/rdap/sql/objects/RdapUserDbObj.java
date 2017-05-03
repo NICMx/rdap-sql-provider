@@ -1,6 +1,5 @@
 package mx.nic.rdap.sql.objects;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -37,22 +36,6 @@ public class RdapUserDbObj extends RdapUser implements DatabaseObject {
 		this.setName(resultSet.getString("rus_name"));
 		this.setPass(resultSet.getString("rus_pass"));
 		this.setMaxSearchResults(resultSet.getInt("rus_max_search_results"));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see mx.nic.rdap.server.db.DatabaseObject#storeToDatabase(java.sql.
-	 * PreparedStatement)
-	 */
-	@Override
-	public void storeToDatabase(PreparedStatement preparedStatement) throws SQLException {
-		preparedStatement.setString(1, this.getName());
-		preparedStatement.setString(2, this.getPass());
-		if (this.getMaxSearchResults() != null)
-			preparedStatement.setInt(3, this.getMaxSearchResults());
-		else
-			preparedStatement.setNull(3, java.sql.Types.INTEGER);
 	}
 
 }

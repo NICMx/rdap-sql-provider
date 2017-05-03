@@ -8,7 +8,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -16,9 +15,6 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.Domain;
 import mx.nic.rdap.core.db.DomainLabel;
-import mx.nic.rdap.core.db.Entity;
-import mx.nic.rdap.core.db.IpNetwork;
-import mx.nic.rdap.core.db.Nameserver;
 import mx.nic.rdap.core.ip.IpAddressFormatException;
 import mx.nic.rdap.core.ip.IpUtils;
 import mx.nic.rdap.db.exception.http.BadRequestException;
@@ -26,10 +22,8 @@ import mx.nic.rdap.db.exception.http.NotFoundException;
 import mx.nic.rdap.db.struct.SearchResultStruct;
 import mx.nic.rdap.sql.QueryGroup;
 import mx.nic.rdap.sql.Util;
-import mx.nic.rdap.sql.exception.IncompleteObjectException;
 import mx.nic.rdap.sql.objects.DomainDbObj;
 import mx.nic.rdap.sql.objects.IpAddressDbObj;
-import mx.nic.rdap.sql.objects.IpNetworkDbObj;
 
 /**
  * Model for the {@link Domain} Object
@@ -42,9 +36,7 @@ public class DomainModel {
 	private final static String QUERY_GROUP = "Domain";
 
 	private static QueryGroup queryGroup = null;
-	private static final String STORE_QUERY = "storeToDatabase";
 
-	private static final String STORE_IP_NETWORK_RELATION_QUERY = "storeDomainIpNetworkRelation";
 	private static final String GET_BY_LDH_QUERY = "getByLdhName";
 	private static final String SEARCH_BY_PARTIAL_NAME_WITH_PARTIAL_ZONE_QUERY = "searchByPartialNameWPartialZone";
 	private static final String SEARCH_BY_NAME_WITH_PARTIAL_ZONE_QUERY = "searchByNameWPartialZone";
@@ -74,109 +66,6 @@ public class DomainModel {
 
 	private static QueryGroup getQueryGroup() {
 		return queryGroup;
-	}
-
-	public static Long storeToDatabase(Domain domain, boolean useNameserverAsAttribute, Connection connection)
-			throws SQLException {
-		String query = getQueryGroup().getQuery(STORE_QUERY);
-		Long domainId;
-		isValidForStore((DomainDbObj) domain);
-		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-			((DomainDbObj) domain).storeToDatabase(statement);
-			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
-			statement.executeUpdate();
-			ResultSet resultSet = statement.getGeneratedKeys();
-			resultSet.next();
-			domainId = resultSet.getLong(1);
-			domain.setId(domainId);
-		}
-
-		storeNestedObjects(domain, useNameserverAsAttribute, connection);
-		return domainId;
-	}
-
-	private static void storeNestedObjects(Domain domain, boolean useNameserverAsAttribute, Connection connection)
-			throws SQLException {
-		Long domainId = domain.getId();
-		RemarkModel.storeDomainRemarksToDatabase(domain.getRemarks(), domainId, connection);
-		EventModel.storeDomainEventsToDatabase(domain.getEvents(), domainId, connection);
-		StatusModel.storeDomainStatusToDatabase(domain.getStatus(), domainId, connection);
-		LinkModel.storeDomainLinksToDatabase(domain.getLinks(), domainId, connection);
-		if (domain.getSecureDNS() != null) {
-			domain.getSecureDNS().setDomainId(domainId);
-			SecureDNSModel.storeToDatabase(domain.getSecureDNS(), connection);
-		}
-		PublicIdModel.storePublicIdByDomain(domain.getPublicIds(), domain.getId(), connection);
-		VariantModel.storeAllToDatabase(domain.getVariants(), domain.getId(), connection);
-
-		if (domain.getNameServers().size() > 0) {
-			if (useNameserverAsAttribute) {
-				NameserverModel.storeDomainNameserversAsAttributesToDatabase(domain.getNameServers(), domainId,
-						connection);
-			} else {
-				storeDomainNameserversAsObjects(domain.getNameServers(), domainId, connection);
-			}
-
-		}
-		storeDomainEntities(domain.getEntities(), domainId, connection);
-		IpNetwork ipNetwork = domain.getIpNetwork();
-		if (ipNetwork != null) {
-			IpNetworkDbObj ipNetResult = IpNetworkModel.getByHandle(ipNetwork.getHandle(), connection);
-			if (ipNetResult == null) {
-				throw new NullPointerException(
-						"IpNetwork: " + ipNetwork.getHandle() + "was not inserted previously to the database");
-			}
-			ipNetwork.setId(ipNetResult.getId());
-
-			storeDomainIpNetworkRelationToDatabase(domainId, ipNetwork.getId(), connection);
-		}
-	}
-
-	private static void storeDomainNameserversAsObjects(List<Nameserver> nameservers, Long domainId,
-			Connection connection) throws SQLException {
-		if (nameservers.size() > 0) {
-			validateDomainNameservers(nameservers, connection);
-			NameserverModel.storeDomainNameserversToDatabase(nameservers, domainId, connection);
-		}
-	}
-
-	private static void validateDomainNameservers(List<Nameserver> nameservers, Connection connection)
-			throws SQLException {
-		for (Nameserver ns : nameservers) {
-			Long nsId = NameserverModel.getByHandle(ns.getHandle(), connection).getId();
-			if (nsId == null) {
-				throw new NullPointerException(
-						"Nameserver: " + ns.getHandle() + "was not inserted previously to the database.");
-			}
-			ns.setId(nsId);
-		}
-	}
-
-	private static void storeDomainEntities(List<Entity> entities, Long domainId, Connection connection)
-			throws SQLException {
-		if (entities.size() > 0) {
-			EntityModel.validateParentEntities(entities, connection);
-			RoleModel.storeDomainEntityRoles(entities, domainId, connection);
-		}
-
-	}
-
-	private static void isValidForStore(DomainDbObj domain) throws IncompleteObjectException {
-		if (domain.getHandle() == null || domain.getHandle().isEmpty())
-			throw new IncompleteObjectException("handle", "Domain");
-		if (domain.getLdhName() == null || domain.getLdhName().isEmpty())
-			throw new IncompleteObjectException("ldhName", "Domain");
-	}
-
-	private static void storeDomainIpNetworkRelationToDatabase(Long domainId, Long ipNetworkId, Connection connection)
-			throws SQLException {
-		String query = getQueryGroup().getQuery(STORE_IP_NETWORK_RELATION_QUERY);
-		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setLong(1, domainId);
-			statement.setLong(2, ipNetworkId);
-			logger.log(Level.INFO, "Excuting QUERY:" + statement.toString());
-			statement.executeUpdate();
-		}
 	}
 
 	public static DomainDbObj findByLdhName(String name, Integer zoneId, boolean useNameserverAsDomainAttribute,

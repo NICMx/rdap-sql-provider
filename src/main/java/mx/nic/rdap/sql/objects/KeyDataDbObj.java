@@ -1,6 +1,5 @@
 package mx.nic.rdap.sql.objects;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -42,21 +41,6 @@ public class KeyDataDbObj extends KeyData implements DatabaseObject {
 		this.setPublicKey(resultSet.getString("kd_public_key"));
 		this.setAlgorithm(resultSet.getInt("kd_algorithm"));
 		this.setSecureDNSId(resultSet.getLong("sdns_id"));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see mx.nic.rdap.server.db.DatabaseObject#storeToDatabase(java.sql.
-	 * PreparedStatement)
-	 */
-	@Override
-	public void storeToDatabase(PreparedStatement preparedStatement) throws SQLException {
-		preparedStatement.setLong(1, this.getSecureDNSId());
-		preparedStatement.setInt(2, this.getFlags());
-		preparedStatement.setInt(3, this.getProtocol());
-		preparedStatement.setString(4, this.getPublicKey());
-		preparedStatement.setInt(5, this.getAlgorithm());
 	}
 
 }

@@ -1,11 +1,8 @@
 package mx.nic.rdap.sql.objects;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Types;
 
-import mx.nic.rdap.core.db.DomainLabel;
 import mx.nic.rdap.core.db.Nameserver;
 
 /**
@@ -46,30 +43,6 @@ public class NameserverDbObj extends Nameserver implements DatabaseObject {
 		} else
 			this.setUnicodeName(resultSet.getString("nse_unicode_name"));
 		this.setPort43(resultSet.getString("nse_port43"));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see mx.nic.rdap.core.db.DatabaseObject#storeToDatabase(java.sql.
-	 * PreparedStatement)
-	 */
-	@Override
-	public void storeToDatabase(PreparedStatement preparedStatement) throws SQLException {
-		preparedStatement.setString(1, this.getHandle());
-
-		String nsName = this.getLdhName();
-		String ldhName = DomainLabel.nameToASCII(nsName);
-		String unicodeName = DomainLabel.nameToUnicode(nsName);
-		if (ldhName.equals(unicodeName)) {
-			preparedStatement.setString(2, ldhName);
-			preparedStatement.setNull(3, Types.VARCHAR);
-		} else {
-			preparedStatement.setString(2, ldhName);
-			preparedStatement.setString(3, unicodeName);
-		}
-
-		preparedStatement.setString(4, this.getPort43());
 	}
 
 }

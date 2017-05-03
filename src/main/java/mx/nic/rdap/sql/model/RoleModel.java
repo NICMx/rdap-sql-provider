@@ -12,7 +12,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mx.nic.rdap.core.catalog.Role;
-import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.sql.QueryGroup;
 
 /**
@@ -23,14 +22,7 @@ public class RoleModel {
 
 	private final static Logger logger = Logger.getLogger(RoleModel.class.getName());
 
-	private final static String QUERY_GROUP = "Rol";
-
-	private static final String DOMAIN_STORE_QUERY = "storeDomainsEntityRol";
-	private static final String ENTITY_STORE_QUERY = "storeEntitiesEntityRol";
-	private static final String NAMESERVER_STORE_QUERY = "storeNSEntityRol";
-	private static final String AUTNUM_STORE_QUERY = "storeAutnumEntityRol";
-	private static final String IP_NETWORK_STORE_ROLES = "storeIpNetworkEntityRol";
-	private static final String MAIN_ENTITY_STORE_QUERY = "storeMainEntityRole";
+	private final static String QUERY_GROUP = "Role";
 
 	private static final String DOMAIN_GET_QUERY = "getDomainRol";
 	private static final String ENTITY_GET_QUERY = "getEntityRol";
@@ -106,67 +98,6 @@ public class RoleModel {
 		}
 
 		return roles;
-	}
-
-	public static void storeEntityEntityRoles(List<Entity> entities, Long entityId, Connection connection)
-			throws SQLException {
-		storeEntitiesRoles(entities, entityId, connection, ENTITY_STORE_QUERY);
-	}
-
-	public static void storeNameserverEntityRoles(List<Entity> entities, Long nsId, Connection connection)
-			throws SQLException {
-		storeEntitiesRoles(entities, nsId, connection, NAMESERVER_STORE_QUERY);
-	}
-
-	public static void storeDomainEntityRoles(List<Entity> entities, Long domainId, Connection connection)
-			throws SQLException {
-		storeEntitiesRoles(entities, domainId, connection, DOMAIN_STORE_QUERY);
-	}
-
-	public static void storeAutnumEntityRoles(List<Entity> entities, Long autnumId, Connection connection)
-			throws SQLException {
-		storeEntitiesRoles(entities, autnumId, connection, AUTNUM_STORE_QUERY);
-	}
-
-	public static void storeIpNetworkEntityRoles(List<Entity> entities, Long ipNetworkId, Connection connection)
-			throws SQLException {
-		storeEntitiesRoles(entities, ipNetworkId, connection, IP_NETWORK_STORE_ROLES);
-	}
-
-	private static void storeEntitiesRoles(List<Entity> entities, Long ownerId, Connection connection,
-			String storeQuery) throws SQLException {
-		if (entities.isEmpty())
-			return;
-
-		String query = getQueryGroup().getQuery(storeQuery);
-
-		try (PreparedStatement statement = connection.prepareStatement(query);) {
-			statement.setLong(1, ownerId);
-			for (Entity entity : entities) {
-				statement.setLong(2, entity.getId());
-				for (Role role : entity.getRoles()) {
-					statement.setLong(3, role.getId());
-					logger.log(Level.INFO, "Executing QUERY" + statement.toString());
-					statement.execute();
-				}
-			}
-		}
-	}
-
-	public static void storeMainEntityRol(Entity mainEntity, Connection connection) throws SQLException {
-		if (mainEntity.getRoles().isEmpty()) {
-			return;
-		}
-
-		String query = getQueryGroup().getQuery(MAIN_ENTITY_STORE_QUERY);
-		try (PreparedStatement statement = connection.prepareStatement(query);) {
-			statement.setLong(1, mainEntity.getId());
-			for (Role role : mainEntity.getRoles()) {
-				statement.setInt(2, role.getId());
-				logger.log(Level.INFO, "Executing QUERY" + statement.toString());
-				statement.execute();
-			}
-		}
 	}
 
 	public static List<Role> getMainEntityRol(Long entId, Connection connection) throws SQLException {

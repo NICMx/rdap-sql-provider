@@ -1,6 +1,3 @@
-#storeToDatabase
-INSERT INTO {schema}.link VALUES(null,?,?,?,?,?,?);
-
 #getAll
 SELECT lin.* FROM {schema}.link lin ORDER BY 1 ASC;
 
@@ -28,38 +25,9 @@ SELECT lin.* FROM {schema}.link lin JOIN {schema}.ip_network_links ine ON ine.li
 #getByKeyDataId
 SELECT lin.* FROM {schema}.link lin JOIN {schema}.key_links kdl ON kdl.lin_id=lin.lin_id WHERE kdl.kd_id=?;
 
-#storeNameserverLinksToDatabase
-INSERT INTO {schema}.nameserver_links VALUES(?,?);
-
-#storeEventLinksToDatabase
-INSERT INTO {schema}.event_links VALUES(?,?);
-
-#storeRemarkLinksToDatabase
-INSERT INTO {schema}.remark_links VALUES(?,?);
-
 #getByRemarkId
 SELECT lin.* FROM {schema}.link lin JOIN {schema}.remark_links rem ON rem.lin_id=lin.lin_id WHERE rem.rem_id=?;
-
-#storeDsDataLinksToDatabase
-INSERT INTO {schema}.ds_links VALUES(?,?);
-
-#storeDomainLinksToDatabase
-INSERT INTO {schema}.domain_links VALUES (?,?);
-
-#storeEntityLinksToDatabase
-INSERT INTO {schema}.entity_links VALUES(?,?);
-
-#storeAutnumLinksToDatabase
-INSERT INTO {schema}.asn_links VALUES(?,?);
-
-#storeIpNetworkLinksToDatabase
-INSERT INTO {schema}.ip_network_links VALUES (?, ?);
-
-#storeKeyDataLinksToDatabase
-INSERT INTO {schema}.key_links VALUES(?,?);
 
 #getLinkHreflangs
 SELECT lan_hreflang FROM {schema}.link_lang lan WHERE lan.lin_id = ?;
 
-#storeLinkHreflangs
-INSERT INTO {schema}.link_lang VALUES (?,?);

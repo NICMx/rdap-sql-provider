@@ -1,6 +1,5 @@
 package mx.nic.rdap.sql.objects;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -39,18 +38,6 @@ public class VariantDbObj extends Variant implements DatabaseObject {
 		this.setId(resultSet.getLong("var_id"));
 		this.setIdnTable(resultSet.getString("var_idn_table"));
 		this.setDomainId(resultSet.getLong("dom_id"));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see mx.nic.rdap.server.db.DatabaseObject#storeToDatabase(java.sql.
-	 * PreparedStatement)
-	 */
-	@Override
-	public void storeToDatabase(PreparedStatement preparedStatement) throws SQLException {
-		preparedStatement.setString(1, this.getIdnTable());
-		preparedStatement.setLong(2, this.getDomainId());
 	}
 
 }

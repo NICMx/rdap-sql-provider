@@ -9,22 +9,16 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import mx.nic.rdap.core.catalog.IpVersion;
-import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.IpNetwork;
 import mx.nic.rdap.core.ip.AddressBlock;
-import mx.nic.rdap.core.ip.IpAddressFormatException;
 import mx.nic.rdap.sql.IpUtils;
 import mx.nic.rdap.sql.QueryGroup;
-import mx.nic.rdap.sql.exception.IncompleteObjectException;
-import mx.nic.rdap.sql.exception.InvalidObjectException;
 import mx.nic.rdap.sql.objects.IpNetworkDbObj;
 
 /**
@@ -41,7 +35,6 @@ public class IpNetworkModel {
 
 	private static final String GET_BY_IPV4 = "getByIPv4";
 	private static final String GET_BY_IPV6 = "getByIPv6";
-	private static final String STORE_TO_DATABASE = "storeToDatabase";
 	private static final String GET_BY_ENTITY_ID = "getByEntityId";
 	private static final String GET_BY_DOMAIN_ID = "getByDomainId";
 	private static final String GET_BY_HANDLE = "getByHandle";
@@ -61,84 +54,6 @@ public class IpNetworkModel {
 
 	private static QueryGroup getQueryGroup() {
 		return queryGroup;
-	}
-
-	private static void isValidForStore(IpNetwork ipNetwork) throws InvalidObjectException {
-		if (ipNetwork.getHandle() == null)
-			throw new IncompleteObjectException("handle", "IpNetwork");
-
-		if (ipNetwork.getStartAddress() == null) {
-			throw new IncompleteObjectException("startAddress", "IpNetwork");
-		}
-
-		if (ipNetwork.getEndAddress() == null) {
-			throw new IncompleteObjectException("endAddress", "IpNetwork");
-		}
-
-		if (ipNetwork.getIpVersion() == null) {
-			throw new IncompleteObjectException("ipVersion", "IpNetwork");
-		}
-
-		if (ipNetwork.getIpVersion() == IpVersion.V4) {
-			if (ipNetwork.getStartAddress() instanceof Inet6Address
-					|| ipNetwork.getEndAddress() instanceof Inet6Address) {
-				throw new RuntimeException("IP version doesn't match with the IpVersion set to the object");
-			}
-		} else {
-			if (ipNetwork.getStartAddress() instanceof Inet4Address
-					|| ipNetwork.getEndAddress() instanceof Inet4Address) {
-				throw new RuntimeException("IP version doesn't match with the IpVersion set to the object");
-			}
-
-		}
-
-		AddressBlock block;
-		try {
-			block = new AddressBlock(ipNetwork.getStartAddress(), ipNetwork.getPrefix());
-		} catch (IpAddressFormatException e) {
-			throw new InvalidObjectException(e.getMessage(), e);
-		}
-		if (!block.getLastAddress().equals(ipNetwork.getEndAddress())) {
-			throw new InvalidObjectException(ipNetwork.getEndAddress() + " is not the last address of " + block);
-		}
-	}
-
-	public static Long storeToDatabase(IpNetwork ipNetwork, Connection connection) throws SQLException {
-		isValidForStore(ipNetwork);
-		String query = getQueryGroup().getQuery(STORE_TO_DATABASE);
-
-		Long resultId = null;
-		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);) {
-			((IpNetworkDbObj) ipNetwork).storeToDatabase(statement);
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			statement.executeUpdate();
-
-			ResultSet resultSet = statement.getGeneratedKeys();
-			resultSet.next();
-			resultId = resultSet.getLong(1);
-			ipNetwork.setId(resultId);
-		}
-
-		storeNestedObjects(ipNetwork, connection);
-
-		return resultId;
-	}
-
-	private static void storeNestedObjects(IpNetwork ipNetwork, Connection connection) throws SQLException {
-		StatusModel.storeIpNetworkStatusToDatabase(ipNetwork.getStatus(), ipNetwork.getId(), connection);
-		RemarkModel.storeIpNetworkRemarksToDatabase(ipNetwork.getRemarks(), ipNetwork.getId(), connection);
-		LinkModel.storeIpNetworkLinksToDatabase(ipNetwork.getLinks(), ipNetwork.getId(), connection);
-		EventModel.storeIpNetworkEventsToDatabase(ipNetwork.getEvents(), ipNetwork.getId(), connection);
-		for (Entity ent : ipNetwork.getEntities()) {
-			Long entId = EntityModel.getIdByHandle(ent.getHandle(), connection);
-			if (entId == null) {
-				throw new NullPointerException(
-						"Entity: " + ent.getHandle() + "was not inserted previously to the database");
-			}
-			ent.setId(entId);
-		}
-		RoleModel.storeIpNetworkEntityRoles(ipNetwork.getEntities(), ipNetwork.getId(), connection);
-
 	}
 
 	private static void loadNestedObjects(IpNetwork ipNetwork, Connection connection) throws SQLException {

@@ -1,6 +1,5 @@
 package mx.nic.rdap.sql.objects;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -40,18 +39,6 @@ public class EntityDbObj extends Entity implements DatabaseObject {
 		setHandle(resultSet.getString("ent_handle"));
 		setPort43(resultSet.getString("ent_port43"));
 
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see mx.nic.rdap.core.db.DatabaseObject#storeToDatabase(java.sql.
-	 * PreparedStatement)
-	 */
-	@Override
-	public void storeToDatabase(PreparedStatement preparedStatement) throws SQLException {
-		preparedStatement.setString(1, getHandle());
-		preparedStatement.setString(2, getPort43());
 	}
 
 }

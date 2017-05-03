@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,9 +27,6 @@ public class VariantModel {
 	private final static Logger logger = Logger.getLogger(VariantModel.class.getName());
 
 	private final static String QUERY_GROUP = "Variant";
-	private static final String STORE_QUERY = "storeToDatabase";
-	private static final String STORE_RELATION_QUERY = "storeVariantRelation";
-	private static final String STORE_NAMES_QUERY = "storeVariantNames";
 	private static final String GET_BY_DOMAIN_QUERY = "getByDomainId";
 	private static final String GET_RELATION_BY_VARIANT_QUERY = "getVariantRelationsByVariantId";
 	private static final String GET_NAMES_BY_VARIANT_QUERY = "getVariantNamesByVariantId";
@@ -52,33 +48,6 @@ public class VariantModel {
 
 	private static QueryGroup getQueryGroup() {
 		return queryGroup;
-	}
-
-	public static void storeAllToDatabase(List<Variant> variants, Long domainId, Connection connection)
-			throws SQLException {
-		for (Variant variant : variants) {
-			variant.setDomainId(domainId);
-			VariantModel.storeToDatabase(variant, connection);
-		}
-	}
-
-	private static Long storeToDatabase(Variant variant, Connection connection) throws SQLException {
-		Long variantInsertedId = null;
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_QUERY),
-				Statement.RETURN_GENERATED_KEYS)) {
-			((VariantDbObj) variant).storeToDatabase(statement);
-			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
-			statement.executeUpdate();
-			ResultSet resultSet = statement.getGeneratedKeys();
-			resultSet.next();
-			variantInsertedId = resultSet.getLong(1);
-			variant.setId(variantInsertedId);
-		}
-
-		storeVariantNames(variant, connection);
-		storeVariantRelations(variant, connection);
-
-		return variantInsertedId;
 	}
 
 	public static List<Variant> getByDomainId(Long domainId, Connection connection) throws SQLException {
@@ -134,37 +103,6 @@ public class VariantModel {
 					relations.add(VariantRelation.getById(resultSet.getInt("rel_id")));
 				} while (resultSet.next());
 				return;
-			}
-		}
-	}
-
-	private static void storeVariantRelations(Variant variant, Connection connection) throws SQLException {
-		if (variant.getRelations().isEmpty())
-			return;
-
-		Long variantId = variant.getId();
-		try (PreparedStatement statement = connection
-				.prepareStatement(getQueryGroup().getQuery(STORE_RELATION_QUERY))) {
-			for (VariantRelation relation : variant.getRelations()) {
-				statement.setInt(1, relation.getId());
-				statement.setLong(2, variantId);
-				logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
-				statement.executeUpdate();
-			}
-		}
-	}
-
-	private static void storeVariantNames(Variant variant, Connection connection) throws SQLException {
-		if (variant.getVariantNames().isEmpty())
-			return;
-
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_NAMES_QUERY))) {
-			Long variantId = variant.getId();
-			for (VariantName variantName : variant.getVariantNames()) {
-				statement.setString(1, variantName.getLdhName());
-				statement.setLong(2, variantId);
-				logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-				statement.executeUpdate();
 			}
 		}
 	}

@@ -9,8 +9,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mx.nic.rdap.sql.QueryGroup;
-import mx.nic.rdap.sql.exception.IncompleteObjectException;
-import mx.nic.rdap.sql.exception.InvalidObjectException;
 import mx.nic.rdap.sql.objects.RdapUserRoleDbObj;
 
 /**
@@ -21,7 +19,6 @@ public class RdapUserRoleModel {
 	private final static Logger logger = Logger.getLogger(RdapUserRoleModel.class.getName());
 
 	private final static String QUERY_GROUP = "RdapUserRole";
-	private final static String STORE_QUERY = "storeToDatabase";
 	private final static String GET_QUERY = "getByUserName";
 	private static QueryGroup queryGroup = null;
 
@@ -40,27 +37,6 @@ public class RdapUserRoleModel {
 
 	private static QueryGroup getQueryGroup() {
 		return queryGroup;
-	}
-
-	/**
-	 * Validate the required attributes for the rdapUserRole
-	 */
-	private static void isValidForStore(RdapUserRoleDbObj userRole) throws InvalidObjectException {
-		if (userRole.getUserName() == null || userRole.getUserName().isEmpty())
-			throw new IncompleteObjectException("userName", "RdapUserRole");
-		if (userRole.getRoleName() == null || userRole.getRoleName().isEmpty())
-			throw new IncompleteObjectException("roleName", "RdapUserRole");
-	}
-
-	public static void storeRdapUserRoleToDatabase(RdapUserRoleDbObj userRole, Connection connection)
-			throws SQLException {
-		isValidForStore(userRole);
-		String query = getQueryGroup().getQuery(STORE_QUERY);
-		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			userRole.storeToDatabase(statement);
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			statement.executeUpdate();
-		}
 	}
 
 	public static RdapUserRoleDbObj getByUserName(String userName, Connection connection) throws SQLException {

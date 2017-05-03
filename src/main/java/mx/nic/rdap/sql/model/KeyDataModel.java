@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +20,6 @@ public class KeyDataModel {
 	private final static Logger logger = Logger.getLogger(KeyDataModel.class.getName());
 
 	private final static String QUERY_GROUP = "KeyData";
-	private final static String STORE_QUERY = "storeToDatabase";
 	private final static String GET_QUERY = "getBySecureDns";
 
 	private static QueryGroup queryGroup = null;
@@ -41,38 +39,6 @@ public class KeyDataModel {
 
 	private static QueryGroup getQueryGroup() {
 		return queryGroup;
-	}
-
-	private static long storeToDatabase(KeyData keyData, Connection connection) throws SQLException {
-		String query = getQueryGroup().getQuery(STORE_QUERY);
-		try (PreparedStatement statement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-			((KeyDataDbObj) keyData).storeToDatabase(statement);
-			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
-			statement.executeUpdate();
-			ResultSet resultSet = statement.getGeneratedKeys();
-			resultSet.next();
-			Long keyDataId = resultSet.getLong(1);
-
-			keyData.setId(keyDataId);
-		}
-
-		EventModel.storeKeyDataEventsToDatabase(keyData.getEvents(), keyData.getId(), connection);
-		LinkModel.storeKeyDataLinksToDatabase(keyData.getLinks(), keyData.getId(), connection);
-
-		return keyData.getId();
-	}
-
-	public static void storeAllToDatabase(List<KeyData> keyDataList, Long secureDnsId, Connection connection)
-			throws SQLException {
-		if (keyDataList.isEmpty()) {
-			return;
-		}
-
-		for (KeyData keyData : keyDataList) {
-			keyData.setSecureDNSId(secureDnsId);
-			storeToDatabase(keyData, connection);
-		}
-
 	}
 
 	/**

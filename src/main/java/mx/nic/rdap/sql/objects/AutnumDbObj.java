@@ -1,6 +1,5 @@
 package mx.nic.rdap.sql.objects;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -43,23 +42,6 @@ public class AutnumDbObj extends Autnum implements DatabaseObject {
 		this.setType(resultSet.getString("asn_type"));
 		this.setPort43(resultSet.getString("asn_port43"));
 		this.setCountry(CountryCodeModel.getCountryNameById(resultSet.getInt("ccd_id")));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * mx.nic.rdap.db.DatabaseObject#storeToDatabase(java.sql.PreparedStatement)
-	 */
-	@Override
-	public void storeToDatabase(PreparedStatement preparedStatement) throws SQLException {
-		preparedStatement.setString(1, this.getHandle());
-		preparedStatement.setLong(2, this.getStartAutnum());
-		preparedStatement.setLong(3, this.getEndAutnum());
-		preparedStatement.setString(4, this.getName());
-		preparedStatement.setString(5, this.getType());
-		preparedStatement.setString(6, this.getPort43());
-		preparedStatement.setInt(7, CountryCodeModel.getIdByCountryName(this.getCountryCode()));
 	}
 
 }

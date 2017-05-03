@@ -8,7 +8,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,7 +29,6 @@ public class ZoneModel {
 
 	private final static String QUERY_GROUP = "Zone";
 	private final static String GET_ALL_QUERY = "getAll";
-	private final static String STORE_QUERY = "storeToDatabase";
 
 	private static QueryGroup queryGroup = null;
 
@@ -135,29 +133,6 @@ public class ZoneModel {
 			idByZone.put(zoneName, zoneId);
 		} while (rs.next());
 
-	}
-
-	public static Integer storeToDatabase(String zoneName, Connection connection) throws SQLException {
-		Integer idByZoneName = getIdByZoneName(zoneName);
-
-		if (idByZoneName != null) {
-			return idByZoneName;
-		}
-
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_QUERY),
-				Statement.RETURN_GENERATED_KEYS)) {
-			statement.setString(1, zoneName);
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			statement.executeUpdate();
-			ResultSet resultSet = statement.getGeneratedKeys();
-			resultSet.next();
-			// Inserted Zone's Id
-			Integer zoneId = resultSet.getInt(1);
-			zoneById.put(zoneId, zoneName);
-			idByZone.put(zoneName, zoneId);
-
-			return zoneId;
-		}
 	}
 
 	/**

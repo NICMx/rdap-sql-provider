@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,7 +22,6 @@ public class IpAddressModel {
 	private final static Logger logger = Logger.getLogger(IpAddressModel.class.getName());
 
 	private final static String QUERY_GROUP = "IpAddress";
-	private static final String STORE_QUERY = "storeToDatabase";
 	private static final String GET_QUERY = "getByNameserverId";
 
 	private static QueryGroup queryGroup = null;
@@ -43,33 +41,6 @@ public class IpAddressModel {
 
 	private static QueryGroup getQueryGroup() {
 		return queryGroup;
-	}
-
-	public static void storeToDatabase(NameserverIpAddressesStruct struct, long nameserverId, Connection connection)
-			throws SQLException {
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(STORE_QUERY),
-				Statement.RETURN_GENERATED_KEYS)) {
-			for (IpAddress addressV4 : struct.getIpv4Adresses()) {
-				addressV4.setNameserverId(nameserverId);
-				((IpAddressDbObj) addressV4).storeToDatabase(statement);
-				logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-				statement.executeUpdate();
-				ResultSet generatedKeys = statement.getGeneratedKeys();
-				generatedKeys.next();
-				long id = generatedKeys.getLong(1);
-				addressV4.setId(id);
-			}
-			for (IpAddress addressV6 : struct.getIpv6Adresses()) {
-				addressV6.setNameserverId(nameserverId);
-				((IpAddressDbObj) addressV6).storeToDatabase(statement);
-				logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-				statement.executeUpdate();
-				ResultSet generatedKeys = statement.getGeneratedKeys();
-				generatedKeys.next();
-				long id = generatedKeys.getLong(1);
-				addressV6.setId(id);
-			}
-		}
 	}
 
 	public static NameserverIpAddressesStruct getIpAddressStructByNameserverId(Long nameserverId, Connection connection)

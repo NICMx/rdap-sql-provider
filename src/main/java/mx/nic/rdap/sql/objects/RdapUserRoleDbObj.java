@@ -1,6 +1,5 @@
 package mx.nic.rdap.sql.objects;
 
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -35,19 +34,6 @@ public class RdapUserRoleDbObj extends RdapUserRole implements DatabaseObject {
 	public void loadFromDatabase(ResultSet resultSet) throws SQLException {
 		this.setUserName(resultSet.getString("rus_name"));
 		this.setRoleName(resultSet.getString("rur_name"));
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see mx.nic.rdap.server.db.DatabaseObject#storeToDatabase(java.sql.
-	 * PreparedStatement)
-	 */
-	@Override
-	public void storeToDatabase(PreparedStatement preparedStatement) throws SQLException {
-		preparedStatement.setString(1, this.getUserName());
-		preparedStatement.setString(2, this.getRoleName());
-
 	}
 
 }

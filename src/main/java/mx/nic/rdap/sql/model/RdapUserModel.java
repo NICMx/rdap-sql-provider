@@ -10,10 +10,7 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.db.RdapUserRole;
 import mx.nic.rdap.sql.QueryGroup;
-import mx.nic.rdap.sql.exception.IncompleteObjectException;
-import mx.nic.rdap.sql.exception.InvalidObjectException;
 import mx.nic.rdap.sql.objects.RdapUserDbObj;
-import mx.nic.rdap.sql.objects.RdapUserRoleDbObj;
 
 /**
  * Model for RdapUserData
@@ -24,10 +21,7 @@ public class RdapUserModel {
 	private final static Logger logger = Logger.getLogger(RdapUserModel.class.getName());
 
 	private final static String QUERY_GROUP = "RdapUser";
-	private final static String STORE_QUERY = "storeToDatabase";
 	private final static String GET_BY_NAME_QUERY = "getByName";
-	private final static String DELETE_ROLES_QUERY = "deleteAllRdapUserRoles";
-	private final static String DELETE_QUERY = "deleteAllRdapUsers";
 
 	private static QueryGroup queryGroup = null;
 
@@ -48,33 +42,7 @@ public class RdapUserModel {
 		return queryGroup;
 	}
 
-	/**
-	 * Validate the required attributes for the rdapuser
-	 * 
-	 */
-	private static void isValidForStore(RdapUserDbObj user) throws InvalidObjectException {
-		if (user.getName() == null || user.getName().isEmpty())
-			throw new IncompleteObjectException("name", "RdapUser");
-		if (user.getPass() == null || user.getPass().isEmpty())
-			throw new IncompleteObjectException("password", "RdapUser");
-		if (user.getUserRole().getRoleName() == null || user.getUserRole().getRoleName().isEmpty())
-			throw new IncompleteObjectException("role", "RdapUser");
-	}
-
-	public static void storeToDatabase(RdapUserDbObj user, Connection connection)
-			throws SQLException {
-		isValidForStore(user);
-		String query = getQueryGroup().getQuery(STORE_QUERY);
-		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			user.storeToDatabase(statement);
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			statement.executeUpdate();
-		}
-		RdapUserRoleModel.storeRdapUserRoleToDatabase((RdapUserRoleDbObj) user.getUserRole(), connection);
-	}
-
-	public static RdapUserDbObj getByName(String name, Connection connection)
-			throws SQLException {
+	public static RdapUserDbObj getByName(String name, Connection connection) throws SQLException {
 		String query = getQueryGroup().getQuery(GET_BY_NAME_QUERY);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, name);
@@ -94,25 +62,6 @@ public class RdapUserModel {
 				user.setUserRole(role);
 				return user;
 			}
-		}
-	}
-
-	/**
-	 * Clean the rdapuser and rdapUserRole tables in the migration
-	 * 
-	 */
-	public static void cleanRdapUserDatabase(Connection connection) throws SQLException {
-		String query = getQueryGroup().getQuery(DELETE_ROLES_QUERY);
-		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			statement.executeUpdate();
-
-		}
-		query = getQueryGroup().getQuery(DELETE_QUERY);
-		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			statement.executeUpdate();
-
 		}
 	}
 

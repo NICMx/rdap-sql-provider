@@ -23,11 +23,6 @@ import mx.nic.rdap.core.db.Nameserver;
 import mx.nic.rdap.core.db.VariantName;
 import mx.nic.rdap.core.db.struct.NameserverIpAddressesStruct;
 import mx.nic.rdap.db.exception.InitializationException;
-import mx.nic.rdap.sql.DatabaseTest;
-import mx.nic.rdap.sql.model.DomainModel;
-import mx.nic.rdap.sql.model.EntityModel;
-import mx.nic.rdap.sql.model.NameserverModel;
-import mx.nic.rdap.sql.model.ZoneModel;
 import mx.nic.rdap.sql.objects.DomainDbObj;
 import mx.nic.rdap.sql.objects.EntityDbObj;
 import mx.nic.rdap.sql.objects.EventDbObj;
@@ -40,6 +35,11 @@ import mx.nic.rdap.sql.objects.RemarkDescriptionDbObj;
 import mx.nic.rdap.sql.objects.VCardDbObj;
 import mx.nic.rdap.sql.objects.VCardPostalInfoDbObj;
 import mx.nic.rdap.sql.objects.VariantDbObj;
+import mx.nic.rdap.sql.test.DatabaseTest;
+import mx.nic.rdap.store.model.DomainStoreModel;
+import mx.nic.rdap.store.model.EntityStoreModel;
+import mx.nic.rdap.store.model.NameserverStoreModel;
+import mx.nic.rdap.store.model.ZoneStoreModel;
 
 public class DummyDataBatch extends DatabaseTest {
 
@@ -70,7 +70,7 @@ public class DummyDataBatch extends DatabaseTest {
 		DummyDataBatch.init();
 		batch.before();
 		for (String zone : zones) {
-			ZoneModel.storeToDatabase(zone, connection);
+			ZoneStoreModel.storeToDatabase(zone, connection);
 		}
 		try {
 			batch.start();
@@ -164,7 +164,7 @@ public class DummyDataBatch extends DatabaseTest {
 		entity.getEntities().add(sponsor);
 		// *****
 
-		EntityModel.storeToDatabase(entity, connection);
+		EntityStoreModel.storeToDatabase(entity, connection);
 
 		entity.getRoles().add(Role.REGISTRANT);
 
@@ -203,11 +203,11 @@ public class DummyDataBatch extends DatabaseTest {
 
 		domain.getStatus().add(Status.ACTIVE);
 
-		if (isIDN && variants.containsKey(idnChar)) {
+		int variantsSize = ThreadLocalRandom.current().nextInt(3 + 1);
+		if (isIDN && variants.containsKey(idnChar) && variantsSize > 0) {
 			VariantDbObj variant = new VariantDbObj();
 			variant.getRelations().add(VariantRelation.REGISTRATION_RESTRICTED);
 			variant.getRelations().add(VariantRelation.UNREGISTERED);
-			int variantsSize = ThreadLocalRandom.current().nextInt(3 + 1);
 			for (int i = 0; i < variantsSize; i++) {
 				VariantName vn = new VariantName();
 				String[] variantsString = variants.get(idnChar);
@@ -221,7 +221,7 @@ public class DummyDataBatch extends DatabaseTest {
 		List<Nameserver> createNameservers = createNameservers(ldhName, tld, registrant);
 		domain.setNameServers(createNameservers);
 
-		DomainModel.storeToDatabase(domain, false, connection);
+		DomainStoreModel.storeToDatabase(domain, false, connection);
 	}
 
 	private List<Nameserver> createNameservers(String domainName, String tld, Entity registrant)
@@ -265,7 +265,7 @@ public class DummyDataBatch extends DatabaseTest {
 
 			nameserver.getEntities().add(registrant);
 
-			NameserverModel.storeToDatabase(nameserver, connection);
+			NameserverStoreModel.storeToDatabase(nameserver, connection);
 			nameservers.add(nameserver);
 		}
 		return nameservers;
@@ -357,7 +357,7 @@ public class DummyDataBatch extends DatabaseTest {
 			break;
 		}
 
-		EntityModel.storeToDatabase(registrar, connection);
+		EntityStoreModel.storeToDatabase(registrar, connection);
 		return registrar;
 	}
 

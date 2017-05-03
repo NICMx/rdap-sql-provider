@@ -1,0 +1,4 @@
+
+#storeToDatabase
+INSERT INTO {schema}.ip_network VALUES (null, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+

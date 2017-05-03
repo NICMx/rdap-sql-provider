@@ -1,6 +1,3 @@
-#storeToDatabase
-INSERT INTO {schema}.entity VALUES (null, ?, ?);
-
 #getByHandle
 SELECT * FROM {schema}.entity e WHERE e.ent_handle = ?;
 
@@ -42,9 +39,6 @@ SELECT * FROM {schema}.entity e WHERE e.ent_handle = ? ORDER BY 1 LIMIT ?;
 
 #searchByName
 SELECT * FROM {schema}.entity ent JOIN {schema}.entity_contact eco ON eco.ent_id=ent.ent_id JOIN {schema}.vcard vca ON vca.vca_id=eco.vca_id WHERE vca.vca_name = ? ORDER BY 1 LIMIT ?;
-
-#updateInDatabase
-UPDATE {schema}.entity SET ent_port43=? WHERE ent_id=?;
 
 #existByPartialName
 SELECT EXISTS(SELECT 1 FROM {schema}.entity ent JOIN {schema}.entity_contact eco ON eco.ent_id=ent.ent_id JOIN {schema}.vcard vca ON vca.vca_id=eco.vca_id WHERE vca.vca_name LIKE ?);
