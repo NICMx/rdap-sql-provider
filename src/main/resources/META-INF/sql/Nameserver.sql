@@ -1,6 +1,3 @@
-#getByHandle
-SELECT * FROM {schema}.nameserver WHERE nse_handle=?;
-
 #findByName
 SELECT * FROM {schema}.nameserver nse WHERE nse.nse_ldh_name=? OR nse.nse_unicode_name = ?;
 

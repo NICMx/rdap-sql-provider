@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.KeyData;
 import mx.nic.rdap.sql.QueryGroup;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.objects.KeyDataDbObj;
 
 public class KeyDataModel {
@@ -47,6 +48,9 @@ public class KeyDataModel {
 	 */
 	public static List<KeyData> getBySecureDnsId(Long secureDnsId, Connection connection) throws SQLException {
 		String query = getQueryGroup().getQuery(GET_QUERY);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return Collections.emptyList();
+		}
 		List<KeyData> resultList = null;
 
 		try (PreparedStatement statement = connection.prepareStatement(query);) { // QUERY

@@ -21,9 +21,10 @@ import mx.nic.rdap.core.db.Nameserver;
 import mx.nic.rdap.core.ip.IpAddressFormatException;
 import mx.nic.rdap.core.ip.IpUtils;
 import mx.nic.rdap.db.exception.http.BadRequestException;
+import mx.nic.rdap.db.exception.http.NotImplementedException;
 import mx.nic.rdap.db.struct.SearchResultStruct;
 import mx.nic.rdap.sql.QueryGroup;
-import mx.nic.rdap.sql.exception.IncompleteObjectException;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.objects.NameserverDbObj;
 
 /**
@@ -37,8 +38,6 @@ public class NameserverModel {
 	private final static String QUERY_GROUP = "Nameserver";
 
 	private static QueryGroup queryGroup = null;
-
-	private static final String GET_BY_HANDLE_QUERY = "getByHandle";
 
 	private static final String FIND_BY_NAME_QUERY = "findByName";
 
@@ -68,8 +67,10 @@ public class NameserverModel {
 		return queryGroup;
 	}
 
-	public static NameserverDbObj findByName(DomainLabel name, Connection connection) throws SQLException {
+	public static NameserverDbObj findByName(DomainLabel name, Connection connection)
+			throws SQLException, NotImplementedException {
 		String query = getQueryGroup().getQuery(FIND_BY_NAME_QUERY);
+		QueryGroup.userImplemented(query);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, name.getALabel());
 			statement.setString(2, name.getULabel());
@@ -86,7 +87,7 @@ public class NameserverModel {
 	}
 
 	public static SearchResultStruct<Nameserver> searchByName(String namePattern, int resultLimit,
-			Connection connection) throws SQLException {
+			Connection connection) throws SQLException, NotImplementedException {
 		String query = null;
 		if (namePattern.contains("*")) {// check if is a partial search
 			query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_NAME_QUERY);
@@ -98,12 +99,13 @@ public class NameserverModel {
 	}
 
 	public static SearchResultStruct<Nameserver> searchByRegexName(String namePattern, int resultLimit,
-			Connection connection) throws SQLException {
+			Connection connection) throws SQLException, NotImplementedException {
 		return searchByName(namePattern, resultLimit, connection, getQueryGroup().getQuery(SEARCH_BY_NAME_REGEX_QUERY));
 	}
 
 	private static SearchResultStruct<Nameserver> searchByName(String namePattern, int resultLimit,
-			Connection connection, String query) throws SQLException {
+			Connection connection, String query) throws SQLException, NotImplementedException {
+		QueryGroup.userImplemented(query);
 		SearchResultStruct<Nameserver> result = new SearchResultStruct<Nameserver>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -141,12 +143,12 @@ public class NameserverModel {
 	}
 
 	public static SearchResultStruct<Nameserver> searchByIp(String ipaddressPattern, int resultLimit,
-			Connection connection) throws SQLException, BadRequestException {
+			Connection connection) throws SQLException, BadRequestException, NotImplementedException {
 		SearchResultStruct<Nameserver> result = new SearchResultStruct<Nameserver>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
 		resultLimit = resultLimit + 1;
-		String query = "";
+		String query = null;
 		List<NameserverDbObj> nameservers = new ArrayList<NameserverDbObj>();
 
 		InetAddress address;
@@ -160,7 +162,10 @@ public class NameserverModel {
 			query = getQueryGroup().getQuery(SEARCH_BY_IP6_QUERY);
 		} else if (address instanceof Inet4Address) {
 			query = getQueryGroup().getQuery(SEARCH_BY_IP4_QUERY);
+		} else {
+			throw new NotImplementedException("Not implemented for : " + address.getClass().getName());
 		}
+		QueryGroup.userImplemented(query);
 
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, ipaddressPattern);
@@ -201,6 +206,9 @@ public class NameserverModel {
 	public static List<Nameserver> getByDomainId(Long domainId, boolean useNameserverAsDomainAttribute,
 			Connection connection) throws SQLException {
 		String query = getQueryGroup().getQuery(DOMAIN_GET_QUERY);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return Collections.emptyList();
+		}
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setLong(1, domainId);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
@@ -220,7 +228,7 @@ public class NameserverModel {
 		}
 	}
 
-	private static void loadNestedObjects(Nameserver nameserver, Connection connection) throws SQLException {
+	public static void loadNestedObjects(Nameserver nameserver, Connection connection) throws SQLException {
 
 		// Retrieve the ipAddress
 		nameserver.setIpAddresses(IpAddressModel.getIpAddressStructByNameserverId(nameserver.getId(), connection));
@@ -242,25 +250,6 @@ public class NameserverModel {
 		for (Entity entity : entities) {
 			List<Role> roles = RoleModel.getNameserverEntityRol(nameserver.getId(), entity.getId(), connection);
 			entity.setRoles(roles);
-		}
-	}
-
-	public static NameserverDbObj getByHandle(String handle, Connection rdapConnection) throws SQLException {
-		if (handle == null || handle.isEmpty()) {
-			throw new IncompleteObjectException("handle", "Nameserver");
-		}
-		String query = getQueryGroup().getQuery(GET_BY_HANDLE_QUERY);
-		try (PreparedStatement statement = rdapConnection.prepareStatement(query)) {
-			statement.setString(1, handle);
-			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
-			try (ResultSet resultSet = statement.executeQuery()) {
-				if (!resultSet.next()) {
-					return null;
-				}
-				NameserverDbObj nameserver = new NameserverDbObj(resultSet);
-				loadNestedObjects(nameserver, rdapConnection);
-				return nameserver;
-			}
 		}
 	}
 

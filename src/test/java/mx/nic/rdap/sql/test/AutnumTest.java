@@ -17,6 +17,7 @@ import mx.nic.rdap.core.db.Event;
 import mx.nic.rdap.core.db.Link;
 import mx.nic.rdap.core.db.Remark;
 import mx.nic.rdap.core.db.RemarkDescription;
+import mx.nic.rdap.db.exception.http.NotImplementedException;
 import mx.nic.rdap.sql.model.AutnumModel;
 import mx.nic.rdap.sql.objects.AutnumDbObj;
 import mx.nic.rdap.sql.objects.EntityDbObj;
@@ -34,7 +35,7 @@ import mx.nic.rdap.store.model.EntityStoreModel;
 public class AutnumTest extends DatabaseTest {
 
 	@Test
-	public void insertAndGetAutnum() throws SQLException {
+	public void insertAndGetAutnum() throws SQLException, NotImplementedException {
 		Entity registrant = new EntityDbObj();
 		registrant.setHandle("testHandler");
 		registrant.setPort43("testestestest");

@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import mx.nic.rdap.core.db.IpAddress;
 import mx.nic.rdap.core.db.struct.NameserverIpAddressesStruct;
 import mx.nic.rdap.sql.QueryGroup;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.objects.IpAddressDbObj;
 
 /**
@@ -46,6 +47,9 @@ public class IpAddressModel {
 	public static NameserverIpAddressesStruct getIpAddressStructByNameserverId(Long nameserverId, Connection connection)
 			throws SQLException {
 		String query = getQueryGroup().getQuery(GET_QUERY);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return null;
+		}
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setLong(1, nameserverId);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());

@@ -6,12 +6,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.RemarkDescription;
 import mx.nic.rdap.sql.QueryGroup;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.exception.ObjectNotFoundException;
 import mx.nic.rdap.sql.objects.RemarkDescriptionDbObj;
 
@@ -54,7 +56,11 @@ public class RemarkDescriptionModel {
 	 */
 	public static List<RemarkDescription> findByRemarkId(Long id, Connection connection)
 			throws SQLException, ObjectNotFoundException {
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_QUERY))) {
+		String query = getQueryGroup().getQuery(GET_QUERY);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return Collections.emptyList();
+		}
+		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setLong(1, id);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {

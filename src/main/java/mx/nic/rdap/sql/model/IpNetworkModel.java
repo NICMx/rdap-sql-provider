@@ -17,8 +17,10 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.IpNetwork;
 import mx.nic.rdap.core.ip.AddressBlock;
+import mx.nic.rdap.db.exception.http.NotImplementedException;
 import mx.nic.rdap.sql.IpUtils;
 import mx.nic.rdap.sql.QueryGroup;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.objects.IpNetworkDbObj;
 
 /**
@@ -37,7 +39,6 @@ public class IpNetworkModel {
 	private static final String GET_BY_IPV6 = "getByIPv6";
 	private static final String GET_BY_ENTITY_ID = "getByEntityId";
 	private static final String GET_BY_DOMAIN_ID = "getByDomainId";
-	private static final String GET_BY_HANDLE = "getByHandle";
 
 	public static void loadQueryGroup(String schema) {
 		try {
@@ -56,7 +57,7 @@ public class IpNetworkModel {
 		return queryGroup;
 	}
 
-	private static void loadNestedObjects(IpNetwork ipNetwork, Connection connection) throws SQLException {
+	public static void loadNestedObjects(IpNetwork ipNetwork, Connection connection) throws SQLException {
 		Long ipNetworkId = ipNetwork.getId();
 
 		loadSimpleNestedObjects(ipNetwork, connection);
@@ -82,13 +83,16 @@ public class IpNetworkModel {
 		ipNetwork.getRemarks().addAll(RemarkModel.getByIpNetworkId(ipNetworkId, connection));
 	}
 
-	private static IpNetwork getByIpv4Block(AddressBlock block, Connection connection) throws SQLException {
+	private static IpNetwork getByIpv4Block(AddressBlock block, Connection connection)
+			throws SQLException, NotImplementedException {
+		String query = getQueryGroup().getQuery(GET_BY_IPV4);
+		QueryGroup.userImplemented(query);
+
 		InetAddress lastAddressFromNetwork = block.getLastAddress();
 
 		BigInteger start = IpUtils.addressToNumber((Inet4Address) block.getAddress());
 		BigInteger end = IpUtils.addressToNumber((Inet4Address) lastAddressFromNetwork);
 
-		String query = getQueryGroup().getQuery(GET_BY_IPV4);
 		IpNetworkDbObj ipDao = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setInt(1, block.getPrefix());
@@ -106,7 +110,11 @@ public class IpNetworkModel {
 		return ipDao;
 	}
 
-	private static IpNetwork getByIpv6Block(AddressBlock block, Connection connection) throws SQLException {
+	private static IpNetwork getByIpv6Block(AddressBlock block, Connection connection)
+			throws SQLException, NotImplementedException {
+		String query = getQueryGroup().getQuery(GET_BY_IPV6);
+		QueryGroup.userImplemented(query);
+
 		InetAddress lastAddressFromNetwork = block.getLastAddress();
 
 		BigInteger startUpperPart = IpUtils.inet6AddressToUpperPart((Inet6Address) block.getAddress());
@@ -115,7 +123,6 @@ public class IpNetworkModel {
 		BigInteger endUpperPart = IpUtils.inet6AddressToUpperPart((Inet6Address) lastAddressFromNetwork);
 		BigInteger endLowerPart = IpUtils.inet6AddressToLowerPart((Inet6Address) lastAddressFromNetwork);
 
-		String query = getQueryGroup().getQuery(GET_BY_IPV6);
 		IpNetworkDbObj ipDao = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setInt(1, block.getPrefix());
@@ -138,7 +145,8 @@ public class IpNetworkModel {
 		return ipDao;
 	}
 
-	public static IpNetwork getByAddressBlock(AddressBlock block, Connection connection) throws SQLException {
+	public static IpNetwork getByAddressBlock(AddressBlock block, Connection connection)
+			throws SQLException, NotImplementedException {
 		IpNetwork result = null;
 		if (block.getAddress() instanceof Inet4Address) {
 			result = getByIpv4Block(block, connection);
@@ -157,6 +165,10 @@ public class IpNetworkModel {
 
 	public static IpNetwork getByDomainId(long domainId, Connection connection) throws SQLException {
 		String query = getQueryGroup().getQuery(GET_BY_DOMAIN_ID);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return null;
+		}
+
 		IpNetworkDbObj result = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setLong(1, domainId);
@@ -180,6 +192,10 @@ public class IpNetworkModel {
 	private static List<IpNetwork> getByRdapObjectId(long id, Connection connection, String getQueryId)
 			throws SQLException {
 		String query = getQueryGroup().getQuery(getQueryId);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return Collections.emptyList();
+		}
+
 		List<IpNetwork> results = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setLong(1, id);
@@ -201,25 +217,6 @@ public class IpNetworkModel {
 		}
 
 		return results;
-	}
-
-	public static IpNetworkDbObj getByHandle(String handle, Connection connection) throws SQLException {
-		String query = getQueryGroup().getQuery(GET_BY_HANDLE);
-		IpNetworkDbObj result = null;
-		try (PreparedStatement statement = connection.prepareStatement(query);) {
-			statement.setString(1, handle);
-			logger.log(Level.INFO, "Executing QUERY : " + statement.toString());
-			ResultSet rs = statement.executeQuery();
-			if (!rs.next()) {
-				return null;
-			}
-
-			result = new IpNetworkDbObj(rs);
-		}
-
-		loadNestedObjects(result, connection);
-
-		return result;
 	}
 
 }

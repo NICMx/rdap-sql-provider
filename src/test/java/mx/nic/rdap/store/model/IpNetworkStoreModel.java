@@ -22,7 +22,8 @@ import mx.nic.rdap.sql.QueryGroup;
 import mx.nic.rdap.sql.exception.IncompleteObjectException;
 import mx.nic.rdap.sql.exception.InvalidObjectException;
 import mx.nic.rdap.sql.model.CountryCodeModel;
-import mx.nic.rdap.sql.model.EntityModel;
+import mx.nic.rdap.sql.model.IpNetworkModel;
+import mx.nic.rdap.sql.objects.IpNetworkDbObj;
 
 /**
  * Model for the {@link IpNetworkStoreModel} Object
@@ -37,6 +38,7 @@ public class IpNetworkStoreModel {
 	private static QueryGroup queryGroup = null;
 
 	private static final String STORE_TO_DATABASE = "storeToDatabase";
+	private static final String GET_BY_HANDLE = "getByHandle";
 
 	public static void loadQueryGroup(String schema) {
 		try {
@@ -122,7 +124,7 @@ public class IpNetworkStoreModel {
 		LinkStoreModel.storeIpNetworkLinksToDatabase(ipNetwork.getLinks(), ipNetwork.getId(), connection);
 		EventStoreModel.storeIpNetworkEventsToDatabase(ipNetwork.getEvents(), ipNetwork.getId(), connection);
 		for (Entity ent : ipNetwork.getEntities()) {
-			Long entId = EntityModel.getIdByHandle(ent.getHandle(), connection);
+			Long entId = EntityStoreModel.getIdByHandle(ent.getHandle(), connection);
 			if (entId == null) {
 				throw new NullPointerException(
 						"Entity: " + ent.getHandle() + "was not inserted previously to the database");
@@ -161,5 +163,24 @@ public class IpNetworkStoreModel {
 		preparedStatement.setInt(10, ipNetwork.getIpVersion().getVersion());
 		preparedStatement.setString(11, ipNetwork.getParentHandle());
 		preparedStatement.setInt(12, ipNetwork.getPrefix());
+	}
+
+	public static IpNetworkDbObj getByHandle(String handle, Connection connection) throws SQLException {
+		String query = getQueryGroup().getQuery(GET_BY_HANDLE);
+		IpNetworkDbObj result = null;
+		try (PreparedStatement statement = connection.prepareStatement(query);) {
+			statement.setString(1, handle);
+			logger.log(Level.INFO, "Executing QUERY : " + statement.toString());
+			ResultSet rs = statement.executeQuery();
+			if (!rs.next()) {
+				return null;
+			}
+
+			result = new IpNetworkDbObj(rs);
+		}
+
+		IpNetworkModel.loadNestedObjects(result, connection);
+
+		return result;
 	}
 }

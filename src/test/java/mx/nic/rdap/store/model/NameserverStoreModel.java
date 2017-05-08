@@ -15,7 +15,8 @@ import mx.nic.rdap.core.db.DomainLabel;
 import mx.nic.rdap.core.db.Nameserver;
 import mx.nic.rdap.sql.QueryGroup;
 import mx.nic.rdap.sql.exception.IncompleteObjectException;
-import mx.nic.rdap.sql.model.EntityModel;
+import mx.nic.rdap.sql.model.NameserverModel;
+import mx.nic.rdap.sql.objects.NameserverDbObj;
 
 /**
  * Model for the {@link Nameserver} Object
@@ -30,6 +31,7 @@ public class NameserverStoreModel {
 	private static QueryGroup queryGroup = null;
 
 	private static final String STORE_QUERY = "storeToDatabase";
+	private static final String GET_BY_HANDLE_QUERY = "getByHandle";
 
 	private static final String DOMAIN_STORE_QUERY = "storeDomainNameserversToDatabase";
 
@@ -93,7 +95,7 @@ public class NameserverStoreModel {
 
 	private static void storeNameserverEntities(Nameserver nameserver, Connection connection) throws SQLException {
 		if (nameserver.getEntities().size() > 0) {
-			EntityModel.validateParentEntities(nameserver.getEntities(), connection);
+			EntityStoreModel.validateParentEntities(nameserver.getEntities(), connection);
 			RoleStoreModel.storeNameserverEntityRoles(nameserver.getEntities(), nameserver.getId(), connection);
 		}
 
@@ -146,5 +148,26 @@ public class NameserverStoreModel {
 		}
 
 		preparedStatement.setString(4, ns.getPort43());
+	}
+
+	public static NameserverDbObj getByHandle(String handle, Connection rdapConnection) throws SQLException {
+		String query = getQueryGroup().getQuery(GET_BY_HANDLE_QUERY);
+
+		if (handle == null || handle.isEmpty()) {
+			throw new IncompleteObjectException("handle", "Nameserver");
+		}
+
+		try (PreparedStatement statement = rdapConnection.prepareStatement(query)) {
+			statement.setString(1, handle);
+			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
+			try (ResultSet resultSet = statement.executeQuery()) {
+				if (!resultSet.next()) {
+					return null;
+				}
+				NameserverDbObj nameserver = new NameserverDbObj(resultSet);
+				NameserverModel.loadNestedObjects(nameserver, rdapConnection);
+				return nameserver;
+			}
+		}
 	}
 }

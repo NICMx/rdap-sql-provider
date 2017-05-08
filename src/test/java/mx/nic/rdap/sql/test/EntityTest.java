@@ -21,6 +21,7 @@ import mx.nic.rdap.core.db.Remark;
 import mx.nic.rdap.core.db.RemarkDescription;
 import mx.nic.rdap.core.db.VCard;
 import mx.nic.rdap.core.db.VCardPostalInfo;
+import mx.nic.rdap.db.exception.http.NotImplementedException;
 import mx.nic.rdap.sql.model.EntityModel;
 import mx.nic.rdap.sql.objects.EntityDbObj;
 import mx.nic.rdap.sql.objects.EventDbObj;
@@ -37,7 +38,7 @@ import mx.nic.rdap.store.model.EntityStoreModel;
 public class EntityTest extends DatabaseTest {
 
 	@Test
-	public void insertMinimunEntity() throws SQLException {
+	public void insertMinimunEntity() throws SQLException, NotImplementedException {
 		Entity entity = createEntity(null, "minimunEntity", "www.rardhfelix.mx");
 		EntityStoreModel.storeToDatabase(entity, connection);
 
@@ -49,9 +50,11 @@ public class EntityTest extends DatabaseTest {
 	 * Creates a simple entity object and store it in the database, then get the
 	 * same entity from the database by its ID and Handle, finally compares the
 	 * first objects with the objects in the database
+	 * 
+	 * @throws NotImplementedException
 	 */
 	@Test
-	public void insertAndGetSimpleEntity() throws SQLException {
+	public void insertAndGetSimpleEntity() throws SQLException, NotImplementedException {
 		Random random = new Random();
 		int randomInt = random.nextInt();
 
@@ -159,7 +162,7 @@ public class EntityTest extends DatabaseTest {
 	}
 
 	@Test
-	public void createAndInsertComplexObject() throws SQLException {
+	public void createAndInsertComplexObject() throws SQLException, NotImplementedException {
 		Random random = new Random();
 		int randomInt = random.nextInt();
 
@@ -370,7 +373,7 @@ public class EntityTest extends DatabaseTest {
 	}
 
 	@Test
-	public void createAndInsertRegistrar() throws SQLException {
+	public void createAndInsertRegistrar() throws SQLException, NotImplementedException {
 		Entity entity = createEntity(null, "rar_test", "whois.rar_test.com");
 		// entity.getRoles().add(Role.REGISTRAR);
 
@@ -414,7 +417,7 @@ public class EntityTest extends DatabaseTest {
 		return e;
 	}
 
-	public static Entity createDefaultEntity(Connection connection) throws SQLException {
+	public static Entity createDefaultEntity(Connection connection) throws SQLException, NotImplementedException {
 		// Entity base data
 		Random random = new Random();
 		int randomInt = random.nextInt();

@@ -20,6 +20,7 @@ import mx.nic.rdap.core.db.Nameserver;
 import mx.nic.rdap.core.db.Remark;
 import mx.nic.rdap.core.db.RemarkDescription;
 import mx.nic.rdap.core.db.struct.NameserverIpAddressesStruct;
+import mx.nic.rdap.db.exception.http.NotImplementedException;
 import mx.nic.rdap.sql.model.NameserverModel;
 import mx.nic.rdap.sql.objects.EventDbObj;
 import mx.nic.rdap.sql.objects.IpAddressDbObj;
@@ -36,7 +37,7 @@ import mx.nic.rdap.store.model.NameserverStoreModel;
 public class NameserverTest extends DatabaseTest {
 
 	@Test
-	public void insertMinimunNameServer() throws SQLException, DomainLabelException {
+	public void insertMinimunNameServer() throws SQLException, DomainLabelException, NotImplementedException {
 
 		// Nameserver base data
 		Nameserver nameserver = new NameserverDbObj();

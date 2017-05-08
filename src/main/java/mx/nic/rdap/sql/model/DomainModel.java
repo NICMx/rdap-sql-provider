@@ -19,6 +19,7 @@ import mx.nic.rdap.core.ip.IpAddressFormatException;
 import mx.nic.rdap.core.ip.IpUtils;
 import mx.nic.rdap.db.exception.http.BadRequestException;
 import mx.nic.rdap.db.exception.http.NotFoundException;
+import mx.nic.rdap.db.exception.http.NotImplementedException;
 import mx.nic.rdap.db.struct.SearchResultStruct;
 import mx.nic.rdap.sql.QueryGroup;
 import mx.nic.rdap.sql.Util;
@@ -69,8 +70,9 @@ public class DomainModel {
 	}
 
 	public static DomainDbObj findByLdhName(String name, Integer zoneId, boolean useNameserverAsDomainAttribute,
-			Connection connection) throws SQLException {
+			Connection connection) throws SQLException, NotImplementedException {
 		String query = getQueryGroup().getQuery(GET_BY_LDH_QUERY);
+		QueryGroup.userImplemented(query);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, DomainLabel.nameToASCII(name));
 			statement.setString(2, DomainLabel.nameToUnicode(name));
@@ -91,7 +93,8 @@ public class DomainModel {
 	 * Searches a domain by it´s name and TLD
 	 */
 	public static SearchResultStruct<Domain> searchByName(String name, String zone, int resultLimit,
-			boolean useNameserverAsDomainAttribute, Connection connection) throws SQLException, NotFoundException {
+			boolean useNameserverAsDomainAttribute, Connection connection)
+			throws SQLException, NotFoundException, NotImplementedException {
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -108,11 +111,13 @@ public class DomainModel {
 			if (isPartialName) {
 				name = name.replaceAll("\\*", "%");
 				query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_NAME_WITH_PARTIAL_ZONE_QUERY);
-				query = Util.createDynamicQueryWithInClause(zoneIds.size(), query);
 			} else {
 				query = getQueryGroup().getQuery(SEARCH_BY_NAME_WITH_PARTIAL_ZONE_QUERY);
-				query = Util.createDynamicQueryWithInClause(zoneIds.size(), query);
 			}
+
+			QueryGroup.userImplemented(query);
+
+			query = Util.createDynamicQueryWithInClause(zoneIds.size(), query);
 		} else {
 
 			if (!ZoneModel.existsZone(zone)) {
@@ -125,6 +130,9 @@ public class DomainModel {
 			} else {
 				query = getQueryGroup().getQuery(SEARCH_BY_NAME_WITH_ZONE_QUERY);
 			}
+
+			QueryGroup.userImplemented(query);
+
 		}
 
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
@@ -170,7 +178,8 @@ public class DomainModel {
 	}
 
 	public static SearchResultStruct<Domain> searchByName(String domainName, int resultLimit,
-			boolean useNameserverAsDomainAttribute, Connection connection) throws SQLException {
+			boolean useNameserverAsDomainAttribute, Connection connection)
+			throws SQLException, NotImplementedException {
 		String query;
 		if (domainName.contains("*")) {
 			domainName = domainName.replaceAll("\\*", "%");
@@ -182,18 +191,22 @@ public class DomainModel {
 	}
 
 	public static SearchResultStruct<Domain> searchByRegexName(String regexName, int resultLimit,
-			boolean useNameserverAsDomainAttribute, Connection connection) throws SQLException {
+			boolean useNameserverAsDomainAttribute, Connection connection)
+			throws SQLException, NotImplementedException {
 		String query = getQueryGroup().getQuery(SEARCH_BY_REGEX_NAME_WITHOUT_ZONE);
 		return searchByName(regexName, resultLimit, useNameserverAsDomainAttribute, connection, query);
 	}
 
 	public static SearchResultStruct<Domain> searchByRegexName(String name, String zone, int resultLimit,
-			boolean useNameserverAsDomainAttribute, Connection connection) throws SQLException {
+			boolean useNameserverAsDomainAttribute, Connection connection)
+			throws SQLException, NotImplementedException {
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
 		resultLimit = resultLimit + 1;
 		String query = getQueryGroup().getQuery(SEARCH_BY_REGEX_NAME_WITH_ZONE);
+		QueryGroup.userImplemented(query);
+
 		List<Integer> zoneIds = ZoneModel.getValidZoneIds();
 		query = Util.createDynamicQueryWithInClause(zoneIds.size(), query);
 
@@ -233,9 +246,14 @@ public class DomainModel {
 
 	/**
 	 * Searches a domain by it's name when user don´t care about the TLD
+	 * 
+	 * @throws NotImplementedException
 	 */
 	private static SearchResultStruct<Domain> searchByName(String domainName, int resultLimit,
-			boolean useNameserverAsDomainAttribute, Connection connection, String query) throws SQLException {
+			boolean useNameserverAsDomainAttribute, Connection connection, String query)
+			throws SQLException, NotImplementedException {
+		QueryGroup.userImplemented(query);
+
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -278,14 +296,16 @@ public class DomainModel {
 	}
 
 	public static SearchResultStruct<Domain> searchByNsLdhName(String name, int resultLimit,
-			boolean useNameserverAsDomainAttribute, Connection connection) throws SQLException {
+			boolean useNameserverAsDomainAttribute, Connection connection)
+			throws SQLException, NotImplementedException {
 		String query = getQueryGroup().getQuery(SEARCH_BY_NAMESERVER_LDH_QUERY);
 		name = name.replace("*", "%");
 		return searchByNsLdhName(name, resultLimit, useNameserverAsDomainAttribute, connection, query);
 	}
 
 	public static SearchResultStruct<Domain> searchByRegexNsLdhName(String name, int resultLimit,
-			boolean useNameserverAsDomainAttribute, Connection connection) throws SQLException {
+			boolean useNameserverAsDomainAttribute, Connection connection)
+			throws SQLException, NotImplementedException {
 		String query = getQueryGroup().getQuery(SEARCH_BY_REGEX_NAMESERVER_LDH_QUERY);
 		return searchByNsLdhName(name, resultLimit, useNameserverAsDomainAttribute, connection, query);
 	}
@@ -294,7 +314,10 @@ public class DomainModel {
 	 * Searches all domains with a nameserver by name
 	 */
 	private static SearchResultStruct<Domain> searchByNsLdhName(String name, int resultLimit,
-			boolean useNameserverAsDomainAttribute, Connection connection, String query) throws SQLException {
+			boolean useNameserverAsDomainAttribute, Connection connection, String query)
+			throws SQLException, NotImplementedException {
+		QueryGroup.userImplemented(query);
+
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -332,7 +355,11 @@ public class DomainModel {
 	 * searches all domains with a nameserver by address
 	 */
 	public static SearchResultStruct<Domain> searchByNsIp(String ip, int resultLimit,
-			boolean useNameserverAsDomainAttribute, Connection connection) throws SQLException, BadRequestException {
+			boolean useNameserverAsDomainAttribute, Connection connection)
+			throws SQLException, BadRequestException, NotImplementedException {
+		String query = getQueryGroup().getQuery(SEARCH_BY_NAMESERVER_IP_QUERY);
+		QueryGroup.userImplemented(query);
+
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -353,8 +380,7 @@ public class DomainModel {
 		} else if (ipAddress.getAddress() instanceof Inet6Address) {
 			ipAddress.setType(6);
 		}
-		try (PreparedStatement statement = connection
-				.prepareStatement(getQueryGroup().getQuery(SEARCH_BY_NAMESERVER_IP_QUERY))) {
+		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setInt(1, ipAddress.getType());
 			statement.setString(2, ipAddress.getAddress().getHostAddress());
 			statement.setString(3, ipAddress.getAddress().getHostAddress());

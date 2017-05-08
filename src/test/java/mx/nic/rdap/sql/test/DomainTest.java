@@ -35,6 +35,7 @@ import mx.nic.rdap.core.db.SecureDNS;
 import mx.nic.rdap.core.db.Variant;
 import mx.nic.rdap.core.db.VariantName;
 import mx.nic.rdap.core.db.struct.NameserverIpAddressesStruct;
+import mx.nic.rdap.db.exception.http.NotImplementedException;
 import mx.nic.rdap.sql.model.DomainModel;
 import mx.nic.rdap.sql.model.EntityModel;
 import mx.nic.rdap.sql.objects.DomainDbObj;
@@ -59,7 +60,7 @@ import mx.nic.rdap.store.model.ZoneStoreModel;
 public class DomainTest extends DatabaseTest {
 
 	@Test
-	public void insertAndGetSimpleDomain() throws SQLException {
+	public void insertAndGetSimpleDomain() throws SQLException, NotImplementedException {
 
 		Domain dom = new DomainDbObj();
 		dom.setHandle("dummyhandle");
@@ -82,7 +83,7 @@ public class DomainTest extends DatabaseTest {
 	/**
 	 * Inserts a domain and retrieves it
 	 */
-	public void insertDomainAndGet() throws SQLException, UnknownHostException {
+	public void insertDomainAndGet() throws SQLException, UnknownHostException, NotImplementedException {
 		Random random = new Random();
 		int randomInt = random.nextInt();
 
@@ -371,7 +372,7 @@ public class DomainTest extends DatabaseTest {
 		return nameservers;
 	}
 
-	public static Entity createDefaultEntity(Connection connection) {
+	public static Entity createDefaultEntity(Connection connection) throws NotImplementedException {
 		// Entity base data
 
 		// Create local instances

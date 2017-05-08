@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import mx.nic.rdap.core.db.VCard;
 import mx.nic.rdap.core.db.VCardPostalInfo;
 import mx.nic.rdap.sql.QueryGroup;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.exception.ObjectNotFoundException;
 import mx.nic.rdap.sql.objects.VCardDbObj;
 
@@ -54,8 +55,12 @@ public class VCardModel {
 	 */
 	public static List<VCard> getByEntityId(Long registrarId, Connection connection) throws SQLException {
 		List<VCard> vCardResults = null;
-		try (PreparedStatement statement = connection
-				.prepareStatement(getQueryGroup().getQuery(GET_BY_ENTITY_QUERY));) {
+		String query = getQueryGroup().getQuery(GET_BY_ENTITY_QUERY);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return Collections.emptyList();
+		}
+
+		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setLong(1, registrarId);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();

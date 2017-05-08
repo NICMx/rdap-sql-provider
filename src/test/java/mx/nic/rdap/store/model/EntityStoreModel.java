@@ -14,7 +14,6 @@ import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.VCard;
 import mx.nic.rdap.sql.QueryGroup;
 import mx.nic.rdap.sql.exception.IncompleteObjectException;
-import mx.nic.rdap.sql.model.EntityModel;
 
 /**
  * Model for the {@link Entity} Object
@@ -29,6 +28,7 @@ public class EntityStoreModel {
 	private static QueryGroup queryGroup = null;
 
 	private final static String STORE_QUERY = "storeToDatabase";
+	private final static String GET_ID_BY_HANDLE_QUERY = "getIdByHandle";
 
 	public static void loadQueryGroup(String schema) {
 		try {
@@ -47,13 +47,43 @@ public class EntityStoreModel {
 		return queryGroup;
 	}
 
+	public static Long getIdByHandle(String entityHandle, Connection connection) throws SQLException {
+		String query = getQueryGroup().getQuery(GET_ID_BY_HANDLE_QUERY);
+		Long entId = null;
+		try (PreparedStatement statement = connection.prepareStatement(query);) {
+			statement.setString(1, entityHandle);
+			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
+			ResultSet rs = statement.executeQuery();
+			if (!rs.next()) {
+				return null;
+			}
+			long long1 = rs.getLong("ent_id");
+			if (!rs.wasNull()) {
+				entId = long1;
+			}
+		}
+
+		return entId;
+	}
+
+	public static void validateParentEntities(List<Entity> entities, Connection connection) throws SQLException {
+		for (Entity ent : entities) {
+			Long entId = EntityStoreModel.getIdByHandle(ent.getHandle(), connection);
+			if (entId == null) {
+				throw new NullPointerException(
+						"Entity: " + ent.getHandle() + " was not inserted previously to the database");
+			}
+			ent.setId(entId);
+		}
+	}
+
 	public static long storeToDatabase(Entity entity, Connection connection) throws SQLException {
 		return storeToDatabase(entity, connection, true);
 	}
 
 	private static long storeToDatabase(Entity entity, Connection connection, boolean isParentEntity)
 			throws SQLException {
-		Long entityId = EntityModel.getIdByHandle(entity.getHandle(), connection);
+		Long entityId = EntityStoreModel.getIdByHandle(entity.getHandle(), connection);
 		if (entityId != null) {
 			entity.setId(entityId);
 			return entityId;

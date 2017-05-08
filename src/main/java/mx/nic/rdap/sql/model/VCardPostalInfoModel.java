@@ -6,12 +6,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.VCardPostalInfo;
 import mx.nic.rdap.sql.QueryGroup;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.exception.ObjectNotFoundException;
 import mx.nic.rdap.sql.objects.VCardPostalInfoDbObj;
 
@@ -50,7 +52,11 @@ public class VCardPostalInfoModel {
 	public static List<VCardPostalInfo> getByVCardId(Long vCardId, Connection connection)
 			throws SQLException, ObjectNotFoundException {
 		List<VCardPostalInfo> vCardPostalInfoResult = null;
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_VCARD_QUERY));) {
+		String query = getQueryGroup().getQuery(GET_BY_VCARD_QUERY);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return Collections.emptyList();
+		}
+		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setLong(1, vCardId);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();

@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.PublicId;
 import mx.nic.rdap.sql.QueryGroup;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.objects.PublicIdDbObj;
 
 /**
@@ -48,6 +49,9 @@ public class PublicIdModel {
 	}
 
 	private static List<PublicId> getBy(Long entityId, Connection connection, String query) throws SQLException {
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return Collections.emptyList();
+		}
 		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(query))) {
 			statement.setLong(1, entityId);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());

@@ -18,9 +18,6 @@ import mx.nic.rdap.core.db.IpNetwork;
 import mx.nic.rdap.core.db.Nameserver;
 import mx.nic.rdap.sql.QueryGroup;
 import mx.nic.rdap.sql.exception.IncompleteObjectException;
-import mx.nic.rdap.sql.model.EntityModel;
-import mx.nic.rdap.sql.model.IpNetworkModel;
-import mx.nic.rdap.sql.model.NameserverModel;
 import mx.nic.rdap.sql.model.ZoneModel;
 import mx.nic.rdap.sql.objects.DomainDbObj;
 import mx.nic.rdap.sql.objects.IpNetworkDbObj;
@@ -102,7 +99,7 @@ public class DomainStoreModel {
 		storeDomainEntities(domain.getEntities(), domainId, connection);
 		IpNetwork ipNetwork = domain.getIpNetwork();
 		if (ipNetwork != null) {
-			IpNetworkDbObj ipNetResult = IpNetworkModel.getByHandle(ipNetwork.getHandle(), connection);
+			IpNetworkDbObj ipNetResult = IpNetworkStoreModel.getByHandle(ipNetwork.getHandle(), connection);
 			if (ipNetResult == null) {
 				throw new NullPointerException(
 						"IpNetwork: " + ipNetwork.getHandle() + "was not inserted previously to the database");
@@ -124,7 +121,7 @@ public class DomainStoreModel {
 	private static void validateDomainNameservers(List<Nameserver> nameservers, Connection connection)
 			throws SQLException {
 		for (Nameserver ns : nameservers) {
-			Long nsId = NameserverModel.getByHandle(ns.getHandle(), connection).getId();
+			Long nsId = NameserverStoreModel.getByHandle(ns.getHandle(), connection).getId();
 			if (nsId == null) {
 				throw new NullPointerException(
 						"Nameserver: " + ns.getHandle() + "was not inserted previously to the database.");
@@ -136,7 +133,7 @@ public class DomainStoreModel {
 	private static void storeDomainEntities(List<Entity> entities, Long domainId, Connection connection)
 			throws SQLException {
 		if (entities.size() > 0) {
-			EntityModel.validateParentEntities(entities, connection);
+			EntityStoreModel.validateParentEntities(entities, connection);
 			RoleStoreModel.storeDomainEntityRoles(entities, domainId, connection);
 		}
 

@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.Link;
 import mx.nic.rdap.sql.QueryGroup;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.objects.LinkDbObj;
 
 /**
@@ -94,6 +95,9 @@ public class LinkModel {
 	private static List<LinkDbObj> getByRelationId(Long id, Connection connection, String queryGetId)
 			throws SQLException {
 		String query = getQueryGroup().getQuery(queryGetId);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return Collections.emptyList();
+		}
 		List<LinkDbObj> result = null;
 
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -122,6 +126,9 @@ public class LinkModel {
 	private static List<String> getLinkHreflangs(Long linkId, Connection connection) throws SQLException {
 		List<String> result;
 		String query = getQueryGroup().getQuery(HREFLANG_GET_QUERY);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return Collections.emptyList();
+		}
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setLong(1, linkId);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());

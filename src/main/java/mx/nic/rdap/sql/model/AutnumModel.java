@@ -12,7 +12,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.Autnum;
+import mx.nic.rdap.db.exception.http.NotImplementedException;
 import mx.nic.rdap.sql.QueryGroup;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.objects.AutnumDbObj;
 
 /**
@@ -47,8 +49,12 @@ public class AutnumModel {
 		return queryGroup;
 	}
 
-	public static AutnumDbObj getByRange(long autnumValue, Connection connection) throws SQLException {
-		try (PreparedStatement statement = connection.prepareStatement(getQueryGroup().getQuery(GET_BY_RANGE))) {
+	public static AutnumDbObj getByRange(long autnumValue, Connection connection)
+			throws SQLException, NotImplementedException {
+		String query = getQueryGroup().getQuery(GET_BY_RANGE);
+		QueryGroup.userImplemented(query);
+
+		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setLong(1, autnumValue);
 			statement.setLong(2, autnumValue);
 			logger.log(Level.INFO, "Executing query: " + statement.toString());
@@ -80,6 +86,11 @@ public class AutnumModel {
 	private static List<Autnum> getByRdapObjectId(long id, Connection connection, String getQueryId)
 			throws SQLException {
 		String query = getQueryGroup().getQuery(getQueryId);
+
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return Collections.emptyList();
+		}
+
 		List<Autnum> autnums = null;
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setLong(1, id);

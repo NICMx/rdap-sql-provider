@@ -2,9 +2,17 @@ package mx.nic.rdap.sql;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
+
+import mx.nic.rdap.db.exception.http.NotImplementedException;
 
 /**
  * A bunch of queries read from a .sql file.
@@ -16,7 +24,9 @@ public class QueryGroup {
 	private static Pattern SCHEMA_PATTERN = Pattern.compile(Pattern.quote(SCHEMA_KEY));
 
 	/** The queries, indexed by means of their names. */
-	private HashMap<String, String> queries = new HashMap<>();
+	private Map<String, String> queries;
+
+	private static String DEFAULT_SQL_FILES_DIR = "META-INF/sql/";
 
 	/**
 	 * Loads the query group described by file <code>file</code>.
@@ -29,9 +39,21 @@ public class QueryGroup {
 	 *             Problems reading the <code>file</code> file.
 	 */
 	public QueryGroup(String file, String schema) throws IOException {
-		file = "META-INF/sql/" + file + ".sql";
-		try (BufferedReader reader = new BufferedReader(
-				new InputStreamReader(QueryGroup.class.getClassLoader().getResourceAsStream(file)))) {
+		InputStream in;
+
+		if (SQLProviderConfiguration.isUserSQL()) {
+			in = getStreamFromUserDir(file);
+			if (in == null) {
+				queries = Collections.emptyMap();
+				return;
+			}
+		} else {
+			String filePath = DEFAULT_SQL_FILES_DIR + file + ".sql";
+			in = QueryGroup.class.getClassLoader().getResourceAsStream(filePath);
+		}
+
+		queries = new HashMap<String, String>();
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(in))) {
 
 			StringBuilder querySB = new StringBuilder();
 			String queryName = null;
@@ -61,6 +83,17 @@ public class QueryGroup {
 		}
 	}
 
+	private InputStream getStreamFromUserDir(String file) throws IOException {
+		String userSQLFilesPath = SQLProviderConfiguration.getUserSQLFilesPath();
+		if (userSQLFilesPath != null) {
+			Path path = Paths.get(userSQLFilesPath, file + ".sql");
+			return Files.newInputStream(path);
+		}
+
+		userSQLFilesPath = Paths.get(SQLProviderConfiguration.DEFAULT_USER_SQL_FILE_PATH, file + ".sql").toString();
+		return SQLProviderConfiguration.class.getClassLoader().getResourceAsStream(userSQLFilesPath);
+	}
+
 	/**
 	 * Returns the query whose name is <code>name</code>.
 	 * 
@@ -76,8 +109,26 @@ public class QueryGroup {
 	/**
 	 * @return the queries
 	 */
-	public HashMap<String, String> getQueries() {
+	public Map<String, String> getQueries() {
 		return queries;
+	}
+
+	/**
+	 * For the main objects (entity, ns, domain, asn, ip), if the user overwrite
+	 * the queries, check that the query to be used is available.
+	 * 
+	 * @param query
+	 *            Query string to check
+	 * @throws NotImplementedException
+	 *             If the user wrote the queries and did not write the query to
+	 *             use.
+	 */
+	public static void userImplemented(String query) throws NotImplementedException {
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			throw new NotImplementedException();
+		}
+
+		return;
 	}
 
 }

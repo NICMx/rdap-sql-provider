@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.core.catalog.Status;
 import mx.nic.rdap.sql.QueryGroup;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 
 /**
  * Model for the {@link Status} Object
@@ -73,6 +74,9 @@ public class StatusModel {
 			throws SQLException {
 		List<Status> result = null;
 		String query = getQueryGroup().getQuery(getQueryId);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return Collections.emptyList();
+		}
 
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setLong(1, id);

@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.core.catalog.Role;
 import mx.nic.rdap.sql.QueryGroup;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 
 /**
  * Model for the {@link Role} objects of nested entities of main objects.
@@ -77,6 +78,9 @@ public class RoleModel {
 	private static List<Role> getNestedEntityRol(Long ownerId, Long nestedEntityId, Connection connection,
 			String getQuery) throws SQLException {
 		String query = getQueryGroup().getQuery(getQuery);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return Collections.emptyList();
+		}
 		List<Role> roles = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setLong(1, ownerId);
@@ -103,6 +107,9 @@ public class RoleModel {
 	public static List<Role> getMainEntityRol(Long entId, Connection connection) throws SQLException {
 		List<Role> result = null;
 		String query = getQueryGroup().getQuery(MAIN_ENTITY_GET_QUERY);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return Collections.emptyList();
+		}
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setLong(1, entId);
 			logger.log(Level.FINE, "Executing QUERY: " + statement.toString());

@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mx.nic.rdap.sql.QueryGroup;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.objects.RdapUserRoleDbObj;
 
 /**
@@ -41,6 +42,9 @@ public class RdapUserRoleModel {
 
 	public static RdapUserRoleDbObj getByUserName(String userName, Connection connection) throws SQLException {
 		String query = getQueryGroup().getQuery(GET_QUERY);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return null;
+		}
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, userName);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());

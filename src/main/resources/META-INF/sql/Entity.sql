@@ -22,9 +22,6 @@ SELECT DISTINCT (ent.ent_id),  ent.ent_handle, ent.ent_port43 FROM {schema}.enti
 #getIpNetworkEntitiesQuery
 SELECT DISTINCT (ent.ent_id),  ent.ent_handle, ent.ent_port43 FROM {schema}.entity ent JOIN {schema}.ip_network_entity_roles rol ON rol.ent_id = ent.ent_id WHERE rol.ine_id = ?;
 
-#getIdByHandle
-SELECT ent_id FROM {schema}.entity ent WHERE ent.ent_handle = ?;
-
 #searchByPartialHandle
 SELECT * FROM {schema}.entity e WHERE e.ent_handle LIKE ? ORDER BY 1 LIMIT ?;
 

@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.Remark;
 import mx.nic.rdap.sql.QueryGroup;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.exception.ObjectNotFoundException;
 import mx.nic.rdap.sql.objects.RemarkDbObj;
 
@@ -53,6 +54,9 @@ public class RemarkModel {
 
 	private static List<Remark> getByRelationId(Long id, Connection connection, String queryId) throws SQLException {
 		String query = getQueryGroup().getQuery(queryId);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return Collections.emptyList();
+		}
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setLong(1, id);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());

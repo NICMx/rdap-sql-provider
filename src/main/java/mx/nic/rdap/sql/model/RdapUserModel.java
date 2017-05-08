@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.db.RdapUserRole;
 import mx.nic.rdap.sql.QueryGroup;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.objects.RdapUserDbObj;
 
 /**
@@ -44,6 +45,9 @@ public class RdapUserModel {
 
 	public static RdapUserDbObj getByName(String name, Connection connection) throws SQLException {
 		String query = getQueryGroup().getQuery(GET_BY_NAME_QUERY);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return null;
+		}
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, name);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());

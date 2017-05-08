@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.Event;
 import mx.nic.rdap.sql.QueryGroup;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.objects.EventDbObj;
 
 /**
@@ -83,6 +84,9 @@ public class EventModel {
 
 	private static List<Event> getByRelationId(Long id, Connection connection, String getQueryId) throws SQLException {
 		String query = getQueryGroup().getQuery(getQueryId);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return Collections.emptyList();
+		}
 		List<Event> result = null;
 
 		try (PreparedStatement statement = connection.prepareStatement(query)) {

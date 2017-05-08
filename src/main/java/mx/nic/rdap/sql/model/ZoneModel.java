@@ -17,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mx.nic.rdap.sql.QueryGroup;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.exception.ObjectNotFoundException;
 
 /**
@@ -119,6 +120,9 @@ public class ZoneModel {
 		idByZone = new HashMap<String, Integer>();
 
 		String query = getQueryGroup().getQuery(GET_ALL_QUERY);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return;
+		}
 
 		PreparedStatement statement = con.prepareStatement(query);
 		ResultSet rs = statement.executeQuery();

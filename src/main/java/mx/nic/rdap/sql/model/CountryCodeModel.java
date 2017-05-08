@@ -1,16 +1,20 @@
 package mx.nic.rdap.sql.model;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mx.nic.rdap.sql.QueryGroup;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 
 /**
  * Model for the CountryCode table, read all CountryCodes in the
@@ -19,6 +23,8 @@ import mx.nic.rdap.sql.QueryGroup;
  */
 
 public class CountryCodeModel {
+
+	private final static String COUNTRIES_CODE_FILE = "META-INF/country_codes.properties";
 
 	private final static String QUERY_GROUP = "CountryCode";
 
@@ -54,7 +60,10 @@ public class CountryCodeModel {
 		idByCountryName = new HashMap<String, Integer>();
 
 		String query = getQueryGroup().getQuery(GET_ALL_QUERY);
-
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			loadFromProperties();
+			return;
+		}
 		PreparedStatement statement = con.prepareStatement(query);
 		ResultSet rs = statement.executeQuery();
 		if (!rs.next()) {
@@ -70,6 +79,22 @@ public class CountryCodeModel {
 
 		Logger.getLogger(CountryCodeModel.class.getName()).log(Level.INFO,
 				"Loaded " + countryNameById.size() + " country codes.");
+	}
+
+	private static void loadFromProperties() {
+		Properties p = new Properties();
+		try (InputStream in = CountryCodeModel.class.getClassLoader().getResourceAsStream(COUNTRIES_CODE_FILE)) {
+			p.load(in);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+
+		for (Entry<Object, Object> entry : p.entrySet()) {
+			Integer key = Integer.parseInt(((String) entry.getKey()));
+			String value = (String) entry.getValue();
+			countryNameById.put(key, value);
+			idByCountryName.put(value, key);
+		}
 	}
 
 	public static String getCountryNameById(Integer id) {

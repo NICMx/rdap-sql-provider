@@ -19,8 +19,10 @@ import mx.nic.rdap.core.db.Event;
 import mx.nic.rdap.core.db.IpNetwork;
 import mx.nic.rdap.core.db.PublicId;
 import mx.nic.rdap.core.db.VCard;
+import mx.nic.rdap.db.exception.http.NotImplementedException;
 import mx.nic.rdap.db.struct.SearchResultStruct;
 import mx.nic.rdap.sql.QueryGroup;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.objects.EntityDbObj;
 
 /**
@@ -35,7 +37,6 @@ public class EntityModel {
 
 	private static QueryGroup queryGroup = null;
 
-	private final static String GET_ID_BY_HANDLE_QUERY = "getIdByHandle";
 	private final static String GET_BY_HANDLE_QUERY = "getByHandle";
 
 	private final static String SEARCH_BY_PARTIAL_HANDLE_QUERY = "searchByPartialHandle";
@@ -69,29 +70,13 @@ public class EntityModel {
 		return queryGroup;
 	}
 
-	public static Long getIdByHandle(String entityHandle, Connection connection) throws SQLException {
-		String query = getQueryGroup().getQuery(GET_ID_BY_HANDLE_QUERY);
-		Long entId = null;
-		try (PreparedStatement statement = connection.prepareStatement(query);) {
-			statement.setString(1, entityHandle);
-			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
-			ResultSet rs = statement.executeQuery();
-			if (!rs.next()) {
-				return null;
-			}
-			long long1 = rs.getLong("ent_id");
-			if (!rs.wasNull()) {
-				entId = long1;
-			}
-		}
-
-		return entId;
-	}
-
-	public static EntityDbObj getByHandle(String entityHandle, Connection connection) throws SQLException {
+	public static EntityDbObj getByHandle(String entityHandle, Connection connection)
+			throws SQLException, NotImplementedException {
 		EntityDbObj entResult = null;
-		try (PreparedStatement statement = connection
-				.prepareStatement(getQueryGroup().getQuery(GET_BY_HANDLE_QUERY));) {
+		String query = getQueryGroup().getQuery(GET_BY_HANDLE_QUERY);
+		QueryGroup.userImplemented(query);
+
+		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setString(1, entityHandle);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();
@@ -200,6 +185,10 @@ public class EntityModel {
 
 	private static List<Entity> getEntitiesById(Long id, Connection connection, String getQueryId) throws SQLException {
 		String query = getQueryGroup().getQuery(getQueryId);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return Collections.emptyList();
+		}
+
 		List<Entity> result = null;
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
 			statement.setLong(1, id);
@@ -242,7 +231,7 @@ public class EntityModel {
 	}
 
 	public static SearchResultStruct<Entity> searchByHandle(String handle, int resultLimit, Connection connection)
-			throws SQLException {
+			throws SQLException, NotImplementedException {
 		String query = null;
 		if (handle.contains("*")) {
 			query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_HANDLE_QUERY);
@@ -255,7 +244,7 @@ public class EntityModel {
 	}
 
 	public static SearchResultStruct<Entity> searchByVCardName(String vcardName, int resultLimit, Connection connection)
-			throws SQLException {
+			throws SQLException, NotImplementedException {
 		String query = null;
 		if (vcardName.contains("*")) {
 			vcardName = vcardName.replace("*", "%");
@@ -268,17 +257,19 @@ public class EntityModel {
 	}
 
 	public static SearchResultStruct<Entity> searchByRegexHandle(String regexHandle, int resultLimit,
-			Connection connection) throws SQLException {
+			Connection connection) throws SQLException, NotImplementedException {
 		return searchBy(regexHandle, resultLimit, connection, getQueryGroup().getQuery(SEARCH_BY_HANDLE_REGEX_QUERY));
 	}
 
 	public static SearchResultStruct<Entity> searchByRegexName(String regexName, int resultLimit, Connection connection)
-			throws SQLException {
+			throws SQLException, NotImplementedException {
 		return searchBy(regexName, resultLimit, connection, getQueryGroup().getQuery(SEARCH_BY_NAME_REGEX_QUERY));
 	}
 
 	private static SearchResultStruct<Entity> searchBy(String criteria, int resultLimit, Connection connection,
-			String query) throws SQLException {
+			String query) throws SQLException, NotImplementedException {
+		QueryGroup.userImplemented(query);
+
 		SearchResultStruct<Entity> result = new SearchResultStruct<Entity>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -311,17 +302,6 @@ public class EntityModel {
 			return result;
 		}
 
-	}
-
-	public static void validateParentEntities(List<Entity> entities, Connection connection) throws SQLException {
-		for (Entity ent : entities) {
-			Long entId = EntityModel.getIdByHandle(ent.getHandle(), connection);
-			if (entId == null) {
-				throw new NullPointerException(
-						"Entity: " + ent.getHandle() + " was not inserted previously to the database");
-			}
-			ent.setId(entId);
-		}
 	}
 
 }

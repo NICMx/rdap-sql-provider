@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.DsData;
 import mx.nic.rdap.sql.QueryGroup;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.objects.DsDataDbObj;
 
 /**
@@ -51,6 +52,10 @@ public class DsDataModel {
 	 */
 	public static List<DsData> getBySecureDnsId(Long secureDnsId, Connection connection) throws SQLException {
 		String query = getQueryGroup().getQuery(GET_QUERY);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return Collections.emptyList();
+		}
+
 		List<DsData> resultList = null;
 
 		try (PreparedStatement statement = connection.prepareStatement(query);) { // QUERY

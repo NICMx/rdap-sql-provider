@@ -14,7 +14,6 @@ import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.sql.QueryGroup;
 import mx.nic.rdap.sql.exception.IncompleteObjectException;
 import mx.nic.rdap.sql.model.CountryCodeModel;
-import mx.nic.rdap.sql.model.EntityModel;
 
 /**
  * Model for the {@link Autnum} Object
@@ -71,7 +70,7 @@ public class AutnumStoreModel {
 		LinkStoreModel.storeAutnumLinksToDatabase(autnum.getLinks(), autnumId, connection);
 		EventStoreModel.storeAutnumEventsToDatabase(autnum.getEvents(), autnumId, connection);
 		for (Entity ent : autnum.getEntities()) {
-			Long entId = EntityModel.getIdByHandle(ent.getHandle(), connection);
+			Long entId = EntityStoreModel.getIdByHandle(ent.getHandle(), connection);
 			if (entId == null) {
 				throw new NullPointerException(
 						"Entity: " + ent.getHandle() + "was not inserted previously to the database");

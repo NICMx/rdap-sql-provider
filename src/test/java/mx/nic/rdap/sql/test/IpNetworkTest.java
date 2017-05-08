@@ -18,6 +18,7 @@ import mx.nic.rdap.core.db.RemarkDescription;
 import mx.nic.rdap.core.ip.AddressBlock;
 import mx.nic.rdap.core.ip.IpAddressFormatException;
 import mx.nic.rdap.core.ip.IpUtils;
+import mx.nic.rdap.db.exception.http.NotImplementedException;
 import mx.nic.rdap.sql.model.EntityModel;
 import mx.nic.rdap.sql.model.IpNetworkModel;
 import mx.nic.rdap.sql.objects.EventDbObj;
@@ -37,9 +38,11 @@ public class IpNetworkTest extends DatabaseTest {
 	 * Creates a simple ipNetwork object and store it in the database, then get
 	 * the same ip object from the database by an IP, finally compares the first
 	 * objects with the objects in the database
+	 * 
+	 * @throws NotImplementedException
 	 */
 	@Test
-	public void insertAndGetSimpleObject() throws SQLException, IpAddressFormatException {
+	public void insertAndGetSimpleObject() throws SQLException, IpAddressFormatException, NotImplementedException {
 		// create local instances;
 		IpNetwork ipNetwork = createInstance("192.168.1.0", 24, "home-ip", "type", "MX", null, "client-1234-home-ip");
 
@@ -56,9 +59,11 @@ public class IpNetworkTest extends DatabaseTest {
 	 * Creates a simple ipNetwork object and store it in the database, then get
 	 * the same ip object from the database by an IP, finally compares the first
 	 * objects with the objects in the database
+	 * 
+	 * @throws NotImplementedException
 	 */
 	@Test
-	public void insertAndGetSimpleObjectIpv6() throws SQLException, IpAddressFormatException {
+	public void insertAndGetSimpleObjectIpv6() throws SQLException, IpAddressFormatException, NotImplementedException {
 		// create local instances;
 		IpNetwork ipNetwork = createInstance("2001:BABA:CAFE:0003::", 64, "home-ip", "type", "MX", null,
 				"client-1234-home-ip");
@@ -77,9 +82,11 @@ public class IpNetworkTest extends DatabaseTest {
 	 * Creates a simple ipNetwork object and store it in the database, then get
 	 * the same ip object from the database by an IP, finally compares the first
 	 * objects with the objects in the database
+	 * 
+	 * @throws NotImplementedException
 	 */
 	@Test
-	public void insertAndGetComplexObject() throws SQLException, IpAddressFormatException {
+	public void insertAndGetComplexObject() throws SQLException, IpAddressFormatException, NotImplementedException {
 		// create local instances;
 		IpNetwork ipNetwork = createInstance("192.168.1.0", 24, "home-ip", "type", "MX", null, "client-1234-home-ip");
 
@@ -157,7 +164,7 @@ public class IpNetworkTest extends DatabaseTest {
 	}
 
 	@Test
-	public void insertAndGetComplexV6Object() throws SQLException, IpAddressFormatException {
+	public void insertAndGetComplexV6Object() throws SQLException, IpAddressFormatException, NotImplementedException {
 		// create local instances;
 		IpNetwork ipNetwork = createInstance("2001:BABA:CAFE:0003::", 64, "home-ip", "type", "MX", null,
 				"client-1234-home-ip");
