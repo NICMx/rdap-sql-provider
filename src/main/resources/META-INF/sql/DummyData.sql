@@ -563,14 +563,29 @@ INSERT INTO rdap.ip_address VALUES(10, 10, 4, '192.168.1.8');
 -- -----------------------------------------------------
 -- Link
 -- -----------------------------------------------------
-INSERT INTO rdap.link VALUES (1, 'http://example.net', 'self', 'http://example.net', 'en', 'Link title', 'screen', 'text/html');
-INSERT INTO rdap.link VALUES (2, 'http://example.net/event', 'self', 'http://example.net/event', 'en', 'Link to event', 'screen', 'application/rdap+json');
-INSERT INTO rdap.link VALUES (3, 'http://example.net/domain', 'self', 'http://example.net/domain', 'en', 'Link to domain', 'screen', 'application/rdap+json');
-INSERT INTO rdap.link VALUES (4, 'http://example.net/remark', 'self', 'http://example.net/remark', 'en', 'Link to remark', 'screen', 'application/rdap+json');
-INSERT INTO rdap.link VALUES (5, 'http://example.net/nameserver', 'self', 'http://example.net/nameserver', 'en', 'Link to nameserver', 'screen', 'application/rdap+json');
-INSERT INTO rdap.link VALUES (6, 'http://example.net/asn', 'self', 'http://example.net/asn', 'en', 'Link to asn', 'screen', 'application/rdap+json');
-INSERT INTO rdap.link VALUES (7, 'http://example.net/ds', 'self', 'http://example.net/ds', 'en', 'Link to ds data', 'screen', 'application/rdap+json');
-INSERT INTO rdap.link VALUES (8, 'http://example.net/entity', 'self', 'http://example.net/entity', 'en', 'Link to entity', 'screen', 'application/rdap+json');
+INSERT INTO rdap.link VALUES (1, 'http://example.net', 'self', 'http://example.net', 'Link title', 'screen', 'text/html');
+INSERT INTO rdap.link VALUES (2, 'http://example.net/event', 'self', 'http://example.net/event', 'Link to event', 'screen', 'application/rdap+json');
+INSERT INTO rdap.link VALUES (3, 'http://example.net/domain', 'self', 'http://example.net/domain', 'Link to domain', 'screen', 'application/rdap+json');
+INSERT INTO rdap.link VALUES (4, 'http://example.net/remark', 'self', 'http://example.net/remark', 'Link to remark', 'screen', 'application/rdap+json');
+INSERT INTO rdap.link VALUES (5, 'http://example.net/nameserver', 'self', 'http://example.net/nameserver', 'Link to nameserver', 'screen', 'application/rdap+json');
+INSERT INTO rdap.link VALUES (6, 'http://example.net/asn', 'self', 'http://example.net/asn', 'Link to asn', 'screen', 'application/rdap+json');
+INSERT INTO rdap.link VALUES (7, 'http://example.net/ds', 'self', 'http://example.net/ds', 'Link to ds data', 'screen', 'application/rdap+json');
+INSERT INTO rdap.link VALUES (8, 'http://example.net/entity', 'self', 'http://example.net/entity', 'Link to entity', 'screen', 'application/rdap+json');
+
+-- -----------------------------------------------------
+-- Link Language
+-- -----------------------------------------------------
+INSERT INTO rdap.link_lang VALUES (1,'en');
+INSERT INTO rdap.link_lang VALUES (2,'en');
+INSERT INTO rdap.link_lang VALUES (3,'en');
+INSERT INTO rdap.link_lang VALUES (4,'en');
+INSERT INTO rdap.link_lang VALUES (5,'en');
+INSERT INTO rdap.link_lang VALUES (6,'en');
+INSERT INTO rdap.link_lang VALUES (7,'en');
+INSERT INTO rdap.link_lang VALUES (8,'en');
+INSERT INTO rdap.link_lang VALUES (2,'es');
+INSERT INTO rdap.link_lang VALUES (4,'ch');
+INSERT INTO rdap.link_lang VALUES (6,'ru');
 
 -- -----------------------------------------------------
 -- Public Id

@@ -8,9 +8,10 @@ CREATE TABLE IF NOT EXISTS `rdap`.`entity` (
   `ent_handle` VARCHAR(100) NULL,
   `ent_port43` VARCHAR(254) NULL,
   PRIMARY KEY (`ent_id`),
-  UNIQUE INDEX `id_UNIQUE` (`ent_id` ASC),
-  UNIQUE INDEX `handle_UNIQUE` (`ent_handle` ASC))
-ENGINE = InnoDB;
+  UNIQUE KEY `id_UNIQUE` (`ent_id`),
+  UNIQUE KEY `handle_UNIQUE` (`ent_handle`),
+  KEY `ent_handle_idx` (`ent_handle`)
+) ENGINE=InnoDB AUTO_INCREMENT=1648 DEFAULT CHARSET=utf8;
 
 
 -- -----------------------------------------------------
@@ -48,17 +49,16 @@ ENGINE = InnoDB;
 -- Table `rdap`.`link`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `rdap`.`link` (
-  `lin_id` BIGINT NOT NULL AUTO_INCREMENT,
-  `lin_value` VARCHAR(45) NULL,
-  `lin_rel` VARCHAR(45) NULL,
-  `lin_href` VARCHAR(45) NULL,
-  `lin_hreflang` VARCHAR(45) NULL,
-  `lin_title` VARCHAR(45) NULL,
-  `lin_media` VARCHAR(45) NULL,
-  `lin_type` VARCHAR(45) NULL,
+  `lin_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `lin_value` varchar(45) DEFAULT NULL,
+  `lin_rel` varchar(45) DEFAULT NULL,
+  `lin_href` varchar(45) DEFAULT NULL,
+  `lin_title` varchar(45) DEFAULT NULL,
+  `lin_media` varchar(45) DEFAULT NULL,
+  `lin_type` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`lin_id`),
-  UNIQUE INDEX `lin_id_UNIQUE_7` (`lin_id` ASC))
-ENGINE = InnoDB;
+  UNIQUE KEY `lin_id_UNIQUE` (`lin_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=513 DEFAULT CHARSET=utf8;
 
 
 -- -----------------------------------------------------
@@ -1245,3 +1245,44 @@ CREATE TABLE IF NOT EXISTS `rdap`.`ip_network_parent_relation` (
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `rdap`.`link_lang`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `rdap`.`link_lang` (
+  `lin_id` BIGINT(20) NOT NULL,
+  `lan_hreflang` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`lin_id`, `lan_hreflang`),
+  CONSTRAINT `fk_link_hreflang_link1` 
+  	FOREIGN KEY (`lin_id`) 
+  	REFERENCES `link` (`lin_id`) 
+  	ON DELETE NO ACTION 
+  	ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+-- -----------------------------------------------------
+-- Table `rdap`.`entity_role`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `rdap`.`entity_role` (
+  `ent_id` bigint(20) NOT NULL,
+  `rol_id` tinyint(4) NOT NULL,
+  PRIMARY KEY (`ent_id`,`rol_id`),
+  UNIQUE KEY `unique_ent_rol` (`ent_id`,`rol_id`),
+  KEY `fk_entity_role_roles1_idx` (`rol_id`),
+  CONSTRAINT `fk_entity_role_entity1` 
+  	  FOREIGN KEY (`ent_id`) 
+	  REFERENCES `entity` (`ent_id`) 
+	  ON DELETE NO ACTION 
+	  ON UPDATE NO ACTION,
+  CONSTRAINT `fk_entity_role_roles1` 
+	  FOREIGN KEY (`rol_id`) 
+	  REFERENCES `roles` (`rol_id`) 
+	  ON DELETE NO ACTION 
+	  ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+
+
+

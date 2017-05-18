@@ -6,6 +6,7 @@ import java.util.Properties;
 import java.util.logging.Logger;
 
 import mx.nic.rdap.db.exception.InitializationException;
+import mx.nic.rdap.db.impl.Initializator;
 import mx.nic.rdap.db.spi.AutnumDAO;
 import mx.nic.rdap.db.spi.DataAccessImplementation;
 import mx.nic.rdap.db.spi.DomainDAO;
@@ -30,6 +31,9 @@ public class SqlProviderImplementation implements DataAccessImplementation {
 	public void init(Properties properties) throws InitializationException {
 		DatabaseSession.initRdapConnection(properties);
 		SchemaConfiguration.init(properties);
+
+		Initializator initializer = new Initializator();
+		initializer.init(properties);
 
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			CountryCodeModel.loadAllFromDatabase(connection);
