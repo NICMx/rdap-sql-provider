@@ -1,2 +1,2 @@
 # find-domain
-select name from rdap.domain where ip=?;
+select name from {schema}.domain where ip=?;

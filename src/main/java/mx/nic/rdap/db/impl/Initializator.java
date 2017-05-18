@@ -5,14 +5,13 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import mx.nic.rdap.db.DBConnection;
 import mx.nic.rdap.db.DummyDatabaseCreator;
-import mx.nic.rdap.db.exception.ObjectNotFoundException;
-import mx.nic.rdap.db.model.CountryCodeModel;
-import mx.nic.rdap.db.model.ZoneModel;
-import mx.nic.rdap.db.spi.InitializeSpi;
+import mx.nic.rdap.sql.DatabaseSession;
+import mx.nic.rdap.sql.exception.ObjectNotFoundException;
+import mx.nic.rdap.sql.model.CountryCodeModel;
+import mx.nic.rdap.sql.model.ZoneModel;
 
-public class Initializator implements InitializeSpi {
+public class Initializator {
 
 	public Initializator() {
 	}
@@ -23,7 +22,7 @@ public class Initializator implements InitializeSpi {
 		} catch (SQLException | IOException e) {
 			throw new RuntimeException("Error creating the dummy database", e);
 		}
-		
+
 		try {
 			DummyDatabaseCreator.insertCatalogs();
 		} catch (SQLException | IOException e) {
@@ -35,20 +34,20 @@ public class Initializator implements InitializeSpi {
 			throw new RuntimeException("Error inserting dummy data", e);
 		}
 
-		try (Connection connection = DBConnection.getConnection()) {
+		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			CountryCodeModel.loadAllFromDatabase(connection);
 		} catch (SQLException e) {
 			throw new RuntimeException("Error loading countryCode ", e);
 		}
 
-		try (Connection connection = DBConnection.getConnection()) {
+		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			ZoneModel.loadAllFromDatabase(connection);
 		} catch (SQLException e) {
 			throw new RuntimeException("Error loading zones ", e);
 		}
 
 		try {
-			ZoneModel.validateConfiguratedZones(properties);
+			ZoneModel.validateConfiguredZones(properties);
 		} catch (ObjectNotFoundException e) {
 			throw new RuntimeException("Error validating zones ", e);
 		}
