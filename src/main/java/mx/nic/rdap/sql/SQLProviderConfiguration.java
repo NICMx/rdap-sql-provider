@@ -1,7 +1,5 @@
 package mx.nic.rdap.sql;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -92,14 +90,19 @@ public class SQLProviderConfiguration {
 	}
 
 	private static void init() {
-		ClassLoader classLoader = SQLProviderConfiguration.class.getClassLoader();
+		// ClassLoader classLoader =
+		// SQLProviderConfiguration.class.getClassLoader();
+		
 		Properties p = new Properties();
+		p.setProperty("schema", "rdap");
 
-		try (InputStream ins = classLoader.getResourceAsStream(CONFIG_FILE)) {
-			p.load(ins);
-		} catch (IOException e) {
-			throw new RuntimeException("Error while reading the SQLProviderConfiguration File", e);
-		}
+		// try (InputStream ins = classLoader.getResourceAsStream(CONFIG_FILE))
+		// {
+		// p.load(ins);
+		// } catch (IOException e) {
+		// throw new RuntimeException("Error while reading the
+		// SQLProviderConfiguration File", e);
+		// }
 
 		configuration = p;
 	}

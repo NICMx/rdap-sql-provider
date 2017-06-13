@@ -1282,7 +1282,20 @@ CREATE TABLE IF NOT EXISTS `rdap`.`entity_role` (
 	  ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-
+-- -----------------------------------------------------
+-- Table `rdap`.`key_data`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `rdap`.`key_data` (
+  `kd_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `sdns_id` bigint(20) NOT NULL,
+  `kd_flags` int(10) unsigned DEFAULT NULL,
+  `kd_protocol` int(10) unsigned DEFAULT NULL,
+  `kd_public_key` varchar(255) DEFAULT NULL,
+  `kd_algorithm` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`kd_id`,`sdns_id`),
+  KEY `fk_key_data_secure_dns1_idx` (`sdns_id`),
+  CONSTRAINT `fk_key_data_secure_dns1` FOREIGN KEY (`sdns_id`) REFERENCES `secure_dns` (`sdns_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=117 DEFAULT CHARSET=utf8;
 
 
 
