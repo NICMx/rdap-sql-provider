@@ -1,2 +1,2 @@
 #getAll
-SELECT * FROM rdap.country_code;
+SELECT * FROM {schema}.country_code;

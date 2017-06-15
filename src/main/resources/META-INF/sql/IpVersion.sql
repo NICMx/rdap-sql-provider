@@ -1,2 +1,2 @@
 #getAll
-SELECT * FROM rdap.ip_version;
+SELECT * FROM {schema}.ip_version;

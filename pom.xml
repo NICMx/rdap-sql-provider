@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>mx.nic.rdap</groupId>
 	<artifactId>rdap-sql-provider</artifactId>
-	<version>1.0</version>
+	<version>1.1.0</version>
 	<packaging>jar</packaging>
 	<name>rdap-sql-provider</name>
 
@@ -14,21 +14,12 @@
 	</properties>
 
 	<dependencies>
-		<!-- <dependency>
-			<groupId>mx.nic.rdap</groupId>
-			<artifactId>rdap-core</artifactId>
-			<version>0.0.1</version>
-		</dependency> -->
 		<dependency>
 			<groupId>mx.nic.rdap</groupId>
 			<artifactId>rdap-data-access-api</artifactId>
-			<version>1.0</version>
+			<version>1.1.0</version>
 		</dependency>
 		<dependency>
-			<!--
-				Heads up: If you intend to add some other driver, please note that rdap-server is not supposed to
-				inherit it. See mysql's comment at rdap-server's pom.xml.
-			-->
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.39</version>
