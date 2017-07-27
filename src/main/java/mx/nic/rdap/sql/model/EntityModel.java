@@ -125,8 +125,8 @@ public class EntityModel {
 		entity.getAutnums().addAll(autnums);
 
 		// retrieve the entity roles
-		List<Role> mainEntityRol = RoleModel.getMainEntityRol(entityId, connection);
-		entity.getRoles().addAll(mainEntityRol);
+		List<Role> mainEntityRole = RoleModel.getMainEntityRole(entityId, connection);
+		entity.getRoles().addAll(mainEntityRole);
 	}
 
 	private static EntityDbObj processResultSet(ResultSet resultSet, Connection connection) throws SQLException {
@@ -140,8 +140,8 @@ public class EntityModel {
 	private static List<Entity> getEntitiesByEntityId(Long entityId, Connection connection) throws SQLException {
 		List<Entity> entitiesById = getEntitiesById(entityId, connection, GET_ENTITY_ENTITY_QUERY);
 		for (Entity ent : entitiesById) {
-			List<Role> entityEntityRol = RoleModel.getEntityEntityRol(entityId, ent.getId(), connection);
-			ent.getRoles().addAll(entityEntityRol);
+			List<Role> entityEntityRole = RoleModel.getEntityEntityRole(entityId, ent.getId(), connection);
+			ent.getRoles().addAll(entityEntityRole);
 		}
 
 		return entitiesById;
@@ -150,8 +150,8 @@ public class EntityModel {
 	public static List<Entity> getEntitiesByDomainId(Long domainId, Connection connection) throws SQLException {
 		List<Entity> entitiesById = getEntitiesById(domainId, connection, GET_DOMAIN_ENTITY_QUERY);
 		for (Entity ent : entitiesById) {
-			List<Role> entityEntityRol = RoleModel.getDomainEntityRol(domainId, ent.getId(), connection);
-			ent.getRoles().addAll(entityEntityRol);
+			List<Role> entityEntityRole = RoleModel.getDomainEntityRole(domainId, ent.getId(), connection);
+			ent.getRoles().addAll(entityEntityRole);
 		}
 		return entitiesById;
 	}
@@ -159,8 +159,8 @@ public class EntityModel {
 	public static List<Entity> getEntitiesByNameserverId(Long nameserverId, Connection connection) throws SQLException {
 		List<Entity> entitiesById = getEntitiesById(nameserverId, connection, GET_NS_ENTITY_QUERY);
 		for (Entity ent : entitiesById) {
-			List<Role> entityEntityRol = RoleModel.getNameserverEntityRol(nameserverId, ent.getId(), connection);
-			ent.getRoles().addAll(entityEntityRol);
+			List<Role> entityEntityRole = RoleModel.getNameserverEntityRole(nameserverId, ent.getId(), connection);
+			ent.getRoles().addAll(entityEntityRole);
 		}
 		return entitiesById;
 	}
@@ -168,8 +168,8 @@ public class EntityModel {
 	public static List<Entity> getEntitiesByAutnumId(Long autnumId, Connection connection) throws SQLException {
 		List<Entity> entitiesById = getEntitiesById(autnumId, connection, GET_AUTNUM_ENTITY_QUERY);
 		for (Entity ent : entitiesById) {
-			List<Role> entityEntityRol = RoleModel.getAutnumEntityRol(autnumId, ent.getId(), connection);
-			ent.getRoles().addAll(entityEntityRol);
+			List<Role> entityEntityRole = RoleModel.getAutnumEntityRole(autnumId, ent.getId(), connection);
+			ent.getRoles().addAll(entityEntityRole);
 		}
 		return entitiesById;
 	}
@@ -177,8 +177,8 @@ public class EntityModel {
 	public static List<Entity> getEntitiesByIpNetworkId(Long ipNetworkId, Connection connection) throws SQLException {
 		List<Entity> entitiesById = getEntitiesById(ipNetworkId, connection, GET_IP_NETWORK_ENTITY_QUERY);
 		for (Entity ent : entitiesById) {
-			List<Role> entityEntityRol = RoleModel.getIpNetworkEntityRol(ipNetworkId, ent.getId(), connection);
-			ent.getRoles().addAll(entityEntityRol);
+			List<Role> entityEntityRole = RoleModel.getIpNetworkEntityRole(ipNetworkId, ent.getId(), connection);
+			ent.getRoles().addAll(entityEntityRole);
 		}
 		return entitiesById;
 	}

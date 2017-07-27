@@ -248,7 +248,7 @@ public class NameserverModel {
 		List<Entity> entities = EntityModel.getEntitiesByNameserverId(nameserver.getId(), connection);
 		nameserver.getEntities().addAll(entities);
 		for (Entity entity : entities) {
-			List<Role> roles = RoleModel.getNameserverEntityRol(nameserver.getId(), entity.getId(), connection);
+			List<Role> roles = RoleModel.getNameserverEntityRole(nameserver.getId(), entity.getId(), connection);
 			entity.setRoles(roles);
 		}
 	}
