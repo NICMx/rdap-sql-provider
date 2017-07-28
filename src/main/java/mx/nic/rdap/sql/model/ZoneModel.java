@@ -156,7 +156,7 @@ public class ZoneModel {
 	 * @return The Id if the zone exists in the database, otherwise null.
 	 */
 	public static Integer getIdByZoneName(String zoneName) {
-		return idByZone.get(zoneName);
+		return idByZone.get(zoneName.toLowerCase());
 	}
 
 	/**
@@ -164,7 +164,7 @@ public class ZoneModel {
 	 * @return Checks if the zoneName exists in the database.
 	 */
 	public static boolean existsZone(String zoneName) {
-		return idByZone.containsKey(zoneName);
+		return idByZone.containsKey(zoneName.toLowerCase());
 	}
 
 	/**
