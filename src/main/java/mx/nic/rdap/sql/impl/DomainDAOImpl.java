@@ -3,8 +3,6 @@ package mx.nic.rdap.sql.impl;
 import java.lang.reflect.Array;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.List;
 
 import mx.nic.rdap.core.db.Domain;
 import mx.nic.rdap.core.db.DomainLabel;
@@ -63,13 +61,6 @@ public class DomainDAOImpl implements DomainDAO {
 			throws RdapDataAccessException {
 
 		String domainName = domainLabel.getULabel();
-		if (domainName.contains("*")) {
-			List<String> labels = Arrays.asList(domainName.split("\\."));
-			for (String label : labels) {
-				if (label.contains("*") && !label.endsWith("*"))
-					throw new BadRequestException("Patterns can only have an * at the end.");
-			}
-		}
 		SearchResultStruct<Domain> domains = null;
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			if (domainName.contains(".")) {
@@ -89,13 +80,6 @@ public class DomainDAOImpl implements DomainDAO {
 	public SearchResultStruct<Domain> searchByNsLDHName(DomainLabel domainLabel, int resultLimit)
 			throws RdapDataAccessException {
 		String nsName = domainLabel.getULabel();
-		if (nsName.contains("*")) {
-			List<String> labels = Arrays.asList(nsName.split("\\."));
-			for (String label : labels) {
-				if (label.contains("*") && !label.endsWith("*"))
-					throw new BadRequestException("Patterns can only have an * at the end");
-			}
-		}
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return DomainModel.searchByNsLdhName(nsName, resultLimit, useNsAsAttribute, connection);
 		} catch (SQLException e) {
