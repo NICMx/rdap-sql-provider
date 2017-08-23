@@ -107,9 +107,11 @@ public class DomainModel {
 		if (isPartialZone) {
 			zoneIds = ZoneModel.getValidZoneIds();
 
-			zone = zone.replaceAll("\\*", "%");
+			// Escape special chars for the "LIKE" sentence
+			zone = zone.replaceAll("(\\%|\\_)", "\\\\$1").replaceAll("\\*", "%");
 			if (isPartialName) {
-				name = name.replaceAll("\\*", "%");
+				// Escape special chars for the "LIKE" sentence
+				name = name.replaceAll("(\\%|\\_)", "\\\\$1").replaceAll("\\*", "%");
 				query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_NAME_WITH_PARTIAL_ZONE_QUERY);
 			} else {
 				query = getQueryGroup().getQuery(SEARCH_BY_NAME_WITH_PARTIAL_ZONE_QUERY);
@@ -125,7 +127,8 @@ public class DomainModel {
 			}
 
 			if (isPartialName) {
-				name = name.replaceAll("\\*", "%");
+				// Escape special chars for the "LIKE" sentence
+				name = name.replaceAll("(\\%|\\_)", "\\\\$1").replaceAll("\\*", "%");
 				query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_NAME_WITH_ZONE_QUERY);
 			} else {
 				query = getQueryGroup().getQuery(SEARCH_BY_NAME_WITH_ZONE_QUERY);
@@ -182,7 +185,8 @@ public class DomainModel {
 			throws SQLException, NotImplementedException {
 		String query;
 		if (domainName.contains("*")) {
-			domainName = domainName.replaceAll("\\*", "%");
+			// Escape special chars for the "LIKE" sentence
+			domainName = domainName.replaceAll("(\\%|\\_)", "\\\\$1").replaceAll("\\*", "%");
 			query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_NAME_WITHOUT_ZONE_QUERY);
 		} else {
 			query = getQueryGroup().getQuery(SEARCH_BY_NAME_WITHOUT_ZONE_QUERY);
@@ -299,7 +303,8 @@ public class DomainModel {
 			boolean useNameserverAsDomainAttribute, Connection connection)
 			throws SQLException, NotImplementedException {
 		String query = getQueryGroup().getQuery(SEARCH_BY_NAMESERVER_LDH_QUERY);
-		name = name.replace("*", "%");
+		// Escape special chars for the "LIKE" sentence
+		name = name.replaceAll("(\\%|\\_)", "\\\\$1").replace("*", "%");
 		return searchByNsLdhName(name, resultLimit, useNameserverAsDomainAttribute, connection, query);
 	}
 
