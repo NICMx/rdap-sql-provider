@@ -1,2 +1,2 @@
 #getAll
-SELECT * FROM {schema}.ip_version;
+SELECT ive_id, ive_name FROM {schema}.ip_version;

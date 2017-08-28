@@ -20,5 +20,5 @@ SELECT eve.eve_id, eve.eac_id, eve.eve_actor, eve.eve_date FROM {schema}.event e
 SELECT eve.eve_id,eve.eac_id,eve.eve_actor,eve.eve_date FROM {schema}.event eve JOIN {schema}.key_events kde ON kde.eve_id=eve.eve_id WHERE kde.kd_id=?;
 
 #getAll
-SELECT * FROM {schema}.event;
+SELECT eve_id, eac_id, eve_actor, eve_date FROM {schema}.event;
 

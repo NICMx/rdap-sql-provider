@@ -1,2 +1,2 @@
 #getAll
-SELECT * FROM {schema}.zone;
+SELECT zone_id, zone_name FROM {schema}.zone;
