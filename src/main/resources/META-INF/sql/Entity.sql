@@ -29,13 +29,13 @@ SELECT ent_id, ent_handle, ent_port43 FROM {schema}.entity e WHERE e.ent_handle 
 SELECT DISTINCT (ent.ent_id),  ent.ent_handle, ent.ent_port43 FROM {schema}.entity ent JOIN {schema}.entity_contact eco ON eco.ent_id=ent.ent_id JOIN {schema}.vcard vca ON vca.vca_id=eco.vca_id WHERE vca.vca_name LIKE ? ORDER BY 1 LIMIT ?;
 
 #getByName
-SELECT ent_id, ent_handle, ent_port43 FROM {schema}.entity ent JOIN {schema}.entity_contact eco ON eco.ent_id=ent.ent_id JOIN {schema}.vcard vca ON vca.vca_id=eco.vca_id WHERE vca.vca_name = ?;
+SELECT ent.ent_id, ent.ent_handle, ent.ent_port43 FROM {schema}.entity ent JOIN {schema}.entity_contact eco ON eco.ent_id=ent.ent_id JOIN {schema}.vcard vca ON vca.vca_id=eco.vca_id WHERE vca.vca_name = ?;
 
 #searchByHandle
-SELECT ent_id, ent_handle, ent_port43 FROM {schema}.entity e WHERE e.ent_handle = ? ORDER BY 1 LIMIT ?;
+SELECT e.ent_id, e.ent_handle, e.ent_port43 FROM {schema}.entity e WHERE e.ent_handle = ? ORDER BY 1 LIMIT ?;
 
 #searchByName
-SELECT ent_id, ent_handle, ent_port43 FROM {schema}.entity ent JOIN {schema}.entity_contact eco ON eco.ent_id=ent.ent_id JOIN {schema}.vcard vca ON vca.vca_id=eco.vca_id WHERE vca.vca_name = ? ORDER BY 1 LIMIT ?;
+SELECT ent.ent_id, ent.ent_handle, ent.ent_port43 FROM {schema}.entity ent JOIN {schema}.entity_contact eco ON eco.ent_id=ent.ent_id JOIN {schema}.vcard vca ON vca.vca_id=eco.vca_id WHERE vca.vca_name = ? ORDER BY 1 LIMIT ?;
 
 #existByPartialName
 SELECT EXISTS(SELECT 1 FROM {schema}.entity ent JOIN {schema}.entity_contact eco ON eco.ent_id=ent.ent_id JOIN {schema}.vcard vca ON vca.vca_id=eco.vca_id WHERE vca.vca_name LIKE ?);
