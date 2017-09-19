@@ -63,7 +63,7 @@ public class QueryGroup {
 				if (currentLine.startsWith("#")) {
 					queryName = currentLine.substring(1).trim();
 				} else {
-					querySB.append(currentLine);
+					querySB.append(currentLine).append(" ");
 					if (currentLine.trim().endsWith(";")) {
 						// If the query has no name, it will be ignored.
 						if (queryName != null) {
