@@ -144,12 +144,12 @@ public class DomainModel {
 				for (int i = 1; i <= zoneIds.size(); i++) {
 					statement.setInt(i, zoneIds.get(i - 1));
 				}
-				statement.setString(zoneIds.size() + 1, name);
+				statement.setString(zoneIds.size() + 1, name.toLowerCase());
 				statement.setString(zoneIds.size() + 2, name);
 				statement.setString(zoneIds.size() + 3, zone);
 				statement.setInt(zoneIds.size() + 4, resultLimit);
 			} else {
-				statement.setString(1, name);
+				statement.setString(1, name.toLowerCase());
 				statement.setString(2, name);
 				Integer zoneId = ZoneModel.getIdByZoneName(zone);
 				statement.setInt(3, zoneId);
@@ -191,7 +191,7 @@ public class DomainModel {
 		} else {
 			query = getQueryGroup().getQuery(SEARCH_BY_NAME_WITHOUT_ZONE_QUERY);
 		}
-		return searchByName(domainName, resultLimit, useNameserverAsDomainAttribute, connection, query);
+		return searchByName(domainName.toLowerCase(), domainName, resultLimit, useNameserverAsDomainAttribute, connection, query);
 	}
 
 	public static SearchResultStruct<Domain> searchByRegexName(String regexName, int resultLimit,
@@ -249,12 +249,31 @@ public class DomainModel {
 	}
 
 	/**
-	 * Searches a domain by it's name when user don´t care about the TLD
+	 * Wrapper for {@link mx.nic.rdap.sql.model.DomainModel#searchByName(String, String, boolean, Connection, String)},
+	 * useful when the same namePattern is used as ALabel and ULabel.
 	 * 
+	 * @param domainName
+	 * @param resultLimit
+	 * @param useNameserverAsDomainAttribute
+	 * @param connection
+	 * @param query
+	 * @return SearchResultStruct of Domains
+	 * @throws SQLException
 	 * @throws NotImplementedException
 	 */
 	private static SearchResultStruct<Domain> searchByName(String domainName, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection, String query)
+			throws SQLException, NotImplementedException {
+		return searchByName(domainName, domainName, resultLimit, useNameserverAsDomainAttribute, connection, query);
+	}
+	
+	/**
+	 * Searches a domain by it's name (A-Label and U-Label) when user don´t care about the TLD
+	 * 
+	 * @throws NotImplementedException
+	 */
+	private static SearchResultStruct<Domain> searchByName(String domainNameALabel, String domainNameULabel,
+			int resultLimit, boolean useNameserverAsDomainAttribute, Connection connection, String query)
 			throws SQLException, NotImplementedException {
 		QueryGroup.userImplemented(query);
 
@@ -271,8 +290,8 @@ public class DomainModel {
 				statement.setInt(i, zoneIds.get(i - 1));
 			}
 
-			statement.setString(zoneIds.size() + 1, domainName);
-			statement.setString(zoneIds.size() + 2, domainName);
+			statement.setString(zoneIds.size() + 1, domainNameALabel);
+			statement.setString(zoneIds.size() + 2, domainNameULabel);
 			statement.setInt(zoneIds.size() + 3, resultLimit);
 			logger.log(Level.INFO, "Executing query" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();
@@ -328,7 +347,7 @@ public class DomainModel {
 		// notices
 		resultLimit = resultLimit + 1;
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, name);
+			statement.setString(1, name.toLowerCase());
 			statement.setString(2, name);
 			statement.setInt(3, resultLimit);
 			logger.log(Level.INFO, "Executing query" + statement.toString());

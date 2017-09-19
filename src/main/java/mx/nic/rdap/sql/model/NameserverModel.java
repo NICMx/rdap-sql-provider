@@ -72,7 +72,7 @@ public class NameserverModel {
 		String query = getQueryGroup().getQuery(FIND_BY_NAME_QUERY);
 		QueryGroup.userImplemented(query);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, name.getALabel());
+			statement.setString(1, name.getALabel().toLowerCase());
 			statement.setString(2, name.getULabel());
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
@@ -96,26 +96,42 @@ public class NameserverModel {
 		} else {
 			query = getQueryGroup().getQuery(SEARCH_BY_NAME_QUERY);
 		}
-		return searchByName(namePattern, resultLimit, connection, query);
+		return searchByName(namePattern.toLowerCase(), namePattern, resultLimit, connection, query);
 	}
 
 	public static SearchResultStruct<Nameserver> searchByRegexName(String namePattern, int resultLimit,
 			Connection connection) throws SQLException, NotImplementedException {
 		return searchByName(namePattern, resultLimit, connection, getQueryGroup().getQuery(SEARCH_BY_NAME_REGEX_QUERY));
 	}
-
+	
+	/**
+	 * Wrapper for {@link mx.nic.rdap.sql.model.NameserverModel#searchByName(String, String, int, Connection, String)},
+	 * useful when the same namePattern is used as ALabel and ULabel.
+	 * 
+	 * @param namePattern
+	 * @param resultLimit
+	 * @param connection
+	 * @param query
+	 * @return SearchResultStruct of Nameservers
+	 * @throws SQLException
+	 * @throws NotImplementedException
+	 */
 	private static SearchResultStruct<Nameserver> searchByName(String namePattern, int resultLimit,
+			Connection connection, String query) throws SQLException, NotImplementedException {
+		return searchByName(namePattern, namePattern, resultLimit, connection, query);
+	}
+
+	private static SearchResultStruct<Nameserver> searchByName(String namePatternALabel, String namePatternULabel, int resultLimit,
 			Connection connection, String query) throws SQLException, NotImplementedException {
 		QueryGroup.userImplemented(query);
 		SearchResultStruct<Nameserver> result = new SearchResultStruct<Nameserver>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
 		resultLimit = resultLimit + 1;
-		String criteria = namePattern;
 		List<NameserverDbObj> nameservers = new ArrayList<NameserverDbObj>();
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, criteria);
-			statement.setString(2, criteria);
+			statement.setString(1, namePatternALabel);
+			statement.setString(2, namePatternULabel);
 			statement.setInt(3, resultLimit);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
