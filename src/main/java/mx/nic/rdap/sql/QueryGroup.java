@@ -63,7 +63,7 @@ public class QueryGroup {
 				if (currentLine.startsWith("#")) {
 					queryName = currentLine.substring(1).trim();
 				} else {
-					querySB.append(currentLine).append(" ");
+					querySB.append(currentLine);
 					if (currentLine.trim().endsWith(";")) {
 						// If the query has no name, it will be ignored.
 						if (queryName != null) {
@@ -77,6 +77,8 @@ public class QueryGroup {
 							}
 						}
 						querySB.setLength(0);
+					} else {
+						querySB.append(" ");
 					}
 				}
 			}
