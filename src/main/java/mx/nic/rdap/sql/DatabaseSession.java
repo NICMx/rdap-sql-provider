@@ -30,18 +30,17 @@ public class DatabaseSession {
 	/** From the migrator's perspective, this is the "source" database. */
 	private static DataSource originDataSource;
 
-	private static void testDatabase(BasicDataSource ds) throws SQLException {
-		// http://stackoverflow.com/questions/3668506
-		final String TEST_QUERY = "select 1";
+	private static void testDatabase(BasicDataSource ds, String testQuery) throws SQLException {
 		try (Connection connection = ds.getConnection(); Statement statement = connection.createStatement();) {
-			ResultSet resultSet = statement.executeQuery(TEST_QUERY);
+			logger.log(Level.INFO, "Executing QUERY: " + testQuery);
+			ResultSet resultSet = statement.executeQuery(testQuery);
 
 			if (!resultSet.next()) {
-				throw new SQLException("'" + TEST_QUERY + "' returned no rows.");
+				throw new SQLException("'" + testQuery + "' returned no rows.");
 			}
 			int result = resultSet.getInt(1);
 			if (result != 1) {
-				throw new SQLException("'" + TEST_QUERY + "' returned " + result);
+				throw new SQLException("'" + testQuery + "' returned " + result);
 			}
 		}
 	}
@@ -137,8 +136,10 @@ public class DatabaseSession {
 		dataSource.setPassword(config.getProperty("password"));
 		dataSource.setDefaultAutoCommit(false);
 
+		// Load the test query, if not present then load the most common (http://stackoverflow.com/questions/3668506)
+		String testQuery = config.getProperty("testQuery", "select 1");
 		try {
-			testDatabase(dataSource);
+			testDatabase(dataSource, testQuery);
 		} catch (SQLException e) {
 			throw new InitializationException("The database connection test yielded failure.", e);
 		}
