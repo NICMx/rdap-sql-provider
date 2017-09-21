@@ -106,6 +106,9 @@ public class DomainModel {
 
 		if (isPartialZone) {
 			zoneIds = ZoneModel.getValidZoneIds();
+			if (zoneIds.isEmpty()) {
+				throw new NotFoundException("Zone not found.");
+			}
 
 			// Escape special chars for the "LIKE" sentence
 			zone = zone.replaceAll("(\\%|\\_)", "\\\\$1").replaceAll("\\*", "%");
@@ -182,7 +185,7 @@ public class DomainModel {
 
 	public static SearchResultStruct<Domain> searchByName(String domainName, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
-			throws SQLException, NotImplementedException {
+			throws SQLException, NotImplementedException, NotFoundException {
 		String query;
 		if (domainName.contains("*")) {
 			// Escape special chars for the "LIKE" sentence
@@ -196,14 +199,14 @@ public class DomainModel {
 
 	public static SearchResultStruct<Domain> searchByRegexName(String regexName, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
-			throws SQLException, NotImplementedException {
+			throws SQLException, NotImplementedException, NotFoundException {
 		String query = getQueryGroup().getQuery(SEARCH_BY_REGEX_NAME_WITHOUT_ZONE);
 		return searchByName(regexName, resultLimit, useNameserverAsDomainAttribute, connection, query);
 	}
 
 	public static SearchResultStruct<Domain> searchByRegexName(String name, String zone, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
-			throws SQLException, NotImplementedException {
+			throws SQLException, NotImplementedException, NotFoundException {
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -212,6 +215,9 @@ public class DomainModel {
 		QueryGroup.userImplemented(query);
 
 		List<Integer> zoneIds = ZoneModel.getValidZoneIds();
+		if (zoneIds.isEmpty()) {
+			throw new NotFoundException("Zone not found.");
+		}
 		query = Util.createDynamicQueryWithInClause(zoneIds.size(), query);
 
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
@@ -263,7 +269,7 @@ public class DomainModel {
 	 */
 	private static SearchResultStruct<Domain> searchByName(String domainName, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection, String query)
-			throws SQLException, NotImplementedException {
+			throws SQLException, NotImplementedException, NotFoundException {
 		return searchByName(domainName, domainName, resultLimit, useNameserverAsDomainAttribute, connection, query);
 	}
 	
@@ -274,7 +280,7 @@ public class DomainModel {
 	 */
 	private static SearchResultStruct<Domain> searchByName(String domainNameALabel, String domainNameULabel,
 			int resultLimit, boolean useNameserverAsDomainAttribute, Connection connection, String query)
-			throws SQLException, NotImplementedException {
+			throws SQLException, NotImplementedException, NotFoundException {
 		QueryGroup.userImplemented(query);
 
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
@@ -282,6 +288,9 @@ public class DomainModel {
 		// notices
 		resultLimit = resultLimit + 1;
 		List<Integer> zoneIds = ZoneModel.getValidZoneIds();
+		if (zoneIds.isEmpty()) {
+			throw new NotFoundException("Zone not found.");
+		}
 		query = Util.createDynamicQueryWithInClause(zoneIds.size(), query);
 
 		try (PreparedStatement statement = connection.prepareStatement(query);) {

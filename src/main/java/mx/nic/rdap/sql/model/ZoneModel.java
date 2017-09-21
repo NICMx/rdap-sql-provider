@@ -16,6 +16,7 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import mx.nic.rdap.db.exception.InitializationException;
 import mx.nic.rdap.sql.QueryGroup;
 import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.exception.ObjectNotFoundException;
@@ -35,12 +36,14 @@ public class ZoneModel {
 
 	private static Map<Integer, String> zoneById;
 	private static Map<String, Integer> idByZone;
-	public static String REVERSE_IP_V4 = "in-addr.arpa";
-	public static String REVERSE_IP_V6 = "ip6.arpa";
+	public static final String REVERSE_IP_V4 = "in-addr.arpa";
+	public static final String REVERSE_IP_V6 = "ip6.arpa";
 
 	private static final String ZONE_KEY = "zones";
 	private static final String IS_REVERSE_IPV4_ENABLED_KEY = "is_reverse_ipv4_enabled";
 	private static final String IS_REVERSE_IPV6_ENABLED_KEY = "is_reverse_ipv6_enabled";
+
+	private static final String CONFIGURED_ZONES_DEFAULT_VALUE = "*";
 
 	public static void loadQueryGroup(String schema) {
 		try {
@@ -62,41 +65,69 @@ public class ZoneModel {
 	/**
 	 * Validates the configured zones exist in the database.
 	 */
-	public static void validateConfiguredZones(Properties properties) throws ObjectNotFoundException {
-		List<String> configuredZones;
+	public static void validateConfiguredZones(Properties properties) throws ObjectNotFoundException, InitializationException {
+		List<String> configuredZones = new ArrayList<String>();
 		if (properties.containsKey(ZONE_KEY)) {
-			String zones[] = properties.getProperty(ZONE_KEY).trim().split(",");
-			List<String> trimmedZones = new ArrayList<String>();
-			for (String zone : zones) {
-				if (!zone.trim().isEmpty())
-					trimmedZones.add(zone.trim());
+			String zonesValue = properties.getProperty(ZONE_KEY).trim();
+			// It doesn't make sense to configure no zones or to block them all
+			if (zonesValue.isEmpty()) {
+				throw new InitializationException("Value of property '" + ZONE_KEY + "' is misconfigured");
 			}
-			configuredZones = trimmedZones;
+			String zones[] = zonesValue.split(",");
+			// The wilcard can't be used with other zones
+			if (zonesValue.contains("*") && zones.length > 1) {
+				throw new InitializationException("Property '" + ZONE_KEY + "' can't mix the wildcard with other zones, "
+						+"either the wildcard is used or the zones are specified");
+			}
+			for (String zone : zones) {
+				zone = zone.trim();
+				if (zone.isEmpty()) {
+					continue;
+				}
+				if (zone.equals(CONFIGURED_ZONES_DEFAULT_VALUE)) {
+					// If set, overwrite all with the DB values
+					configuredZones.clear();
+					configuredZones.addAll(ZoneModel.getIdByZone().keySet());
+					break;
+				}
+				if (zone.endsWith(".")) {
+					zone = zone.substring(0, zone.length() - 1);
+				}
+				if (zone.startsWith(".")) {
+					zone = zone.substring(1);
+				}
+				configuredZones.add(zone);
+			}
 		} else {
-			configuredZones = new ArrayList<>();
+			// If the property isn't configured, allow all zones
+			configuredZones.addAll(ZoneModel.getIdByZone().keySet());
 		}
 		Map<Integer, String> zoneByIdForServer = new HashMap<Integer, String>();
 		Map<String, Integer> idByZoneForServer = new HashMap<String, Integer>();
 
 		// Configure reverse zones
-		if (Boolean.parseBoolean(properties.getProperty(IS_REVERSE_IPV4_ENABLED_KEY))) {
-			String zone = ZoneModel.REVERSE_IP_V4;
-			if (ZoneModel.getIdByZone().get(zone) != null) {
-				zoneByIdForServer.put(ZoneModel.getIdByZone().get(zone), zone);
-				idByZoneForServer.put(zone, ZoneModel.getIdByZoneName(zone));
-			} else {
-				logger.log(Level.WARNING, "Configured zone not found in database : " + zone);
+		if (properties.containsKey(IS_REVERSE_IPV4_ENABLED_KEY)) {
+			if (Boolean.parseBoolean(properties.getProperty(IS_REVERSE_IPV4_ENABLED_KEY).trim())) {
+				String zone = ZoneModel.REVERSE_IP_V4;
+				if (ZoneModel.getIdByZone().get(zone) != null) {
+					zoneByIdForServer.put(ZoneModel.getIdByZone().get(zone), zone);
+					idByZoneForServer.put(zone, ZoneModel.getIdByZoneName(zone));
+				} else {
+					logger.log(Level.WARNING, "Configured zone not found in database : " + zone);
+				}
 			}
 		}
 		configuredZones.remove(ZoneModel.REVERSE_IP_V4);
 
-		if (Boolean.parseBoolean(properties.getProperty(IS_REVERSE_IPV6_ENABLED_KEY))) {
-			String zone = ZoneModel.REVERSE_IP_V6;
-			if (ZoneModel.getIdByZone().get(zone) != null) {
-				zoneByIdForServer.put(ZoneModel.getIdByZone().get(zone), zone);
-				idByZoneForServer.put(zone, ZoneModel.getIdByZoneName(zone));
-			} else {
-				logger.log(Level.WARNING, "Configured zone not found in database : " + zone);
+		if (properties.containsKey(IS_REVERSE_IPV6_ENABLED_KEY)) {
+			if (Boolean.parseBoolean(properties.getProperty(IS_REVERSE_IPV6_ENABLED_KEY).trim())) {
+				String zone = ZoneModel.REVERSE_IP_V6;
+				if (ZoneModel.getIdByZone().get(zone) != null) {
+					zoneByIdForServer.put(ZoneModel.getIdByZone().get(zone), zone);
+					idByZoneForServer.put(zone, ZoneModel.getIdByZoneName(zone));
+				} else {
+					logger.log(Level.WARNING, "Configured zone not found in database : " + zone);
+				}
 			}
 		}
 		configuredZones.remove(ZoneModel.REVERSE_IP_V6);
@@ -132,7 +163,7 @@ public class ZoneModel {
 
 		do {
 			Integer zoneId = rs.getInt("zone_id");
-			String zoneName = rs.getString("zone_name");
+			String zoneName = rs.getString("zone_name").toLowerCase();
 			zoneById.put(zoneId, zoneName);
 			idByZone.put(zoneName, zoneId);
 		} while (rs.next());
@@ -172,15 +203,15 @@ public class ZoneModel {
 	 * 
 	 */
 	public static boolean isReverseAddress(String address) {
-		return address.trim().endsWith(REVERSE_IP_V4) || address.trim().endsWith(REVERSE_IP_V6);
+		return address.trim().toLowerCase().endsWith(REVERSE_IP_V4) || address.trim().toLowerCase().endsWith(REVERSE_IP_V6);
 	}
 
 	public static String getAddressWithoutArpaZone(String address) {
-		if (address.endsWith(REVERSE_IP_V4)) {
+		if (address.toLowerCase().endsWith(REVERSE_IP_V4)) {
 			return address.substring(0, address.length() - (REVERSE_IP_V4.length() + 1));
 		}
 
-		if (address.endsWith(REVERSE_IP_V6)) {
+		if (address.toLowerCase().endsWith(REVERSE_IP_V6)) {
 			return address.substring(0, address.length() - (REVERSE_IP_V6.length() + 1));
 		}
 
@@ -188,11 +219,11 @@ public class ZoneModel {
 	}
 
 	public static String getArpaZoneNameFromAddress(String address) {
-		if (address.endsWith(REVERSE_IP_V4)) {
+		if (address.toLowerCase().endsWith(REVERSE_IP_V4)) {
 			return REVERSE_IP_V4;
 		}
 
-		if (address.endsWith(REVERSE_IP_V6)) {
+		if (address.toLowerCase().endsWith(REVERSE_IP_V6)) {
 			return REVERSE_IP_V6;
 		}
 

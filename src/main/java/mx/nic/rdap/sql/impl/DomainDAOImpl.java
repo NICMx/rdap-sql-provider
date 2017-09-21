@@ -7,7 +7,6 @@ import java.sql.SQLException;
 import mx.nic.rdap.core.db.Domain;
 import mx.nic.rdap.core.db.DomainLabel;
 import mx.nic.rdap.db.exception.RdapDataAccessException;
-import mx.nic.rdap.db.exception.http.BadRequestException;
 import mx.nic.rdap.db.exception.http.NotFoundException;
 import mx.nic.rdap.db.exception.http.NotImplementedException;
 import mx.nic.rdap.db.spi.DomainDAO;
@@ -32,9 +31,6 @@ public class DomainDAOImpl implements DomainDAO {
 		String zone;
 
 		String domainName = domainLabel.getULabel();
-		// TODO validations shouls be done by the server.
-		if (!domainName.contains("."))
-			throw new BadRequestException("Invalid fqdn");
 
 		if (ZoneModel.isReverseAddress(domainName)) {
 			zone = ZoneModel.getArpaZoneNameFromAddress(domainName);
