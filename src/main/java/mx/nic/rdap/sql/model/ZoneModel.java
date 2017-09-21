@@ -80,7 +80,7 @@ public class ZoneModel {
 						+"either the wildcard is used or the zones are specified");
 			}
 			for (String zone : zones) {
-				zone = zone.trim();
+				zone = zone.trim().toLowerCase();
 				if (zone.isEmpty()) {
 					continue;
 				}
