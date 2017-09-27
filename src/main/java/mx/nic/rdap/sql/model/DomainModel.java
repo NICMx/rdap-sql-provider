@@ -20,6 +20,7 @@ import mx.nic.rdap.core.ip.IpUtils;
 import mx.nic.rdap.db.exception.http.BadRequestException;
 import mx.nic.rdap.db.exception.http.NotFoundException;
 import mx.nic.rdap.db.exception.http.NotImplementedException;
+import mx.nic.rdap.db.exception.http.UnprocessableEntityException;
 import mx.nic.rdap.db.struct.SearchResultStruct;
 import mx.nic.rdap.sql.QueryGroup;
 import mx.nic.rdap.sql.Util;
@@ -389,7 +390,7 @@ public class DomainModel {
 	 */
 	public static SearchResultStruct<Domain> searchByNsIp(String ip, int resultLimit,
 			boolean useNameserverAsDomainAttribute, Connection connection)
-			throws SQLException, BadRequestException, NotImplementedException {
+			throws SQLException, BadRequestException, NotImplementedException, UnprocessableEntityException {
 		String query = getQueryGroup().getQuery(SEARCH_BY_NAMESERVER_IP_QUERY);
 		QueryGroup.userImplemented(query);
 
@@ -399,6 +400,9 @@ public class DomainModel {
 		resultLimit = resultLimit + 1;
 		IpAddressDbObj ipAddress = new IpAddressDbObj();
 
+		if (ip.contains("*")) {
+			throw new UnprocessableEntityException("Partial search using IPs isn't implemented, try another search");
+		}
 		InetAddress address;
 		try {
 			address = IpUtils.parseAddress(ip);

@@ -22,6 +22,7 @@ import mx.nic.rdap.core.ip.IpAddressFormatException;
 import mx.nic.rdap.core.ip.IpUtils;
 import mx.nic.rdap.db.exception.http.BadRequestException;
 import mx.nic.rdap.db.exception.http.NotImplementedException;
+import mx.nic.rdap.db.exception.http.UnprocessableEntityException;
 import mx.nic.rdap.db.struct.SearchResultStruct;
 import mx.nic.rdap.sql.QueryGroup;
 import mx.nic.rdap.sql.SQLProviderConfiguration;
@@ -160,7 +161,7 @@ public class NameserverModel {
 	}
 
 	public static SearchResultStruct<Nameserver> searchByIp(String ipaddressPattern, int resultLimit,
-			Connection connection) throws SQLException, BadRequestException, NotImplementedException {
+			Connection connection) throws SQLException, BadRequestException, NotImplementedException, UnprocessableEntityException {
 		SearchResultStruct<Nameserver> result = new SearchResultStruct<Nameserver>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -168,6 +169,9 @@ public class NameserverModel {
 		String query = null;
 		List<NameserverDbObj> nameservers = new ArrayList<NameserverDbObj>();
 
+		if (ipaddressPattern.contains("*")) {
+			throw new UnprocessableEntityException("Partial search using IPs isn't implemented, try another search");
+		}
 		InetAddress address;
 		try {
 			address = IpUtils.parseAddress(ipaddressPattern);
