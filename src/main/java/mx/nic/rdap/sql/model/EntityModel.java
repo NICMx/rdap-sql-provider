@@ -235,8 +235,8 @@ public class EntityModel {
 		String query = null;
 		if (handle.contains("*")) {
 			query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_HANDLE_QUERY);
-			// Escape special chars for the "LIKE" sentence
-			handle = handle.replaceAll("(\\%|\\_)", "\\\\$1").replace("*", "%");
+			// Escape special chars for the "LIKE" sentence and consecutive wildcards are treated as one
+			handle = handle.replaceAll("(\\%|\\_)", "\\\\$1").replaceAll("(\\*)+", "\\*").replace("*", "%");
 		} else {
 			query = getQueryGroup().getQuery(SEARCH_BY_HANDLE_QUERY);
 		}
@@ -248,8 +248,8 @@ public class EntityModel {
 			throws SQLException, NotImplementedException {
 		String query = null;
 		if (vcardName.contains("*")) {
-			// Escape special chars for the "LIKE" sentence
-			vcardName = vcardName.replaceAll("(\\%|\\_)", "\\\\$1").replace("*", "%");
+			// Escape special chars for the "LIKE" sentence and consecutive wildcards are treated as one
+			vcardName = vcardName.replaceAll("(\\%|\\_)", "\\\\$1").replaceAll("(\\*)+", "\\*").replace("*", "%");
 			query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_NAME_QUERY);
 		} else {
 			query = getQueryGroup().getQuery(SEARCH_BY_NAME_QUERY);

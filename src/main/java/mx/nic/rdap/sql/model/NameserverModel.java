@@ -92,8 +92,8 @@ public class NameserverModel {
 		String query = null;
 		if (namePattern.contains("*")) {// check if is a partial search
 			query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_NAME_QUERY);
-			// Escape special chars for the "LIKE" sentence
-			namePattern = namePattern.replaceAll("(\\%|\\_)", "\\\\$1").replace('*', '%');
+			// Escape special chars for the "LIKE" sentence and consecutive wildcards are treated as one
+			namePattern = namePattern.replaceAll("(\\%|\\_)", "\\\\$1").replaceAll("(\\*)+", "\\*").replace('*', '%');
 		} else {
 			query = getQueryGroup().getQuery(SEARCH_BY_NAME_QUERY);
 		}
