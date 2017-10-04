@@ -1,3 +1,2 @@
 #storeToDatabase
-INSERT INTO {schema}.rdap_user VALUES(null,?,?,?);
-
+INSERT INTO {schema}.rdap_user VALUES(?,?,?);

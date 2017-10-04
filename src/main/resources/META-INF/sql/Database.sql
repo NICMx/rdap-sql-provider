@@ -1193,13 +1193,20 @@ ENGINE = InnoDB;
 -- Table `rdap`.`rdap_user`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `rdap`.`rdap_user` (
-  `rus_id` BIGINT(200) NOT NULL AUTO_INCREMENT,
   `rus_name` VARCHAR(16) NOT NULL,
   `rus_pass` VARCHAR(200) NOT NULL,
   `rus_max_search_results` INT NULL,
-  PRIMARY KEY (`rus_id`),
-  INDEX `rus_name_index` (`rus_name` ASC),
-  UNIQUE INDEX `rus_name_UNIQUE` (`rus_name` ASC))
+  PRIMARY KEY (`rus_name`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `rdap`.`rdap_access_role`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `rdap`.`rdap_access_role` (
+  `rar_name` VARCHAR(45) NOT NULL,
+  `rar_description` VARCHAR(250) NOT NULL,
+  PRIMARY KEY (`rar_name`))
 ENGINE = InnoDB;
 
 
@@ -1208,11 +1215,16 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `rdap`.`rdap_user_role` (
   `rus_name` VARCHAR(16) NOT NULL,
-  `rur_name` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`rus_name`, `rur_name`),
+  `rar_name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`rus_name`, `rar_name`),
   CONSTRAINT `rdap_user_ir_fk`
     FOREIGN KEY (`rus_name`)
     REFERENCES `rdap`.`rdap_user` (`rus_name`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `rdap_access_role_ir_fk`
+    FOREIGN KEY (`rar_name`)
+    REFERENCES `rdap`.`rdap_access_role` (`rar_name`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;

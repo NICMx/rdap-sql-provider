@@ -27,7 +27,7 @@ import mx.nic.rdap.store.model.KeyDataStoreModel;
 import mx.nic.rdap.store.model.LinkStoreModel;
 import mx.nic.rdap.store.model.NameserverStoreModel;
 import mx.nic.rdap.store.model.PublicIdStoreModel;
-import mx.nic.rdap.store.model.RdapUserRoleStoreModel;
+import mx.nic.rdap.store.model.RdapAccessRoleStoreModel;
 import mx.nic.rdap.store.model.RdapUserStoreModel;
 import mx.nic.rdap.store.model.RemarkDescriptionStoreModel;
 import mx.nic.rdap.store.model.RemarkStoreModel;
@@ -87,7 +87,7 @@ public class DatabaseTest {
 		LinkStoreModel.loadQueryGroup(schema);
 		NameserverStoreModel.loadQueryGroup(schema);
 		PublicIdStoreModel.loadQueryGroup(schema);
-		RdapUserRoleStoreModel.loadQueryGroup(schema);
+		RdapAccessRoleStoreModel.loadQueryGroup(schema);
 		RdapUserStoreModel.loadQueryGroup(schema);
 		RemarkDescriptionStoreModel.loadQueryGroup(schema);
 		RemarkStoreModel.loadQueryGroup(schema);

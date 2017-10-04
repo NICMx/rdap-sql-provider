@@ -12,7 +12,6 @@ import mx.nic.rdap.sql.QueryGroup;
 import mx.nic.rdap.sql.exception.IncompleteObjectException;
 import mx.nic.rdap.sql.exception.InvalidObjectException;
 import mx.nic.rdap.sql.objects.RdapUserDbObj;
-import mx.nic.rdap.sql.objects.RdapUserRoleDbObj;
 
 /**
  * Model for RdapUserData
@@ -53,8 +52,6 @@ public class RdapUserStoreModel {
 			throw new IncompleteObjectException("name", "RdapUser");
 		if (user.getPass() == null || user.getPass().isEmpty())
 			throw new IncompleteObjectException("password", "RdapUser");
-		if (user.getUserRole().getRoleName() == null || user.getUserRole().getRoleName().isEmpty())
-			throw new IncompleteObjectException("role", "RdapUser");
 	}
 
 	public static void storeToDatabase(RdapUserDbObj user, Connection connection) throws SQLException {
@@ -65,7 +62,7 @@ public class RdapUserStoreModel {
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			statement.executeUpdate();
 		}
-		RdapUserRoleStoreModel.storeRdapUserRoleToDatabase((RdapUserRoleDbObj) user.getUserRole(), connection);
+		RdapAccessRoleStoreModel.storeUserAccessRolesToDatabase(user.getName(), user.getAccessRoles(), connection);
 	}
 
 	private static void fillPreparedStatement(PreparedStatement preparedStatement, RdapUser rdapUser)

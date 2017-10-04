@@ -5,22 +5,24 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mx.nic.rdap.sql.QueryGroup;
 import mx.nic.rdap.sql.SQLProviderConfiguration;
-import mx.nic.rdap.sql.objects.RdapUserRoleDbObj;
+import mx.nic.rdap.sql.objects.RdapAccessRoleDbObj;
 
 /**
- * Model for RdapUserRole Data
+ * Model for RdapAccessRoleModel Data
  */
-public class RdapUserRoleModel {
+public class RdapAccessRoleModel {
 
-	private final static Logger logger = Logger.getLogger(RdapUserRoleModel.class.getName());
+	private final static Logger logger = Logger.getLogger(RdapAccessRoleModel.class.getName());
 
-	private final static String QUERY_GROUP = "RdapUserRole";
-	private final static String GET_QUERY = "getByUserName";
+	private final static String QUERY_GROUP = "RdapAccessRole";
+	private final static String GET_BY_USERNAME_QUERY = "getByUserName";
 	private static QueryGroup queryGroup = null;
 
 	public static void loadQueryGroup(String schema) {
@@ -40,22 +42,23 @@ public class RdapUserRoleModel {
 		return queryGroup;
 	}
 
-	public static RdapUserRoleDbObj getByUserName(String userName, Connection connection) throws SQLException {
-		String query = getQueryGroup().getQuery(GET_QUERY);
+	public static Set<String> getByUserName(String userName, Connection connection) throws SQLException {
+		String query = getQueryGroup().getQuery(GET_BY_USERNAME_QUERY);
 		if (SQLProviderConfiguration.isUserSQL() && query == null) {
 			return null;
 		}
+		Set<String> accessRoles = new HashSet<String>();
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
 			statement.setString(1, userName);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
-				if (!resultSet.next()) {
-					return null;
+				while (resultSet.next()) {
+					RdapAccessRoleDbObj accessRole = new RdapAccessRoleDbObj(resultSet);
+					accessRoles.add(accessRole.getName());
 				}
-				RdapUserRoleDbObj userRole = new RdapUserRoleDbObj(resultSet);
-				return userRole;
 			}
 		}
+		return accessRoles;
 	}
 
 }

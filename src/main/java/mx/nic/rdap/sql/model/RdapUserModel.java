@@ -5,10 +5,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import mx.nic.rdap.db.RdapUserRole;
 import mx.nic.rdap.sql.QueryGroup;
 import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.objects.RdapUserDbObj;
@@ -57,13 +57,14 @@ public class RdapUserModel {
 				}
 				RdapUserDbObj user = new RdapUserDbObj(resultSet);
 
-				RdapUserRole role = RdapUserRoleModel.getByUserName(user.getName(), connection);
-				if (role == null) {
-					logger.log(Level.WARNING, "User '" + user.getName() + "' has no roles.");
+				Set<String> accessRoles = RdapAccessRoleModel.getByUserName(user.getName(), connection);
+				if (accessRoles == null) {
+					logger.log(Level.WARNING, "Couldn't find query to load user access roles for user: " + user.getName());
 					return null;
+				} else {
+					user.setAccessRoles(accessRoles);
 				}
 
-				user.setUserRole(role);
 				return user;
 			}
 		}

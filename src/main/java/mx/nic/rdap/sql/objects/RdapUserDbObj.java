@@ -18,10 +18,10 @@ public class RdapUserDbObj extends RdapUser implements DatabaseObject {
 	public RdapUserDbObj(ResultSet resultSet) throws SQLException {
 		super();
 		loadFromDatabase(resultSet);
-		setUserRole(new RdapUserRoleDbObj());
 	}
 
 	public RdapUserDbObj() {
+		// Empty
 	}
 
 	/*
