@@ -32,7 +32,6 @@ public class RdapUserDbObj extends RdapUser implements DatabaseObject {
 	 */
 	@Override
 	public void loadFromDatabase(ResultSet resultSet) throws SQLException {
-		this.setId(resultSet.getLong("rus_id"));
 		this.setName(resultSet.getString("rus_name"));
 		this.setPass(resultSet.getString("rus_pass"));
 		this.setMaxSearchResults(resultSet.getInt("rus_max_search_results"));
