@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import mx.nic.rdap.core.db.Domain;
 import mx.nic.rdap.core.db.DomainLabel;
+import mx.nic.rdap.core.db.DomainLabelException;
 import mx.nic.rdap.core.ip.IpAddressFormatException;
 import mx.nic.rdap.core.ip.IpUtils;
 import mx.nic.rdap.db.exception.http.BadRequestException;
@@ -70,13 +71,38 @@ public class DomainModel {
 		return queryGroup;
 	}
 
-	public static DomainDbObj findByLdhName(String name, Integer zoneId, boolean useNameserverAsDomainAttribute,
-			Connection connection) throws SQLException, NotImplementedException {
+	public static DomainDbObj findByLdhName(DomainLabel domainLabel, boolean useNameserverAsDomainAttribute,
+			Connection connection) throws SQLException, NotImplementedException, NotFoundException {
+		String domainName = domainLabel.getULabel();
+		String name;
+		String zone;
+
+		DomainLabel nameToSearch = null;
+		if (ZoneModel.isReverseAddress(domainName)) {
+			zone = ZoneModel.getArpaZoneNameFromAddress(domainName);
+			if (zone == null) {
+				throw new NotFoundException("Zone not found.");
+			}
+			name = ZoneModel.getAddressWithoutArpaZone(domainName);
+		} else {
+			name = domainName.substring(0, domainName.indexOf('.'));
+			zone = domainName.substring(domainName.indexOf('.') + 1);
+		}
+		if (!ZoneModel.existsZone(zone))
+			throw new NotFoundException("Zone not found.");
+		Integer zoneId = ZoneModel.getIdByZoneName(zone);
+		try {
+			nameToSearch = new DomainLabel(name);
+		} catch (DomainLabelException e) {
+			// The label was already valid, handle as no result found
+			return null;
+		}
+
 		String query = getQueryGroup().getQuery(GET_BY_LDH_QUERY);
 		QueryGroup.userImplemented(query);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, DomainLabel.nameToASCII(name));
-			statement.setString(2, DomainLabel.nameToUnicode(name));
+			statement.setString(1, nameToSearch.getALabel().toLowerCase());
+			statement.setString(2, nameToSearch.getULabel());
 			statement.setInt(3, zoneId);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {

@@ -21,6 +21,8 @@ import mx.nic.rdap.core.catalog.Role;
 import mx.nic.rdap.core.catalog.Status;
 import mx.nic.rdap.core.catalog.VariantRelation;
 import mx.nic.rdap.core.db.Domain;
+import mx.nic.rdap.core.db.DomainLabel;
+import mx.nic.rdap.core.db.DomainLabelException;
 import mx.nic.rdap.core.db.DsData;
 import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.Event;
@@ -35,6 +37,7 @@ import mx.nic.rdap.core.db.SecureDNS;
 import mx.nic.rdap.core.db.Variant;
 import mx.nic.rdap.core.db.VariantName;
 import mx.nic.rdap.core.db.struct.NameserverIpAddressesStruct;
+import mx.nic.rdap.db.exception.http.NotFoundException;
 import mx.nic.rdap.db.exception.http.NotImplementedException;
 import mx.nic.rdap.sql.model.DomainModel;
 import mx.nic.rdap.sql.model.EntityModel;
@@ -60,19 +63,21 @@ import mx.nic.rdap.store.model.ZoneStoreModel;
 public class DomainTest extends DatabaseTest {
 
 	@Test
-	public void insertAndGetSimpleDomain() throws SQLException, NotImplementedException {
+	public void insertAndGetSimpleDomain() throws SQLException, NotImplementedException, DomainLabelException,
+			NotFoundException {
 
 		Domain dom = new DomainDbObj();
 		dom.setHandle("dummyhandle");
 		dom.setLdhName("ninio");
 
 		String zoneName = "example";
-		Integer zoneId = ZoneStoreModel.storeToDatabase(zoneName, connection);
+		ZoneStoreModel.storeToDatabase(zoneName, connection);
 		dom.setZone(zoneName);
 
 		DomainStoreModel.storeToDatabase(dom, false, connection);
 
-		Domain findByLdhName = DomainModel.findByLdhName(dom.getLdhName(), zoneId, false, connection);
+		DomainLabel domainLabel = new DomainLabel(dom.getFQDN());
+		Domain findByLdhName = DomainModel.findByLdhName(domainLabel, false, connection);
 		System.out.println(findByLdhName.getLdhName());
 
 		// Compares the results
@@ -83,7 +88,8 @@ public class DomainTest extends DatabaseTest {
 	/**
 	 * Inserts a domain and retrieves it
 	 */
-	public void insertDomainAndGet() throws SQLException, UnknownHostException, NotImplementedException {
+	public void insertDomainAndGet() throws SQLException, UnknownHostException, NotImplementedException,
+			DomainLabelException, NotFoundException {
 		Random random = new Random();
 		int randomInt = random.nextInt();
 
@@ -114,7 +120,7 @@ public class DomainTest extends DatabaseTest {
 		domain.setNameServers(nameservers);
 
 		// Creates and inserts a zone
-		Integer zoneId = ZoneStoreModel.storeToDatabase("mx", connection);
+		ZoneStoreModel.storeToDatabase("mx", connection);
 
 		domain.setZone("mx");
 		domain.setLdhName(domainName);
@@ -273,7 +279,8 @@ public class DomainTest extends DatabaseTest {
 			resultSet.next();
 		}
 
-		Domain findByLdhName = DomainModel.findByLdhName(domain.getLdhName(), zoneId, false, connection);
+		DomainLabel domainLabel = new DomainLabel(domain.getFQDN());
+		Domain findByLdhName = DomainModel.findByLdhName(domainLabel, false, connection);
 		// Compares the results
 		Assert.assertTrue("findByLdhName fails", domain.equals(findByLdhName));
 

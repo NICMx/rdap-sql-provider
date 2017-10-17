@@ -7,13 +7,11 @@ import java.sql.SQLException;
 import mx.nic.rdap.core.db.Domain;
 import mx.nic.rdap.core.db.DomainLabel;
 import mx.nic.rdap.db.exception.RdapDataAccessException;
-import mx.nic.rdap.db.exception.http.NotFoundException;
 import mx.nic.rdap.db.exception.http.NotImplementedException;
 import mx.nic.rdap.db.spi.DomainDAO;
 import mx.nic.rdap.db.struct.SearchResultStruct;
 import mx.nic.rdap.sql.DatabaseSession;
 import mx.nic.rdap.sql.model.DomainModel;
-import mx.nic.rdap.sql.model.ZoneModel;
 
 public class DomainDAOImpl implements DomainDAO {
 
@@ -26,27 +24,8 @@ public class DomainDAOImpl implements DomainDAO {
 
 	@Override
 	public Domain getByName(DomainLabel domainLabel) throws RdapDataAccessException {
-
-		String name;
-		String zone;
-
-		String domainName = domainLabel.getULabel();
-
-		if (ZoneModel.isReverseAddress(domainName)) {
-			zone = ZoneModel.getArpaZoneNameFromAddress(domainName);
-			if (zone == null) {
-				throw new NotFoundException("Zone not found.");
-			}
-			name = ZoneModel.getAddressWithoutArpaZone(domainName);
-		} else {
-			name = domainName.substring(0, domainName.indexOf('.'));
-			zone = domainName.substring(domainName.indexOf('.') + 1);
-		}
-		if (!ZoneModel.existsZone(zone))
-			throw new NotFoundException("Zone not found.");
-
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			return DomainModel.findByLdhName(name, ZoneModel.getIdByZoneName(zone), useNsAsAttribute, connection);
+			return DomainModel.findByLdhName(domainLabel, useNsAsAttribute, connection);
 		} catch (SQLException e) {
 			throw new RdapDataAccessException(e);
 		}
