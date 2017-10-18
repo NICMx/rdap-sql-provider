@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS `rdap`.`event` (
   `eve_id` BIGINT NOT NULL AUTO_INCREMENT,
   `eac_id` SMALLINT NOT NULL,
   `eve_actor` VARCHAR(45) NULL,
-  `eve_date` VARCHAR(45) NULL,
+  `eve_date` DATETIME NULL,
   PRIMARY KEY (`eve_id`),
   UNIQUE INDEX `eve_id_UNIQUE` (`eve_id` ASC),
   INDEX `fk_event_event_action1_idx` (`eac_id` ASC),
