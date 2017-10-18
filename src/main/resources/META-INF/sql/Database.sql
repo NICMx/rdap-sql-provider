@@ -1193,7 +1193,7 @@ ENGINE = InnoDB;
 -- Table `rdap`.`rdap_user`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `rdap`.`rdap_user` (
-  `rus_name` VARCHAR(16) NOT NULL,
+  `rus_name` VARCHAR(100) NOT NULL,
   `rus_pass` VARCHAR(200) NOT NULL,
   `rus_max_search_results` INT NULL,
   PRIMARY KEY (`rus_name`))
@@ -1214,7 +1214,7 @@ ENGINE = InnoDB;
 -- Table `rdap`.`rdap_user_role`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `rdap`.`rdap_user_role` (
-  `rus_name` VARCHAR(16) NOT NULL,
+  `rus_name` VARCHAR(100) NOT NULL,
   `rar_name` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`rus_name`, `rar_name`),
   CONSTRAINT `rdap_user_ir_fk`
