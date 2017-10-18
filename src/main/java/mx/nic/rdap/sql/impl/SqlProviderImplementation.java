@@ -3,7 +3,6 @@ package mx.nic.rdap.sql.impl;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 import mx.nic.rdap.db.exception.InitializationException;
 import mx.nic.rdap.db.spi.AutnumDAO;
@@ -22,9 +21,8 @@ import mx.nic.rdap.sql.model.ZoneModel;
 public class SqlProviderImplementation implements DataAccessImplementation {
 
 	private static final String NAMESERVER_AS_DOMAIN_ATTRIBUTE_KEY = "nameserver_as_domain_attribute";
-	private static final Logger logger = Logger.getLogger(SqlProviderImplementation.class.getName());
 
-	private Boolean useNsAsAttribute;
+	private boolean useNsAsAttribute;
 
 	@Override
 	public void init(Properties properties) throws InitializationException {
@@ -52,12 +50,19 @@ public class SqlProviderImplementation implements DataAccessImplementation {
 		}
 
 		String useNsAsAttributeString = properties.getProperty(NAMESERVER_AS_DOMAIN_ATTRIBUTE_KEY);
-		if (useNsAsAttributeString != null) {
-			useNsAsAttribute = Boolean.parseBoolean(useNsAsAttributeString);
+		if (useNsAsAttributeString != null && !useNsAsAttributeString.trim().isEmpty()) {
+			useNsAsAttributeString = useNsAsAttributeString.trim();
+			if (useNsAsAttributeString.equalsIgnoreCase("true")) {
+				useNsAsAttribute = true;
+			} else if (useNsAsAttributeString.equalsIgnoreCase("false")) {
+				useNsAsAttribute = false;
+			} else {
+				throw new InitializationException("Property '" + NAMESERVER_AS_DOMAIN_ATTRIBUTE_KEY
+						+ "' has an invalid value '" + useNsAsAttributeString + "', must 'true' or 'false'.");
+			}
 		} else {
-			logger.info("Note: The key '" + NAMESERVER_AS_DOMAIN_ATTRIBUTE_KEY
-					+ "' is not present in the data access configuration. "
-					+ "Domain and Nameserver requests will be rejected.");
+			throw new InitializationException(
+					"Property '" + NAMESERVER_AS_DOMAIN_ATTRIBUTE_KEY + "' must be declared and configured.");
 		}
 	}
 
@@ -68,10 +73,6 @@ public class SqlProviderImplementation implements DataAccessImplementation {
 
 	@Override
 	public DomainDAO getDomainDAO() {
-		if (useNsAsAttribute == null) {
-			return null;
-		}
-
 		return new DomainDAOImpl(useNsAsAttribute);
 	}
 
@@ -89,7 +90,7 @@ public class SqlProviderImplementation implements DataAccessImplementation {
 	public NameserverDAO getNameserverDAO() {
 		// Asking for NS when they are being stored as attributes does not seem
 		// to make sense.
-		if (useNsAsAttribute == null || useNsAsAttribute) {
+		if (useNsAsAttribute) {
 			return null;
 		}
 
