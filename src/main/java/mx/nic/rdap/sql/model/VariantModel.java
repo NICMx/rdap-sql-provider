@@ -132,6 +132,7 @@ public class VariantModel {
 			do {
 				VariantName variantName = new VariantName();
 				variantName.setLdhName(resultSet.getString("vna_ldh_name"));
+				variantName.setUnicodeName(resultSet.getString("vna_unicode_name"));
 				variantNames.add(variantName);
 			} while (resultSet.next());
 		}
