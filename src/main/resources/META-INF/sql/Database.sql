@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS `rdap`.`link` (
   `lin_id` BIGINT NOT NULL AUTO_INCREMENT,
   `lin_value` VARCHAR(45) NULL,
   `lin_rel` VARCHAR(45) NULL,
-  `lin_href` VARCHAR(45) NULL,
+  `lin_href` VARCHAR(45) NOT NULL,
   `lin_title` VARCHAR(45) NULL,
   `lin_media` VARCHAR(45) NULL,
   `lin_type` VARCHAR(45) NULL,
