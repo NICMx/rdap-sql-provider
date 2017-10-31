@@ -151,7 +151,7 @@ public class DummyDataBatch extends DatabaseTest {
 		postalInfo.setCity(country + " city");
 		postalInfo.setStreet1("street " + index + " " + country);
 		postalInfo.setType("WORK");
-		vcard.setPostalInfo(postalInfo);
+		vcard.addPostalInfo(postalInfo);
 		entity.getVCardList().add(vcard);
 
 		// *****
@@ -329,7 +329,7 @@ public class DummyDataBatch extends DatabaseTest {
 		postalInfo.setCity(tld + " city");
 		postalInfo.setStreet1("street " + index + " " + tld);
 		postalInfo.setType("WORK");
-		vcard.setPostalInfo(postalInfo);
+		vcard.addPostalInfo(postalInfo);
 		registrar.getVCardList().add(vcard);
 
 		int contactsSize = ThreadLocalRandom.current().nextInt(1, 3 + 1);
@@ -401,7 +401,7 @@ public class DummyDataBatch extends DatabaseTest {
 		postalInfo.setCity(tld + " city");
 		postalInfo.setStreet1("street " + index + " " + tld);
 		postalInfo.setType("WORK");
-		vcard.setPostalInfo(postalInfo);
+		vcard.addPostalInfo(postalInfo);
 		entity.getVCardList().add(vcard);
 
 		return entity;
