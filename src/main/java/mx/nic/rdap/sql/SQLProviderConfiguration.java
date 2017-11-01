@@ -27,10 +27,16 @@ public class SQLProviderConfiguration {
 
 	// Keys for the configuration file
 	private final static String SCHEMA_KEY = "schema";
+	private static final String ZONES_KEY = "zones";
+	private static final String IS_REVERSE_IPV4_ENABLED_KEY = "is_reverse_ipv4_enabled";
+	private static final String IS_REVERSE_IPV6_ENABLED_KEY = "is_reverse_ipv6_enabled";
+	private static final String NAMESERVER_AS_DOMAIN_ATTRIBUTE_KEY = "nameserver_as_domain_attribute";
 	private final static String USER_SQL_FILES_KEY = "sql_files_directory";
 
-	// Default Path in the META-INF folder of the server, to be use for the user
-	// to write SQL files.
+	/**
+	 * Default Path in the META-INF folder of the server, to be use for the user
+	 * to write SQL files.
+	 */
 	public final static String DEFAULT_USER_SQL_FILE_PATH = "user_sql_files/";
 
 	/**
@@ -43,15 +49,47 @@ public class SQLProviderConfiguration {
 	 */
 	private static boolean isUserSQL;
 
+	/**
+	 * Schema that will be used at the database
+	 */
+	private static String schema;
+
+	/**
+	 * Managed zones by the server
+	 */
+	private static String zones;
+
+	/**
+	 * Indicate if the reverse ipv4 domain search is enabled
+	 */
+	private static boolean isReverseIpv4Enabled;
+
+	/**
+	 * Indicate if the reverse ipv6 domain search is enabled
+	 */
+	private static boolean isReverseIpv6Enabled;
+
+	/**
+	 * Indicate if the Nameservers are used as attributes of a Domain
+	 */
+	private static boolean useNsAsAttribute;
+
+	/**
+	 * Load properties configured from the server. The default properties are loaded
+	 * first, if the server has any of the expected properties then the default
+	 * value is overwritten.
+	 * 
+	 * @param serverProperties
+	 *            Properties configured by the server
+	 */
 	public static void initForServer(Properties serverProperties) {
 		init();
 
-		String schemaKey = serverProperties.getProperty(SCHEMA_KEY);
-		if (schemaKey != null) {
-			configuration.setProperty(SCHEMA_KEY, schemaKey);
-		}
-
-		validateRequiredProperty(SCHEMA_KEY);
+		schema = getStringProperty(serverProperties, SCHEMA_KEY);
+		zones = getStringProperty(serverProperties, ZONES_KEY);
+		isReverseIpv4Enabled = getBooleanProperty(serverProperties, IS_REVERSE_IPV4_ENABLED_KEY);
+		isReverseIpv6Enabled = getBooleanProperty(serverProperties, IS_REVERSE_IPV6_ENABLED_KEY);
+		useNsAsAttribute = getBooleanProperty(serverProperties, NAMESERVER_AS_DOMAIN_ATTRIBUTE_KEY);
 
 		// checks if the user puts sql files outside of the project
 		String property = serverProperties.getProperty(USER_SQL_FILES_KEY);
@@ -78,19 +116,9 @@ public class SQLProviderConfiguration {
 		}
 	}
 
-	private static void validateUserSQLFilesPath(String pathString) {
-		Path path = Paths.get(pathString);
-		if (Files.notExists(path)) {
-			NoSuchFileException e = new NoSuchFileException(pathString);
-			throw new RuntimeException(e);
-		}
-
-		if (!Files.isDirectory(path)) {
-			Exception e = new NotDirectoryException(pathString);
-			throw new RuntimeException(e);
-		}
-	}
-
+	/**
+	 * Load the properties default values
+	 */
 	private static void init() {
 		ClassLoader classLoader = SQLProviderConfiguration.class.getClassLoader();
 		Properties p = new Properties();
@@ -104,14 +132,87 @@ public class SQLProviderConfiguration {
 		configuration = p;
 	}
 
+	private static void validateUserSQLFilesPath(String pathString) {
+		Path path = Paths.get(pathString);
+		if (Files.notExists(path)) {
+			NoSuchFileException e = new NoSuchFileException(pathString);
+			throw new RuntimeException(e);
+		}
+
+		if (!Files.isDirectory(path)) {
+			Exception e = new NotDirectoryException(pathString);
+			throw new RuntimeException(e);
+		}
+	}
+
 	private static void validateRequiredProperty(String key) {
 		if (configuration.getProperty(key) == null) {
 			throw new InvalidConfigurationException("Required property not found : " + key);
 		}
+		if (configuration.getProperty(key).trim().isEmpty()) {
+			throw new InvalidConfigurationException("Required property '" + key + "' can't have a null or empty value");
+		}
 	}
 
+	/**
+	 * Loads to 'configuration' properties, validates and return the value of a
+	 * String property from the properties sent as parameter, throws an
+	 * {@link InvalidConfigurationException} if there's an error
+	 * 
+	 * @param serverProperties
+	 *            Properties from where the property can be loaded
+	 * @param propertyKey
+	 *            Property key
+	 * @return String value of the property
+	 */
+	private static String getStringProperty(Properties serverProperties, String propertyKey) {
+		String propertyAsString = serverProperties.getProperty(propertyKey);
+		if (propertyAsString != null) {
+			configuration.setProperty(propertyKey, propertyAsString);
+		}
+		validateRequiredProperty(propertyKey);
+		return configuration.getProperty(propertyKey).trim();
+	}
+
+	/**
+	 * Loads to 'configuration' properties, validates and return the value of a
+	 * boolean property from the properties sent as parameter, throws an
+	 * {@link InvalidConfigurationException} if there's an error
+	 * 
+	 * @param serverProperties
+	 *            Properties from where the property can be loaded
+	 * @param propertyKey
+	 *            Property key
+	 * @return boolean value of the property
+	 */
+	private static boolean getBooleanProperty(Properties serverProperties, String propertyKey) {
+		String propertyAsString = serverProperties.getProperty(propertyKey);
+		if (propertyAsString != null) {
+			configuration.setProperty(propertyKey, propertyAsString);
+		}
+		validateRequiredProperty(propertyKey);
+		propertyAsString = configuration.getProperty(propertyKey).trim();
+		if (propertyAsString.equalsIgnoreCase("true")) {
+			return true;
+		} else if (propertyAsString.equalsIgnoreCase("false")) {
+			return false;
+		}
+		throw new InvalidConfigurationException("Property '" + propertyKey + "' has an invalid value '"
+				+ propertyAsString + "', must be 'true' or 'false'.");
+	}
+
+	/**
+	 * @return Schema that will be used at the database
+	 */
 	public static String getDefaultSchema() {
-		return configuration.getProperty(SCHEMA_KEY).trim();
+		return schema;
+	}
+
+	/**
+	 * @return Zones managed by the server
+	 */
+	public static String getZones() {
+		return zones;
 	}
 
 	/**
@@ -128,5 +229,29 @@ public class SQLProviderConfiguration {
 	 */
 	public static boolean isUserSQL() {
 		return isUserSQL;
+	}
+
+	/**
+	 * @return <code>true</code> if the reverse ipv4 domain search is enabled,
+	 *         otherwise <code>false</code>.
+	 */
+	public static boolean isReverseIpv4Enabled() {
+		return isReverseIpv4Enabled;
+	}
+
+	/**
+	 * @return <code>true</code> if the reverse ipv6 domain search is enabled,
+	 *         otherwise <code>false</code>.
+	 */
+	public static boolean isReverseIpv6Enabled() {
+		return isReverseIpv6Enabled;
+	}
+
+	/**
+	 * @return <code>true</code> if the nameservers are returned as attributes,
+	 *         otherwise <code>false</code>.
+	 */
+	public static boolean useNsAsAttribute() {
+		return useNsAsAttribute;
 	}
 }

@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -39,11 +38,7 @@ public class ZoneModel {
 	public static final String REVERSE_IP_V4 = "in-addr.arpa";
 	public static final String REVERSE_IP_V6 = "ip6.arpa";
 
-	private static final String ZONE_KEY = "zones";
-	private static final String IS_REVERSE_IPV4_ENABLED_KEY = "is_reverse_ipv4_enabled";
-	private static final String IS_REVERSE_IPV6_ENABLED_KEY = "is_reverse_ipv6_enabled";
-
-	private static final String CONFIGURED_ZONES_DEFAULT_VALUE = "*";
+	private static final String ZONES_WILDCARD_VALUE = "*";
 
 	public static void loadQueryGroup(String schema) {
 		try {
@@ -65,69 +60,58 @@ public class ZoneModel {
 	/**
 	 * Validates the configured zones exist in the database.
 	 */
-	public static void validateConfiguredZones(Properties properties) throws ObjectNotFoundException, InitializationException {
+	public static void validateConfiguredZones() throws ObjectNotFoundException, InitializationException {
 		List<String> configuredZones = new ArrayList<String>();
-		if (properties.containsKey(ZONE_KEY)) {
-			String zonesValue = properties.getProperty(ZONE_KEY).trim();
-			// It doesn't make sense to configure no zones or to block them all
-			if (zonesValue.isEmpty()) {
-				throw new InitializationException("Value of property '" + ZONE_KEY + "' is misconfigured");
-			}
-			String zones[] = zonesValue.split(",");
-			// The wilcard can't be used with other zones
-			if (zonesValue.contains("*") && zones.length > 1) {
-				throw new InitializationException("Property '" + ZONE_KEY + "' can't mix the wildcard with other zones, "
-						+"either the wildcard is used or the zones are specified");
-			}
-			for (String zone : zones) {
-				zone = zone.trim().toLowerCase();
-				if (zone.isEmpty()) {
-					continue;
-				}
-				if (zone.equals(CONFIGURED_ZONES_DEFAULT_VALUE)) {
-					// If set, overwrite all with the DB values
-					configuredZones.clear();
-					configuredZones.addAll(ZoneModel.getIdByZone().keySet());
-					break;
-				}
-				if (zone.endsWith(".")) {
-					zone = zone.substring(0, zone.length() - 1);
-				}
-				if (zone.startsWith(".")) {
-					zone = zone.substring(1);
-				}
-				configuredZones.add(zone);
-			}
-		} else {
-			// If the property isn't configured, allow all zones
-			configuredZones.addAll(ZoneModel.getIdByZone().keySet());
+		String zonesValue = SQLProviderConfiguration.getZones();
+		String zones[] = zonesValue.split(",");
+
+		// The wilcard can't be used with other zones
+		if (zonesValue.contains(ZONES_WILDCARD_VALUE) && zones.length > 1) {
+			throw new InitializationException("Zones configuration: can't mix the wildcard '" + ZONES_WILDCARD_VALUE
+					+ "' with other zones, " + "either the wildcard is used or the zones are specified");
 		}
+		for (String zone : zones) {
+			zone = zone.trim().toLowerCase();
+			if (zone.isEmpty()) {
+				continue;
+			}
+			if (zone.equals(ZONES_WILDCARD_VALUE)) {
+				// If set, overwrite all with the DB values
+				configuredZones.clear();
+				configuredZones.addAll(ZoneModel.getIdByZone().keySet());
+				break;
+			}
+			if (zone.endsWith(".")) {
+				zone = zone.substring(0, zone.length() - 1);
+			}
+			if (zone.startsWith(".")) {
+				zone = zone.substring(1);
+			}
+			configuredZones.add(zone);
+		}
+
 		Map<Integer, String> zoneByIdForServer = new HashMap<Integer, String>();
 		Map<String, Integer> idByZoneForServer = new HashMap<String, Integer>();
 
 		// Configure reverse zones
-		if (properties.containsKey(IS_REVERSE_IPV4_ENABLED_KEY)) {
-			if (Boolean.parseBoolean(properties.getProperty(IS_REVERSE_IPV4_ENABLED_KEY).trim())) {
-				String zone = ZoneModel.REVERSE_IP_V4;
-				if (ZoneModel.getIdByZone().get(zone) != null) {
-					zoneByIdForServer.put(ZoneModel.getIdByZone().get(zone), zone);
-					idByZoneForServer.put(zone, ZoneModel.getIdByZoneName(zone));
-				} else {
-					logger.log(Level.WARNING, "Configured zone not found in database : " + zone);
-				}
+		if (SQLProviderConfiguration.isReverseIpv4Enabled()) {
+			String zone = ZoneModel.REVERSE_IP_V4;
+			if (ZoneModel.getIdByZone().get(zone) != null) {
+				zoneByIdForServer.put(ZoneModel.getIdByZone().get(zone), zone);
+				idByZoneForServer.put(zone, ZoneModel.getIdByZoneName(zone));
+			} else {
+				logger.log(Level.WARNING, "Configured zone not found in database : " + zone);
 			}
 		}
 		configuredZones.remove(ZoneModel.REVERSE_IP_V4);
 
-		if (properties.containsKey(IS_REVERSE_IPV6_ENABLED_KEY)) {
-			if (Boolean.parseBoolean(properties.getProperty(IS_REVERSE_IPV6_ENABLED_KEY).trim())) {
-				String zone = ZoneModel.REVERSE_IP_V6;
-				if (ZoneModel.getIdByZone().get(zone) != null) {
-					zoneByIdForServer.put(ZoneModel.getIdByZone().get(zone), zone);
-					idByZoneForServer.put(zone, ZoneModel.getIdByZoneName(zone));
-				} else {
-					logger.log(Level.WARNING, "Configured zone not found in database : " + zone);
-				}
+		if (SQLProviderConfiguration.isReverseIpv6Enabled()) {
+			String zone = ZoneModel.REVERSE_IP_V6;
+			if (ZoneModel.getIdByZone().get(zone) != null) {
+				zoneByIdForServer.put(ZoneModel.getIdByZone().get(zone), zone);
+				idByZoneForServer.put(zone, ZoneModel.getIdByZoneName(zone));
+			} else {
+				logger.log(Level.WARNING, "Configured zone not found in database : " + zone);
 			}
 		}
 		configuredZones.remove(ZoneModel.REVERSE_IP_V6);
