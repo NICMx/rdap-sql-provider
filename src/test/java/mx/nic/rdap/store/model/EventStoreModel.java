@@ -8,6 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -132,6 +134,15 @@ public class EventStoreModel {
 	private static void fillPreparedStatement(PreparedStatement preparedStatement, Event event) throws SQLException {
 		preparedStatement.setLong(1, event.getEventAction().getId());
 		preparedStatement.setString(2, event.getEventActor());
+
+		// set milliseconds and seconds to 0 to avoid database truncate the value, and
+		// fail in unit tests
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(event.getEventDate());
+		calendar.set(Calendar.MILLISECOND, 0);
+		calendar.set(Calendar.SECOND, 0);
+		Date time = calendar.getTime();
+		event.setEventDate(time);
 		preparedStatement.setTimestamp(3, new Timestamp(event.getEventDate().getTime()));
 	}
 }

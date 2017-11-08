@@ -99,6 +99,7 @@ public class VariantStoreModel {
 			for (VariantName variantName : variant.getVariantNames()) {
 				statement.setString(1, variantName.getLdhName());
 				statement.setLong(2, variantId);
+				statement.setString(3, variantName.getUnicodeName());
 				logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 				statement.executeUpdate();
 			}
