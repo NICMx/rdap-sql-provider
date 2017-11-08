@@ -1,4 +1,4 @@
-# Red Dog's SQL Provider
+# [Red Dog](https://www.reddog.mx/)'s SQL Provider
 
 Red Dog's reference Data Access Implementation (implements the [rdap-data-access-api](https://github.com/NICMx/rdap-data-access-api) interfaces). Uses SQL queries to retrieve data for the server.
 
