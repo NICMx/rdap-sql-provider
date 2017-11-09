@@ -124,7 +124,15 @@ public class SQLProviderConfiguration {
 		Properties p = new Properties();
 
 		try (InputStream ins = classLoader.getResourceAsStream(CONFIG_FILE)) {
-			p.load(ins);
+			if (ins != null) {
+				p.load(ins);
+			}
+			
+			p.setProperty("schema", "rdap");
+			p.setProperty("zones", "*");
+			p.setProperty("is_reverse_ipv4_enabled", "false");
+			p.setProperty("is_reverse_ipv6_enabled", "false");
+			p.setProperty("nameserver_as_domain_attribute", "false");
 		} catch (IOException e) {
 			throw new RuntimeException("Error while reading the SQLProviderConfiguration File", e);
 		}
