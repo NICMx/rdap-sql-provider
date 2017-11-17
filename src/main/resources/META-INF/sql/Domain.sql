@@ -23,13 +23,7 @@ SELECT d.dom_id, d.dom_handle, d.dom_ldh_name, d.dom_unicode_name, d.dom_port43,
 SELECT DISTINCT (dom.dom_id), dom.dom_ldh_name, dom.dom_handle, dom.dom_port43, dom.zone_id, dom.dom_unicode_name FROM {schema}.domain dom JOIN {schema}.domain_nameservers dom_ns ON dom_ns.dom_id = dom.dom_id JOIN {schema}.nameserver ns ON ns.nse_id = dom_ns.nse_id WHERE  (ns.nse_ldh_name LIKE ? OR ns.nse_unicode_name LIKE ?) ORDER BY 1 LIMIT ?;
 
 #searchByNsIp
-SELECT DISTINCT (dom.dom_id), dom.dom_ldh_name, dom.dom_handle, dom.dom_port43, dom.zone_id, dom.dom_unicode_name FROM {schema}.domain dom JOIN {schema}.domain_nameservers dom_ns ON dom_ns.dom_id = dom.dom_id JOIN {schema}.nameserver ns ON ns.nse_id = dom_ns.nse_id JOIN {schema}.ip_address ip	ON ip.nse_id = ns.nse_id WHERE IF(?=4, INET_ATON(?),INET6_ATON(?)) = ip.iad_value ORDER BY 1 LIMIT ?;
-
-#existByNsLdhName
-SELECT EXISTS(SELECT 1 FROM {schema}.domain dom JOIN {schema}.domain_nameservers dom_ns ON dom_ns.dom_id = dom.dom_id JOIN {schema}.nameserver ns ON ns.nse_id = dom_ns.nse_id WHERE ( ns.nse_ldh_name LIKE ? OR ns.nse_unicode_name LIKE ?));
-
-#existByNsIp
-SELECT EXISTS(SELECT 1 FROM {schema}.domain dom JOIN {schema}.domain_nameservers dom_ns ON dom_ns.dom_id = dom.dom_id JOIN {schema}.nameserver ns ON ns.nse_id = dom_ns.nse_id JOIN {schema}.ip_address ip	ON ip.nse_id = ns.nse_id WHERE IF(?=4, INET_ATON(?),INET6_ATON(?)) = ip.iad_value);
+SELECT DISTINCT (dom.dom_id), dom.dom_ldh_name, dom.dom_handle, dom.dom_port43, dom.zone_id, dom.dom_unicode_name FROM {schema}.domain dom JOIN {schema}.domain_nameservers dom_ns ON dom_ns.dom_id = dom.dom_id JOIN {schema}.nameserver ns ON ns.nse_id = dom_ns.nse_id JOIN {schema}.ip_address ip	ON ip.nse_id = ns.nse_id WHERE ? > 0 AND (ip.iad_value = ? AND ip.iad_value = ?) ORDER BY 1 LIMIT ?;
 
 #searchByRegexNameWithZone
 SELECT DISTINCT(d.dom_id), d.dom_handle, d.dom_ldh_name, d.dom_port43, d.zone_id, d.dom_unicode_name FROM {schema}.domain d JOIN {schema}.zone z on d.zone_id = z.zone_id AND z.zone_id IN (?) WHERE (d.dom_ldh_name REGEXP ? OR d.dom_unicode_name REGEXP ?) AND z.zone_name REGEXP ? LIMIT ?;
