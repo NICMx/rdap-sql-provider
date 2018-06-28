@@ -24,6 +24,15 @@ public class NameserverDAOImpl implements NameserverDAO {
 	}
 
 	@Override
+	public Nameserver getByHandle(String handle) throws RdapDataAccessException {
+		try (Connection connection = DatabaseSession.getRdapConnection()) {
+			return NameserverModel.findByHandle(handle, connection);
+		} catch (SQLException e) {
+			throw new RdapDataAccessException(e);
+		}
+	}
+
+	@Override
 	public SearchResultStruct<Nameserver> searchByName(DomainLabel domainLabel, int resultLimit)
 			throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
@@ -58,5 +67,20 @@ public class NameserverDAOImpl implements NameserverDAO {
 			throws NotImplementedException {
 		throw new NotImplementedException();
 	}
+
+	@Override
+	public int getNameserverCount(DomainLabel name) throws RdapDataAccessException {
+		try (Connection connection = DatabaseSession.getRdapConnection()) {
+			return NameserverModel.count(name, connection);
+		} catch (SQLException e) {
+			throw new RdapDataAccessException(e);
+		}
+	}
+
+	@Override
+	public boolean isNameserverSharingNameConformance() {
+		return true;
+	}
+
 
 }

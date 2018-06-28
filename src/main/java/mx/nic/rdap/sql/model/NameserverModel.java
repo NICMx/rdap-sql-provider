@@ -41,6 +41,8 @@ public class NameserverModel {
 	private static QueryGroup queryGroup = null;
 
 	private static final String FIND_BY_NAME_QUERY = "findByName";
+	private static final String COUNT_BY_NAME_QUERY = "countByName";
+	private static final String FIND_BY_HANDLE_QUERY = "findByHandle";
 
 	private static final String SEARCH_BY_PARTIAL_NAME_QUERY = "searchByPartialName";
 	private static final String SEARCH_BY_NAME_QUERY = "searchByName";
@@ -83,6 +85,42 @@ public class NameserverModel {
 				NameserverDbObj nameserver = new NameserverDbObj(resultSet);
 				NameserverModel.loadNestedObjects(nameserver, connection);
 				return nameserver;
+			}
+		}
+	}
+
+	public static NameserverDbObj findByHandle(String handle, Connection connection)
+			throws SQLException, NotImplementedException {
+		String query = getQueryGroup().getQuery(FIND_BY_HANDLE_QUERY);
+		QueryGroup.userImplemented(query);
+		try (PreparedStatement statement = connection.prepareStatement(query)) {
+			statement.setString(1, handle);
+			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
+			try (ResultSet resultSet = statement.executeQuery()) {
+				if (!resultSet.next()) {
+					return null;
+				}
+				NameserverDbObj nameserver = new NameserverDbObj(resultSet);
+				NameserverModel.loadNestedObjects(nameserver, connection);
+				return nameserver;
+			}
+		}
+	}
+
+	public static int count(DomainLabel name, Connection connection)
+			throws SQLException, NotImplementedException {
+		String query = getQueryGroup().getQuery(COUNT_BY_NAME_QUERY);
+		QueryGroup.userImplemented(query);
+		try (PreparedStatement statement = connection.prepareStatement(query)) {
+			statement.setString(1, name.getALabel().toLowerCase());
+			statement.setString(2, name.getULabel());
+			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
+			try (ResultSet resultSet = statement.executeQuery()) {
+				if (!resultSet.next()) {
+					return 0;
+				}
+
+				return resultSet.getInt(1);
 			}
 		}
 	}
