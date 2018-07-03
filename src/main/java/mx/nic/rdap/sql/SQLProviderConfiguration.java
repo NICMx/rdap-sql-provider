@@ -32,6 +32,7 @@ public class SQLProviderConfiguration {
 	private static final String IS_REVERSE_IPV6_ENABLED_KEY = "is_reverse_ipv6_enabled";
 	private static final String NAMESERVER_AS_DOMAIN_ATTRIBUTE_KEY = "nameserver_as_domain_attribute";
 	private final static String USER_SQL_FILES_KEY = "sql_files_directory";
+	private final static String IS_NS_SHARING_NAME_ENABLED_KEY = "is_ns_sharing_name_enabled";
 
 	/**
 	 * Default Path in the META-INF folder of the server, to be use for the user
@@ -75,6 +76,11 @@ public class SQLProviderConfiguration {
 	private static boolean useNsAsAttribute;
 
 	/**
+	 * Indicate if the nameserver-sharing-name conformance is active
+	 */
+	private static boolean isNsSharingNameEnabled;
+
+	/**
 	 * Load properties configured from the server. The default properties are loaded
 	 * first, if the server has any of the expected properties then the default
 	 * value is overwritten.
@@ -90,6 +96,7 @@ public class SQLProviderConfiguration {
 		isReverseIpv4Enabled = getBooleanProperty(serverProperties, IS_REVERSE_IPV4_ENABLED_KEY);
 		isReverseIpv6Enabled = getBooleanProperty(serverProperties, IS_REVERSE_IPV6_ENABLED_KEY);
 		useNsAsAttribute = getBooleanProperty(serverProperties, NAMESERVER_AS_DOMAIN_ATTRIBUTE_KEY);
+		isNsSharingNameEnabled = getBooleanProperty(serverProperties, IS_NS_SHARING_NAME_ENABLED_KEY);
 
 		// checks if the user puts sql files outside of the project
 		String property = serverProperties.getProperty(USER_SQL_FILES_KEY);
@@ -253,5 +260,13 @@ public class SQLProviderConfiguration {
 	 */
 	public static boolean useNsAsAttribute() {
 		return useNsAsAttribute;
+	}
+
+	/**
+	 * @return <code>true</code> If the user enable the ns-sharing-name conformance,
+	 *         otherwise <code>false</code>
+	 */
+	public static boolean isNsSharingNameEnabled() {
+		return isNsSharingNameEnabled;
 	}
 }

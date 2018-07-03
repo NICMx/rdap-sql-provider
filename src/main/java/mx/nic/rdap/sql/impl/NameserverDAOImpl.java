@@ -10,6 +10,7 @@ import mx.nic.rdap.db.exception.http.NotImplementedException;
 import mx.nic.rdap.db.spi.NameserverDAO;
 import mx.nic.rdap.db.struct.SearchResultStruct;
 import mx.nic.rdap.sql.DatabaseSession;
+import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.model.NameserverModel;
 
 public class NameserverDAOImpl implements NameserverDAO {
@@ -25,6 +26,9 @@ public class NameserverDAOImpl implements NameserverDAO {
 
 	@Override
 	public Nameserver getByHandle(String handle) throws RdapDataAccessException {
+		if (!isNameserverSharingNameConformance()) {
+			throw new NotImplementedException();
+		}
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return NameserverModel.findByHandle(handle, connection);
 		} catch (SQLException e) {
@@ -70,6 +74,9 @@ public class NameserverDAOImpl implements NameserverDAO {
 
 	@Override
 	public int getNameserverCount(DomainLabel name) throws RdapDataAccessException {
+		if (!isNameserverSharingNameConformance()) {
+			throw new NotImplementedException();
+		}
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			return NameserverModel.count(name, connection);
 		} catch (SQLException e) {
@@ -79,7 +86,7 @@ public class NameserverDAOImpl implements NameserverDAO {
 
 	@Override
 	public boolean isNameserverSharingNameConformance() {
-		return true;
+		return SQLProviderConfiguration.isNsSharingNameEnabled();
 	}
 
 
