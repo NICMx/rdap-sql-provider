@@ -137,8 +137,13 @@ public class EntityModel {
 		return new EntityDbObj(resultSet);
 	}
 
+
 	private static List<Entity> getEntitiesByEntityId(Long entityId, Connection connection) throws SQLException {
-		List<Entity> entitiesById = getEntitiesById(entityId, connection, GET_ENTITY_ENTITY_QUERY);
+		return getEntitiesByEntityId(entityId, connection, true);
+	}
+	
+	private static List<Entity> getEntitiesByEntityId(Long entityId, Connection connection, boolean isFirstNested) throws SQLException {
+		List<Entity> entitiesById = getEntitiesById(entityId, connection, GET_ENTITY_ENTITY_QUERY, isFirstNested);
 		for (Entity ent : entitiesById) {
 			List<Role> entityEntityRole = RoleModel.getEntityEntityRole(entityId, ent.getId(), connection);
 			ent.getRoles().addAll(entityEntityRole);
@@ -184,6 +189,10 @@ public class EntityModel {
 	}
 
 	private static List<Entity> getEntitiesById(Long id, Connection connection, String getQueryId) throws SQLException {
+		return getEntitiesById(id, connection, getQueryId, true);
+	}
+	
+	private static List<Entity> getEntitiesById(Long id, Connection connection, String getQueryId, boolean isFirstNested) throws SQLException {
 		String query = getQueryGroup().getQuery(getQueryId);
 		if (SQLProviderConfiguration.isUserSQL() && query == null) {
 			return Collections.emptyList();
@@ -204,12 +213,12 @@ public class EntityModel {
 			} while (rs.next());
 		}
 
-		setNestedSimpleObjects(result, connection);
+		setNestedSimpleObjects(result, connection, isFirstNested);
 
 		return result;
 	}
 
-	private static void setNestedSimpleObjects(List<Entity> entities, Connection connection) throws SQLException {
+	private static void setNestedSimpleObjects(List<Entity> entities, Connection connection, boolean isFirstNested) throws SQLException {
 
 		for (Entity entity : entities) {
 			Long entityId = entity.getId();
@@ -225,6 +234,11 @@ public class EntityModel {
 
 			List<Event> eventList = EventModel.getByEntityId(entityId, connection);
 			entity.getEvents().addAll(eventList);
+			
+			if (isFirstNested) {
+				List<Entity> nestedEntities = getEntitiesByEntityId(entityId, connection, false);
+				entity.getEntities().addAll(nestedEntities);
+			}
 		}
 
 		return;
