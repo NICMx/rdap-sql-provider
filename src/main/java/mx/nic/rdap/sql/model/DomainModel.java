@@ -71,8 +71,8 @@ public class DomainModel {
 		return queryGroup;
 	}
 
-	public static DomainDbObj findByLdhName(DomainLabel domainLabel, boolean useNameserverAsDomainAttribute,
-			Connection connection) throws SQLException, NotImplementedException, NotFoundException {
+	public static DomainDbObj findByLdhName(DomainLabel domainLabel, Connection connection)
+			throws SQLException, NotImplementedException, NotFoundException {
 		String domainName = domainLabel.getULabel();
 		String name;
 		String zone;
@@ -110,7 +110,7 @@ public class DomainModel {
 					return null;
 				}
 				DomainDbObj domain = new DomainDbObj(resultSet);
-				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
+				loadNestedObjects(domain, connection);
 				return domain;
 			}
 		}
@@ -120,8 +120,7 @@ public class DomainModel {
 	 * Searches a domain by it´s name and TLD
 	 */
 	public static SearchResultStruct<Domain> searchByName(String name, String zone, int resultLimit,
-			boolean useNameserverAsDomainAttribute, Connection connection)
-			throws SQLException, NotFoundException, NotImplementedException {
+			Connection connection) throws SQLException, NotFoundException, NotImplementedException {
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -137,10 +136,12 @@ public class DomainModel {
 				throw new NotFoundException("Zone not found.");
 			}
 
-			// Escape special chars for the "LIKE" sentence and consecutive wildcards are treated as one
+			// Escape special chars for the "LIKE" sentence and consecutive wildcards
+			// are treated as one
 			zone = zone.replaceAll("(\\%|\\_)", "\\\\$1").replaceAll("(\\*)+", "\\*").replaceAll("\\*", "%");
 			if (isPartialName) {
-				// Escape special chars for the "LIKE" sentence and consecutive wildcards are treated as one
+				// Escape special chars for the "LIKE" sentence and consecutive
+				// wildcards are treated as one
 				name = name.replaceAll("(\\%|\\_)", "\\\\$1").replaceAll("(\\*)+", "\\*").replaceAll("\\*", "%");
 				query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_NAME_WITH_PARTIAL_ZONE_QUERY);
 			} else {
@@ -157,7 +158,8 @@ public class DomainModel {
 			}
 
 			if (isPartialName) {
-				// Escape special chars for the "LIKE" sentence and consecutive wildcards are treated as one
+				// Escape special chars for the "LIKE" sentence and consecutive
+				// wildcards are treated as one
 				name = name.replaceAll("(\\%|\\_)", "\\\\$1").replaceAll("(\\*)+", "\\*").replaceAll("\\*", "%");
 				query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_NAME_WITH_ZONE_QUERY);
 			} else {
@@ -202,7 +204,7 @@ public class DomainModel {
 				domains.remove(domains.size() - 1);
 			}
 			for (DomainDbObj domain : domains) {
-				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
+				loadNestedObjects(domain, connection);
 			}
 			result.setSearchResultsLimitForUser(resultLimit);
 			result.getResults().addAll(domains);
@@ -210,30 +212,29 @@ public class DomainModel {
 		}
 	}
 
-	public static SearchResultStruct<Domain> searchByName(String domainName, int resultLimit,
-			boolean useNameserverAsDomainAttribute, Connection connection)
+	public static SearchResultStruct<Domain> searchByName(String domainName, int resultLimit, Connection connection)
 			throws SQLException, NotImplementedException, NotFoundException {
 		String query;
 		if (domainName.contains("*")) {
-			// Escape special chars for the "LIKE" sentence and consecutive wildcards are treated as one
-			domainName = domainName.replaceAll("(\\%|\\_)", "\\\\$1").replaceAll("(\\*)+", "\\*").replaceAll("\\*", "%");
+			// Escape special chars for the "LIKE" sentence and consecutive wildcards
+			// are treated as one
+			domainName = domainName.replaceAll("(\\%|\\_)", "\\\\$1").replaceAll("(\\*)+", "\\*").replaceAll("\\*",
+					"%");
 			query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_NAME_WITHOUT_ZONE_QUERY);
 		} else {
 			query = getQueryGroup().getQuery(SEARCH_BY_NAME_WITHOUT_ZONE_QUERY);
 		}
-		return searchByName(domainName.toLowerCase(), domainName, resultLimit, useNameserverAsDomainAttribute, connection, query);
+		return searchByName(domainName.toLowerCase(), domainName, resultLimit, connection, query);
 	}
 
-	public static SearchResultStruct<Domain> searchByRegexName(String regexName, int resultLimit,
-			boolean useNameserverAsDomainAttribute, Connection connection)
+	public static SearchResultStruct<Domain> searchByRegexName(String regexName, int resultLimit, Connection connection)
 			throws SQLException, NotImplementedException, NotFoundException {
 		String query = getQueryGroup().getQuery(SEARCH_BY_REGEX_NAME_WITHOUT_ZONE);
-		return searchByName(regexName, resultLimit, useNameserverAsDomainAttribute, connection, query);
+		return searchByName(regexName, resultLimit, connection, query);
 	}
 
 	public static SearchResultStruct<Domain> searchByRegexName(String name, String zone, int resultLimit,
-			boolean useNameserverAsDomainAttribute, Connection connection)
-			throws SQLException, NotImplementedException, NotFoundException {
+			Connection connection) throws SQLException, NotImplementedException, NotFoundException {
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -273,7 +274,7 @@ public class DomainModel {
 				domains.remove(domains.size() - 1);
 			}
 			for (DomainDbObj domain : domains) {
-				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
+				loadNestedObjects(domain, connection);
 			}
 			result.setSearchResultsLimitForUser(resultLimit);
 			result.getResults().addAll(domains);
@@ -282,7 +283,8 @@ public class DomainModel {
 	}
 
 	/**
-	 * Wrapper for {@link mx.nic.rdap.sql.model.DomainModel#searchByName(String, String, boolean, Connection, String)},
+	 * Wrapper for
+	 * {@link mx.nic.rdap.sql.model.DomainModel#searchByName(String, String, boolean, Connection, String)},
 	 * useful when the same namePattern is used as ALabel and ULabel.
 	 * 
 	 * @param domainName
@@ -294,19 +296,19 @@ public class DomainModel {
 	 * @throws SQLException
 	 * @throws NotImplementedException
 	 */
-	private static SearchResultStruct<Domain> searchByName(String domainName, int resultLimit,
-			boolean useNameserverAsDomainAttribute, Connection connection, String query)
-			throws SQLException, NotImplementedException, NotFoundException {
-		return searchByName(domainName, domainName, resultLimit, useNameserverAsDomainAttribute, connection, query);
+	private static SearchResultStruct<Domain> searchByName(String domainName, int resultLimit, Connection connection,
+			String query) throws SQLException, NotImplementedException, NotFoundException {
+		return searchByName(domainName, domainName, resultLimit, connection, query);
 	}
-	
+
 	/**
-	 * Searches a domain by it's name (A-Label and U-Label) when user don´t care about the TLD
+	 * Searches a domain by it's name (A-Label and U-Label) when user don´t care
+	 * about the TLD
 	 * 
 	 * @throws NotImplementedException
 	 */
 	private static SearchResultStruct<Domain> searchByName(String domainNameALabel, String domainNameULabel,
-			int resultLimit, boolean useNameserverAsDomainAttribute, Connection connection, String query)
+			int resultLimit, Connection connection, String query)
 			throws SQLException, NotImplementedException, NotFoundException {
 		QueryGroup.userImplemented(query);
 
@@ -346,7 +348,7 @@ public class DomainModel {
 				domains.remove(domains.size() - 1);
 			}
 			for (DomainDbObj domain : domains) {
-				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
+				loadNestedObjects(domain, connection);
 			}
 			result.setSearchResultsLimitForUser(resultLimit);
 			result.getResults().addAll(domains);
@@ -354,28 +356,26 @@ public class DomainModel {
 		}
 	}
 
-	public static SearchResultStruct<Domain> searchByNsLdhName(String name, int resultLimit,
-			boolean useNameserverAsDomainAttribute, Connection connection)
+	public static SearchResultStruct<Domain> searchByNsLdhName(String name, int resultLimit, Connection connection)
 			throws SQLException, NotImplementedException {
 		String query = getQueryGroup().getQuery(SEARCH_BY_NAMESERVER_LDH_QUERY);
-		// Escape special chars for the "LIKE" sentence and consecutive wildcards are treated as one
+		// Escape special chars for the "LIKE" sentence and consecutive wildcards are
+		// treated as one
 		name = name.replaceAll("(\\%|\\_)", "\\\\$1").replaceAll("(\\*)+", "\\*").replace("*", "%");
-		return searchByNsLdhName(name, resultLimit, useNameserverAsDomainAttribute, connection, query);
+		return searchByNsLdhName(name, resultLimit, connection, query);
 	}
 
-	public static SearchResultStruct<Domain> searchByRegexNsLdhName(String name, int resultLimit,
-			boolean useNameserverAsDomainAttribute, Connection connection)
+	public static SearchResultStruct<Domain> searchByRegexNsLdhName(String name, int resultLimit, Connection connection)
 			throws SQLException, NotImplementedException {
 		String query = getQueryGroup().getQuery(SEARCH_BY_REGEX_NAMESERVER_LDH_QUERY);
-		return searchByNsLdhName(name, resultLimit, useNameserverAsDomainAttribute, connection, query);
+		return searchByNsLdhName(name, resultLimit, connection, query);
 	}
 
 	/**
 	 * Searches all domains with a nameserver by name
 	 */
-	private static SearchResultStruct<Domain> searchByNsLdhName(String name, int resultLimit,
-			boolean useNameserverAsDomainAttribute, Connection connection, String query)
-			throws SQLException, NotImplementedException {
+	private static SearchResultStruct<Domain> searchByNsLdhName(String name, int resultLimit, Connection connection,
+			String query) throws SQLException, NotImplementedException {
 		QueryGroup.userImplemented(query);
 
 		SearchResultStruct<Domain> result = new SearchResultStruct<Domain>();
@@ -403,7 +403,7 @@ public class DomainModel {
 				domains.remove(domains.size() - 1);
 			}
 			for (DomainDbObj domain : domains) {
-				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
+				loadNestedObjects(domain, connection);
 			}
 			result.setSearchResultsLimitForUser(resultLimit);
 			result.getResults().addAll(domains);
@@ -414,8 +414,7 @@ public class DomainModel {
 	/**
 	 * searches all domains with a nameserver by address
 	 */
-	public static SearchResultStruct<Domain> searchByNsIp(String ip, int resultLimit,
-			boolean useNameserverAsDomainAttribute, Connection connection)
+	public static SearchResultStruct<Domain> searchByNsIp(String ip, int resultLimit, Connection connection)
 			throws SQLException, BadRequestException, NotImplementedException, UnprocessableEntityException {
 		String query = getQueryGroup().getQuery(SEARCH_BY_NAMESERVER_IP_QUERY);
 		QueryGroup.userImplemented(query);
@@ -457,7 +456,7 @@ public class DomainModel {
 			List<DomainDbObj> domains = new ArrayList<DomainDbObj>();
 			do {
 				DomainDbObj domain = new DomainDbObj(resultSet);
-				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
+				loadNestedObjects(domain, connection);
 				domains.add(domain);
 			} while (resultSet.next());
 			resultLimit = resultLimit - 1;// Back to the original limit
@@ -466,7 +465,7 @@ public class DomainModel {
 				domains.remove(domains.size() - 1);
 			}
 			for (DomainDbObj domain : domains) {
-				loadNestedObjects(domain, useNameserverAsDomainAttribute, connection);
+				loadNestedObjects(domain, connection);
 			}
 			result.setSearchResultsLimitForUser(resultLimit);
 			result.getResults().addAll(domains);
@@ -482,8 +481,7 @@ public class DomainModel {
 	 *            if false, load all the nameserver object
 	 * 
 	 */
-	private static void loadNestedObjects(Domain domain, boolean useNameserverAsDomainAttribute, Connection connection)
-			throws SQLException {
+	private static void loadNestedObjects(Domain domain, Connection connection) throws SQLException {
 		Long domainId = domain.getId();
 
 		// Retrieve the events
@@ -508,8 +506,7 @@ public class DomainModel {
 		domain.setVariants(VariantModel.getByDomainId(domainId, connection));
 
 		// Retrieve the domainsNs
-		domain.getNameServers()
-				.addAll(NameserverModel.getByDomainId(domainId, useNameserverAsDomainAttribute, connection));
+		domain.getNameServers().addAll(NameserverModel.getByDomainId(domainId, connection));
 
 		// Retrieve the entities
 		domain.getEntities().addAll(EntityModel.getEntitiesByDomainId(domainId, connection));

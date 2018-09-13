@@ -107,8 +107,7 @@ public class NameserverModel {
 		}
 	}
 
-	public static int count(DomainLabel name, Connection connection)
-			throws SQLException, NotImplementedException {
+	public static int count(DomainLabel name, Connection connection) throws SQLException, NotImplementedException {
 		String query = getQueryGroup().getQuery(COUNT_BY_NAME_QUERY);
 		QueryGroup.userImplemented(query);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -130,7 +129,8 @@ public class NameserverModel {
 		String query = null;
 		if (namePattern.contains("*")) {// check if is a partial search
 			query = getQueryGroup().getQuery(SEARCH_BY_PARTIAL_NAME_QUERY);
-			// Escape special chars for the "LIKE" sentence and consecutive wildcards are treated as one
+			// Escape special chars for the "LIKE" sentence and consecutive wildcards
+			// are treated as one
 			namePattern = namePattern.replaceAll("(\\%|\\_)", "\\\\$1").replaceAll("(\\*)+", "\\*").replace('*', '%');
 		} else {
 			query = getQueryGroup().getQuery(SEARCH_BY_NAME_QUERY);
@@ -142,9 +142,10 @@ public class NameserverModel {
 			Connection connection) throws SQLException, NotImplementedException {
 		return searchByName(namePattern, resultLimit, connection, getQueryGroup().getQuery(SEARCH_BY_NAME_REGEX_QUERY));
 	}
-	
+
 	/**
-	 * Wrapper for {@link mx.nic.rdap.sql.model.NameserverModel#searchByName(String, String, int, Connection, String)},
+	 * Wrapper for
+	 * {@link mx.nic.rdap.sql.model.NameserverModel#searchByName(String, String, int, Connection, String)},
 	 * useful when the same namePattern is used as ALabel and ULabel.
 	 * 
 	 * @param namePattern
@@ -160,8 +161,8 @@ public class NameserverModel {
 		return searchByName(namePattern, namePattern, resultLimit, connection, query);
 	}
 
-	private static SearchResultStruct<Nameserver> searchByName(String namePatternALabel, String namePatternULabel, int resultLimit,
-			Connection connection, String query) throws SQLException, NotImplementedException {
+	private static SearchResultStruct<Nameserver> searchByName(String namePatternALabel, String namePatternULabel,
+			int resultLimit, Connection connection, String query) throws SQLException, NotImplementedException {
 		QueryGroup.userImplemented(query);
 		SearchResultStruct<Nameserver> result = new SearchResultStruct<Nameserver>();
 		// Hack to know is there is more domains that the limit, used for
@@ -199,7 +200,8 @@ public class NameserverModel {
 	}
 
 	public static SearchResultStruct<Nameserver> searchByIp(String ipaddressPattern, int resultLimit,
-			Connection connection) throws SQLException, BadRequestException, NotImplementedException, UnprocessableEntityException {
+			Connection connection)
+			throws SQLException, BadRequestException, NotImplementedException, UnprocessableEntityException {
 		SearchResultStruct<Nameserver> result = new SearchResultStruct<Nameserver>();
 		// Hack to know is there is more domains that the limit, used for
 		// notices
@@ -262,8 +264,7 @@ public class NameserverModel {
 	 *            if true, don't have to load nested objects
 	 * 
 	 */
-	public static List<Nameserver> getByDomainId(Long domainId, boolean useNameserverAsDomainAttribute,
-			Connection connection) throws SQLException {
+	public static List<Nameserver> getByDomainId(Long domainId, Connection connection) throws SQLException {
 		String query = getQueryGroup().getQuery(DOMAIN_GET_QUERY);
 		if (SQLProviderConfiguration.isUserSQL() && query == null) {
 			return Collections.emptyList();
@@ -279,10 +280,9 @@ public class NameserverModel {
 				do {
 					Nameserver nameserver = new NameserverDbObj(resultSet);
 					// Retrieve the ipAddress
-					nameserver.setIpAddresses(IpAddressModel.getIpAddressStructByNameserverId(nameserver.getId(), connection));
-					if (!useNameserverAsDomainAttribute) {
-						NameserverModel.loadNestedObjects(nameserver, connection);
-					}
+					nameserver.setIpAddresses(
+							IpAddressModel.getIpAddressStructByNameserverId(nameserver.getId(), connection));
+					NameserverModel.loadNestedObjects(nameserver, connection);
 					nameservers.add(nameserver);
 				} while (resultSet.next());
 				return nameservers;

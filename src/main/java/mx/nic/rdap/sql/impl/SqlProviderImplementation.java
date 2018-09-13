@@ -13,7 +13,6 @@ import mx.nic.rdap.db.spi.IpNetworkDAO;
 import mx.nic.rdap.db.spi.NameserverDAO;
 import mx.nic.rdap.db.spi.RdapUserDAO;
 import mx.nic.rdap.sql.DatabaseSession;
-import mx.nic.rdap.sql.SQLProviderConfiguration;
 import mx.nic.rdap.sql.SchemaConfiguration;
 import mx.nic.rdap.sql.exception.ObjectNotFoundException;
 import mx.nic.rdap.sql.model.CountryCodeModel;
@@ -54,7 +53,7 @@ public class SqlProviderImplementation implements DataAccessImplementation {
 
 	@Override
 	public DomainDAO getDomainDAO() {
-		return new DomainDAOImpl(SQLProviderConfiguration.useNsAsAttribute());
+		return new DomainDAOImpl();
 	}
 
 	@Override
@@ -69,12 +68,6 @@ public class SqlProviderImplementation implements DataAccessImplementation {
 
 	@Override
 	public NameserverDAO getNameserverDAO() {
-		// Asking for NS when they are being stored as attributes does not seem
-		// to make sense.
-		if (SQLProviderConfiguration.useNsAsAttribute()) {
-			return null;
-		}
-
 		return new NameserverDAOImpl();
 	}
 

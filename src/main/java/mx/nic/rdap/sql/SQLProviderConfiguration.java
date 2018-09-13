@@ -30,7 +30,6 @@ public class SQLProviderConfiguration {
 	private static final String ZONES_KEY = "zones";
 	private static final String IS_REVERSE_IPV4_ENABLED_KEY = "is_reverse_ipv4_enabled";
 	private static final String IS_REVERSE_IPV6_ENABLED_KEY = "is_reverse_ipv6_enabled";
-	private static final String NAMESERVER_AS_DOMAIN_ATTRIBUTE_KEY = "nameserver_as_domain_attribute";
 	private final static String USER_SQL_FILES_KEY = "sql_files_directory";
 	private final static String IS_NS_SHARING_NAME_ENABLED_KEY = "is_ns_sharing_name_enabled";
 
@@ -71,11 +70,6 @@ public class SQLProviderConfiguration {
 	private static boolean isReverseIpv6Enabled;
 
 	/**
-	 * Indicate if the Nameservers are used as attributes of a Domain
-	 */
-	private static boolean useNsAsAttribute;
-
-	/**
 	 * Indicate if the nameserver-sharing-name conformance is active
 	 */
 	private static boolean isNsSharingNameEnabled;
@@ -95,7 +89,6 @@ public class SQLProviderConfiguration {
 		zones = getStringProperty(serverProperties, ZONES_KEY);
 		isReverseIpv4Enabled = getBooleanProperty(serverProperties, IS_REVERSE_IPV4_ENABLED_KEY);
 		isReverseIpv6Enabled = getBooleanProperty(serverProperties, IS_REVERSE_IPV6_ENABLED_KEY);
-		useNsAsAttribute = getBooleanProperty(serverProperties, NAMESERVER_AS_DOMAIN_ATTRIBUTE_KEY);
 		isNsSharingNameEnabled = getBooleanProperty(serverProperties, IS_NS_SHARING_NAME_ENABLED_KEY);
 
 		// checks if the user puts sql files outside of the project
@@ -252,14 +245,6 @@ public class SQLProviderConfiguration {
 	 */
 	public static boolean isReverseIpv6Enabled() {
 		return isReverseIpv6Enabled;
-	}
-
-	/**
-	 * @return <code>true</code> if the nameservers are returned as attributes,
-	 *         otherwise <code>false</code>.
-	 */
-	public static boolean useNsAsAttribute() {
-		return useNsAsAttribute;
 	}
 
 	/**

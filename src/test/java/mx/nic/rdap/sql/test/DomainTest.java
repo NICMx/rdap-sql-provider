@@ -77,7 +77,7 @@ public class DomainTest extends DatabaseTest {
 		DomainStoreModel.storeToDatabase(dom, false, connection);
 
 		DomainLabel domainLabel = new DomainLabel(dom.getFQDN());
-		Domain findByLdhName = DomainModel.findByLdhName(domainLabel, false, connection);
+		Domain findByLdhName = DomainModel.findByLdhName(domainLabel, connection);
 		System.out.println(findByLdhName.getLdhName());
 
 		// Compares the results
@@ -280,7 +280,7 @@ public class DomainTest extends DatabaseTest {
 		}
 
 		DomainLabel domainLabel = new DomainLabel(domain.getFQDN());
-		Domain findByLdhName = DomainModel.findByLdhName(domainLabel, false, connection);
+		Domain findByLdhName = DomainModel.findByLdhName(domainLabel, connection);
 		// Compares the results
 		Assert.assertTrue("findByLdhName fails", domain.equals(findByLdhName));
 

@@ -15,17 +15,15 @@ import mx.nic.rdap.sql.model.DomainModel;
 
 public class DomainDAOImpl implements DomainDAO {
 
-	private boolean useNsAsAttribute;
 
-	public DomainDAOImpl(boolean useNsAsAttribute) {
+	public DomainDAOImpl() {
 		super();
-		this.useNsAsAttribute = useNsAsAttribute;
 	}
 
 	@Override
 	public Domain getByName(DomainLabel domainLabel) throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			return DomainModel.findByLdhName(domainLabel, useNsAsAttribute, connection);
+			return DomainModel.findByLdhName(domainLabel, connection);
 		} catch (SQLException e) {
 			throw new RdapDataAccessException(e);
 		}
@@ -41,9 +39,9 @@ public class DomainDAOImpl implements DomainDAO {
 			if (domainName.contains(".")) {
 				String name = domainName.substring(0, domainName.indexOf('.'));
 				String zone = domainName.substring(domainName.indexOf('.') + 1);
-				domains = DomainModel.searchByName(name, zone, resultLimit, useNsAsAttribute, connection);
+				domains = DomainModel.searchByName(name, zone, resultLimit, connection);
 			} else {
-				domains = DomainModel.searchByName(domainName, resultLimit, useNsAsAttribute, connection);
+				domains = DomainModel.searchByName(domainName, resultLimit, connection);
 			}
 		} catch (SQLException e) {
 			throw new RdapDataAccessException(e);
@@ -56,7 +54,7 @@ public class DomainDAOImpl implements DomainDAO {
 			throws RdapDataAccessException {
 		String nsName = domainLabel.getULabel();
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			return DomainModel.searchByNsLdhName(nsName, resultLimit, useNsAsAttribute, connection);
+			return DomainModel.searchByNsLdhName(nsName, resultLimit, connection);
 		} catch (SQLException e) {
 			throw new RdapDataAccessException(e);
 		}
@@ -65,7 +63,7 @@ public class DomainDAOImpl implements DomainDAO {
 	@Override
 	public SearchResultStruct<Domain> searchByNsIp(String ip, int resultLimit) throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			return DomainModel.searchByNsIp(ip, resultLimit, useNsAsAttribute, connection);
+			return DomainModel.searchByNsIp(ip, resultLimit, connection);
 		} catch (SQLException e) {
 			throw new RdapDataAccessException(e);
 		}
@@ -81,9 +79,9 @@ public class DomainDAOImpl implements DomainDAO {
 		}
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
 			if (regexWZone == null || Array.getLength(regexWZone) <= 1) {
-				domains = DomainModel.searchByRegexName(regexName, resultLimit, useNsAsAttribute, connection);
+				domains = DomainModel.searchByRegexName(regexName, resultLimit, connection);
 			} else {
-				domains = DomainModel.searchByRegexName(regexWZone[0], regexWZone[1], resultLimit, useNsAsAttribute,
+				domains = DomainModel.searchByRegexName(regexWZone[0], regexWZone[1], resultLimit,
 						connection);
 			}
 		} catch (SQLException e) {
@@ -96,7 +94,7 @@ public class DomainDAOImpl implements DomainDAO {
 	public SearchResultStruct<Domain> searchByRegexNsLDHName(String regexNsName, int resultLimit)
 			throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			return DomainModel.searchByRegexNsLdhName(regexNsName, resultLimit, useNsAsAttribute, connection);
+			return DomainModel.searchByRegexNsLdhName(regexNsName, resultLimit, connection);
 		} catch (SQLException e) {
 			throw new RdapDataAccessException(e);
 		}
