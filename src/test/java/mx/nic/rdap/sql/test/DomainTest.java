@@ -63,8 +63,8 @@ import mx.nic.rdap.store.model.ZoneStoreModel;
 public class DomainTest extends DatabaseTest {
 
 	@Test
-	public void insertAndGetSimpleDomain() throws SQLException, NotImplementedException, DomainLabelException,
-			NotFoundException {
+	public void insertAndGetSimpleDomain()
+			throws SQLException, NotImplementedException, DomainLabelException, NotFoundException {
 
 		Domain dom = new DomainDbObj();
 		dom.setHandle("dummyhandle");
@@ -76,7 +76,10 @@ public class DomainTest extends DatabaseTest {
 
 		DomainStoreModel.storeToDatabase(dom, false, connection);
 
-		DomainLabel domainLabel = new DomainLabel(dom.getFQDN());
+		String fqdn = dom.getFQDN();
+		if (fqdn.endsWith("."))
+			fqdn = fqdn.substring(0, fqdn.length() - 1);
+		DomainLabel domainLabel = new DomainLabel(fqdn);
 		Domain findByLdhName = DomainModel.findByLdhName(domainLabel, connection);
 		System.out.println(findByLdhName.getLdhName());
 
@@ -279,7 +282,10 @@ public class DomainTest extends DatabaseTest {
 			resultSet.next();
 		}
 
-		DomainLabel domainLabel = new DomainLabel(domain.getFQDN());
+		String fqdn = domain.getFQDN();
+		if (fqdn.endsWith("."))
+			fqdn = fqdn.substring(0, fqdn.length() - 1);
+		DomainLabel domainLabel = new DomainLabel(fqdn);
 		Domain findByLdhName = DomainModel.findByLdhName(domainLabel, connection);
 		// Compares the results
 		Assert.assertTrue("findByLdhName fails", domain.equals(findByLdhName));
