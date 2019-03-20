@@ -55,6 +55,27 @@ COMMENT = 'This table contains the entities VCards.';
 
 
 -- -----------------------------------------------------
+-- Table `rdap`.`vcard_contact_uri`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `rdap`.`vcard_contact_uri`
+
+CREATE TABLE IF NOT EXISTS `rdap`.`vcard_contact_uri` (
+  `vcu_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Contact URI\'s id',
+  `vca_id` BIGINT NOT NULL COMMENT 'Vcard\'s id',
+  `vcu_order` INT UNSIGNED NOT NULL COMMENT 'Order of contact',
+  `vcu_uri` VARCHAR(255) NOT NULL COMMENT 'Contact URI',
+  PRIMARY KEY (`vcu_id`, `vca_id`),
+  INDEX `fk_vcard_contact_uri_vcard1_idx` (`vca_id` ASC),
+  CONSTRAINT `fk_vcard_contact_uri_1`
+    FOREIGN KEY (`vca_id`)
+    REFERENCES `rdap`.`vcard` (`vca_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB
+COMMENT = 'This table contains the VCard Contact URI information.';
+
+
+-- -----------------------------------------------------
 -- Table `rdap`.`remark`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `rdap`.`remark` ;
@@ -1091,6 +1112,7 @@ CREATE TABLE IF NOT EXISTS `rdap`.`vcard_postal_info` (
   `vca_id` BIGINT NOT NULL COMMENT 'Vcard\'s id',
   `vpi_type` VARCHAR(45) NULL COMMENT 'Postal info\'s type.',
   `vpi_country` VARCHAR(100) NULL COMMENT 'Country',
+  `vpi_country_code` VARCHAR(2) NULL COMMENT 'Country Code',
   `vpi_city` VARCHAR(100) NULL COMMENT 'City',
   `vpi_street1` VARCHAR(100) NULL COMMENT 'Street (first part)',
   `vpi_street2` VARCHAR(100) NULL COMMENT 'Street (second part)',

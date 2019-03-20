@@ -23,6 +23,7 @@ public class VCardPostalInfoDbObj extends VCardPostalInfo implements DatabaseObj
 		setVCardId(resultSet.getLong("vca_id"));
 		setType(resultSet.getString("vpi_type"));
 		setCountry(resultSet.getString("vpi_country"));
+		setCountryCode(resultSet.getString("vpi_country_code"));
 		setCity(resultSet.getString("vpi_city"));
 		setStreet1(resultSet.getString("vpi_street1"));
 		setStreet2(resultSet.getString("vpi_street2"));

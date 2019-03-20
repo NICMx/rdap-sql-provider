@@ -31,6 +31,7 @@ public class VCardModel {
 	private static QueryGroup queryGroup = null;
 
 	private final static String GET_BY_ENTITY_QUERY = "getByEntityId";
+	private final static String GET_CONTACT_URIS_BY_VCARD_ID = "getContactUrisByVcardId";
 
 	public static void loadQueryGroup(String schema) {
 		try {
@@ -79,6 +80,17 @@ public class VCardModel {
 	 * 
 	 */
 	private static void setSonObjects(VCard vCard, Connection connection) throws SQLException {
+		String query = getQueryGroup().getQuery(GET_CONTACT_URIS_BY_VCARD_ID);
+		try (PreparedStatement statement = connection.prepareStatement(query)) {
+			statement.setLong(1, vCard.getId());
+			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
+			ResultSet rs = statement.executeQuery();
+
+			while (rs.next()) {
+				vCard.getContactUri().add(rs.getString("vcu_uri"));
+			}
+		}
+
 		try {
 			List<VCardPostalInfo> postalInfoList = VCardPostalInfoModel.getByVCardId(vCard.getId(), connection);
 			vCard.setPostalInfo(postalInfoList);
