@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -161,19 +160,12 @@ public class DomainStoreModel {
 		preparedStatement.setString(1, domain.getHandle());
 
 		String domName = domain.getLdhName();
-		String ldhName = DomainLabel.nameToASCII(domName);
 		String unicodeName = DomainLabel.nameToUnicode(domName);
 
-		if (ldhName.equals(unicodeName)) {
-			preparedStatement.setString(2, ldhName);
-			preparedStatement.setNull(3, Types.VARCHAR);
-		} else {
-			preparedStatement.setString(2, ldhName);
-			preparedStatement.setString(3, unicodeName);
-		}
+		preparedStatement.setString(2, unicodeName);
 
-		preparedStatement.setString(4, domain.getPort43());
-		preparedStatement.setInt(5, ZoneModel.getIdByZoneName(domain.getZone()));
+		preparedStatement.setString(3, domain.getPort43());
+		preparedStatement.setInt(4, ZoneModel.getIdByZoneName(domain.getZone()));
 
 	}
 }

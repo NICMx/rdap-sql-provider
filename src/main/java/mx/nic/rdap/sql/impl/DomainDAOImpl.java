@@ -23,7 +23,7 @@ public class DomainDAOImpl implements DomainDAO {
 	@Override
 	public Domain getByName(DomainLabel domainLabel) throws RdapDataAccessException {
 		try (Connection connection = DatabaseSession.getRdapConnection()) {
-			return DomainModel.findByLdhName(domainLabel, connection);
+			return DomainModel.findByDomainName(domainLabel, connection);
 		} catch (SQLException e) {
 			throw new RdapDataAccessException(e);
 		}

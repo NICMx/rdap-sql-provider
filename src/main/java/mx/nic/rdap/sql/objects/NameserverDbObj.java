@@ -3,6 +3,8 @@ package mx.nic.rdap.sql.objects;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import mx.nic.rdap.core.db.DomainLabel;
+import mx.nic.rdap.core.db.DomainLabelException;
 import mx.nic.rdap.core.db.Nameserver;
 
 /**
@@ -37,11 +39,16 @@ public class NameserverDbObj extends Nameserver implements DatabaseObject {
 	public void loadFromDatabase(ResultSet resultSet) throws SQLException {
 		this.setId(resultSet.getLong("nse_id"));
 		this.setHandle(resultSet.getString("nse_handle"));
-		this.setLdhName(resultSet.getString("nse_ldh_name"));
-		if (resultSet.getString("nse_unicode_name") == null || resultSet.getString("nse_unicode_name").isEmpty()) {
-			this.setUnicodeName(null);
-		} else
-			this.setUnicodeName(resultSet.getString("nse_unicode_name"));
+		if (resultSet.getString("nse_unicode_name") != null && !resultSet.getString("nse_unicode_name").isEmpty()) {
+			try {
+				DomainLabel d = new DomainLabel(resultSet.getString("nse_unicode_name"));
+				this.setLdhName(d.getALabel());
+				if (!d.isALabel())
+					this.setUnicodeName(d.getULabel());
+			} catch (DomainLabelException e) {
+				throw new SQLException(e);
+			}
+		}
 		this.setPort43(resultSet.getString("nse_port43"));
 	}
 

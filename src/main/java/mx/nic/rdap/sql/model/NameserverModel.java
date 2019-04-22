@@ -75,8 +75,7 @@ public class NameserverModel {
 		String query = getQueryGroup().getQuery(FIND_BY_NAME_QUERY);
 		QueryGroup.userImplemented(query);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, name.getALabel().toLowerCase());
-			statement.setString(2, name.getULabel());
+			statement.setString(1, name.getULabel());
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (!resultSet.next()) {
@@ -111,8 +110,7 @@ public class NameserverModel {
 		String query = getQueryGroup().getQuery(COUNT_BY_NAME_QUERY);
 		QueryGroup.userImplemented(query);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, name.getALabel().toLowerCase());
-			statement.setString(2, name.getULabel());
+			statement.setString(1, name.getULabel());
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (!resultSet.next()) {
@@ -170,9 +168,8 @@ public class NameserverModel {
 		resultLimit = resultLimit + 1;
 		List<NameserverDbObj> nameservers = new ArrayList<NameserverDbObj>();
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, namePatternALabel);
-			statement.setString(2, namePatternULabel);
-			statement.setInt(3, resultLimit);
+			statement.setString(1, namePatternULabel);
+			statement.setInt(2, resultLimit);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 

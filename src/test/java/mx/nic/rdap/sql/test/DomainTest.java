@@ -80,7 +80,7 @@ public class DomainTest extends DatabaseTest {
 		if (fqdn.endsWith("."))
 			fqdn = fqdn.substring(0, fqdn.length() - 1);
 		DomainLabel domainLabel = new DomainLabel(fqdn);
-		Domain findByLdhName = DomainModel.findByLdhName(domainLabel, connection);
+		Domain findByLdhName = DomainModel.findByDomainName(domainLabel, connection);
 		System.out.println(findByLdhName.getLdhName());
 
 		// Compares the results
@@ -286,7 +286,7 @@ public class DomainTest extends DatabaseTest {
 		if (fqdn.endsWith("."))
 			fqdn = fqdn.substring(0, fqdn.length() - 1);
 		DomainLabel domainLabel = new DomainLabel(fqdn);
-		Domain findByLdhName = DomainModel.findByLdhName(domainLabel, connection);
+		Domain findByLdhName = DomainModel.findByDomainName(domainLabel, connection);
 		// Compares the results
 		Assert.assertTrue("findByLdhName fails", domain.equals(findByLdhName));
 

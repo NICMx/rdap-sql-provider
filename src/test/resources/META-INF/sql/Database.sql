@@ -57,7 +57,7 @@ COMMENT = 'This table contains the entities VCards.';
 -- -----------------------------------------------------
 -- Table `rdap`.`vcard_contact_uri`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `rdap`.`vcard_contact_uri`
+DROP TABLE IF EXISTS `rdap`.`vcard_contact_uri` ;
 
 CREATE TABLE IF NOT EXISTS `rdap`.`vcard_contact_uri` (
   `vcu_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Contact URI\'s id',
@@ -182,8 +182,7 @@ DROP TABLE IF EXISTS `rdap`.`domain` ;
 CREATE TABLE IF NOT EXISTS `rdap`.`domain` (
   `dom_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Domain\'s unique id',
   `dom_handle` VARCHAR(255) NULL COMMENT 'A RIR/DNR unique identifier of the domain registration',
-  `dom_ldh_name` VARCHAR(63) NULL COMMENT 'A string containing a domain name in LDH form',
-  `dom_unicode_name` VARCHAR(255) NULL COMMENT 'A string containing a domain name in Unicode',
+  `dom_unicode_name` VARCHAR(255) NULL COMMENT 'A string containing a domain name in Unicode' COLLATE utf8_bin,
   `dom_port43` VARCHAR(254) NULL COMMENT 'A string containing the fully qualified host name or IP address of the WHOIS server where the domain instance may be found',
   `zone_id` SMALLINT NOT NULL COMMENT 'Zone\'s id',
   PRIMARY KEY (`dom_id`, `zone_id`),
@@ -197,6 +196,7 @@ CREATE TABLE IF NOT EXISTS `rdap`.`domain` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 COMMENT = 'This table contains the information about the domain registration.';
+
 
 
 -- -----------------------------------------------------
@@ -444,14 +444,14 @@ DROP TABLE IF EXISTS `rdap`.`nameserver` ;
 CREATE TABLE IF NOT EXISTS `rdap`.`nameserver` (
   `nse_id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'Nameserver\'s id',
   `nse_handle` VARCHAR(100) NULL COMMENT 'A RIR/DNR unique identifier of the nameserver registration',
-  `nse_ldh_name` VARCHAR(253) NULL DEFAULT NULL COMMENT 'A string containing a nameserver name in LDH form',
-  `nse_unicode_name` VARCHAR(255) NULL COMMENT 'A string containing a nameserver name in Unicode',
+  `nse_unicode_name` VARCHAR(255) NULL COMMENT 'A string containing a nameserver name in Unicode' COLLATE utf8_bin,
   `nse_port43` VARCHAR(254) NULL DEFAULT NULL COMMENT 'A string containing the fully qualified host name or IP address of the WHOIS server where the nameserver instance may be found',
   PRIMARY KEY (`nse_id`),
   UNIQUE INDEX `nse_handle_UNIQUE` (`nse_handle` ASC),
   UNIQUE INDEX `nse_id_UNIQUE` (`nse_id` ASC))
 ENGINE = InnoDB
 COMMENT = 'This table contains information regarding DNS nameservers used in both forward and reverse DNS.';
+
 
 
 -- -----------------------------------------------------

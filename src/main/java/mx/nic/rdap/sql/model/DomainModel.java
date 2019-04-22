@@ -40,19 +40,19 @@ public class DomainModel {
 
 	private static QueryGroup queryGroup = null;
 
-	private static final String GET_BY_LDH_QUERY = "getByLdhName";
+	private static final String GET_BY_NAME_QUERY = "getByDomainName";
 	private static final String SEARCH_BY_PARTIAL_NAME_WITH_PARTIAL_ZONE_QUERY = "searchByPartialNameWPartialZone";
 	private static final String SEARCH_BY_NAME_WITH_PARTIAL_ZONE_QUERY = "searchByNameWPartialZone";
 	private static final String SEARCH_BY_PARTIAL_NAME_WITH_ZONE_QUERY = "searchByPartialNameWZone";
 	private static final String SEARCH_BY_NAME_WITH_ZONE_QUERY = "searchByNameWZone";
 	private static final String SEARCH_BY_PARTIAL_NAME_WITHOUT_ZONE_QUERY = "searchByPartialNameWOutZone";
 	private static final String SEARCH_BY_NAME_WITHOUT_ZONE_QUERY = "searchByNameWOutZone";
-	private static final String SEARCH_BY_NAMESERVER_LDH_QUERY = "searchByNsLdhName";
+	private static final String SEARCH_BY_NAMESERVER_NAME_QUERY = "searchByNsName";
 	private static final String SEARCH_BY_NAMESERVER_IP_QUERY = "searchByNsIp";
 
 	private static final String SEARCH_BY_REGEX_NAME_WITH_ZONE = "searchByRegexNameWithZone";
 	private static final String SEARCH_BY_REGEX_NAME_WITHOUT_ZONE = "searchByRegexNameWithOutZone";
-	private static final String SEARCH_BY_REGEX_NAMESERVER_LDH_QUERY = "searchByRegexNsLdhName";
+	private static final String SEARCH_BY_REGEX_NAMESERVER_NAME_QUERY = "searchByRegexNsName";
 
 	public static void loadQueryGroup(String schema) {
 		try {
@@ -71,7 +71,7 @@ public class DomainModel {
 		return queryGroup;
 	}
 
-	public static DomainDbObj findByLdhName(DomainLabel domainLabel, Connection connection)
+	public static DomainDbObj findByDomainName(DomainLabel domainLabel, Connection connection)
 			throws SQLException, NotImplementedException, NotFoundException {
 		String domainName = domainLabel.getULabel();
 		String name;
@@ -98,12 +98,11 @@ public class DomainModel {
 			return null;
 		}
 
-		String query = getQueryGroup().getQuery(GET_BY_LDH_QUERY);
+		String query = getQueryGroup().getQuery(GET_BY_NAME_QUERY);
 		QueryGroup.userImplemented(query);
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, nameToSearch.getALabel().toLowerCase());
-			statement.setString(2, nameToSearch.getULabel());
-			statement.setInt(3, zoneId);
+			statement.setString(1, nameToSearch.getULabel());
+			statement.setInt(2, zoneId);
 			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
 			try (ResultSet resultSet = statement.executeQuery()) {
 				if (!resultSet.next()) {
@@ -176,16 +175,14 @@ public class DomainModel {
 				for (int i = 1; i <= zoneIds.size(); i++) {
 					statement.setInt(i, zoneIds.get(i - 1));
 				}
-				statement.setString(zoneIds.size() + 1, name.toLowerCase());
-				statement.setString(zoneIds.size() + 2, name);
-				statement.setString(zoneIds.size() + 3, zone);
-				statement.setInt(zoneIds.size() + 4, resultLimit);
+				statement.setString(zoneIds.size() + 1, name);
+				statement.setString(zoneIds.size() + 2, zone);
+				statement.setInt(zoneIds.size() + 3, resultLimit);
 			} else {
-				statement.setString(1, name.toLowerCase());
-				statement.setString(2, name);
+				statement.setString(1, name);
 				Integer zoneId = ZoneModel.getIdByZoneName(zone);
-				statement.setInt(3, zoneId);
-				statement.setInt(4, resultLimit);
+				statement.setInt(2, zoneId);
+				statement.setInt(3, resultLimit);
 			}
 
 			logger.log(Level.INFO, "Executing query" + statement.toString());
@@ -254,9 +251,8 @@ public class DomainModel {
 				statement.setInt(i, zoneIds.get(i - 1));
 			}
 			statement.setString(zoneIds.size() + 1, name);
-			statement.setString(zoneIds.size() + 2, name);
-			statement.setString(zoneIds.size() + 3, zone);
-			statement.setInt(zoneIds.size() + 4, resultLimit);
+			statement.setString(zoneIds.size() + 2, zone);
+			statement.setInt(zoneIds.size() + 3, resultLimit);
 
 			logger.log(Level.INFO, "Executing query" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();
@@ -328,9 +324,8 @@ public class DomainModel {
 				statement.setInt(i, zoneIds.get(i - 1));
 			}
 
-			statement.setString(zoneIds.size() + 1, domainNameALabel);
-			statement.setString(zoneIds.size() + 2, domainNameULabel);
-			statement.setInt(zoneIds.size() + 3, resultLimit);
+			statement.setString(zoneIds.size() + 1, domainNameULabel);
+			statement.setInt(zoneIds.size() + 2, resultLimit);
 			logger.log(Level.INFO, "Executing query" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();
 
@@ -358,7 +353,7 @@ public class DomainModel {
 
 	public static SearchResultStruct<Domain> searchByNsLdhName(String name, int resultLimit, Connection connection)
 			throws SQLException, NotImplementedException {
-		String query = getQueryGroup().getQuery(SEARCH_BY_NAMESERVER_LDH_QUERY);
+		String query = getQueryGroup().getQuery(SEARCH_BY_NAMESERVER_NAME_QUERY);
 		// Escape special chars for the "LIKE" sentence and consecutive wildcards are
 		// treated as one
 		name = name.replaceAll("(\\%|\\_)", "\\\\$1").replaceAll("(\\*)+", "\\*").replace("*", "%");
@@ -367,7 +362,7 @@ public class DomainModel {
 
 	public static SearchResultStruct<Domain> searchByRegexNsLdhName(String name, int resultLimit, Connection connection)
 			throws SQLException, NotImplementedException {
-		String query = getQueryGroup().getQuery(SEARCH_BY_REGEX_NAMESERVER_LDH_QUERY);
+		String query = getQueryGroup().getQuery(SEARCH_BY_REGEX_NAMESERVER_NAME_QUERY);
 		return searchByNsLdhName(name, resultLimit, connection, query);
 	}
 
@@ -383,9 +378,8 @@ public class DomainModel {
 		// notices
 		resultLimit = resultLimit + 1;
 		try (PreparedStatement statement = connection.prepareStatement(query)) {
-			statement.setString(1, name.toLowerCase());
-			statement.setString(2, name);
-			statement.setInt(3, resultLimit);
+			statement.setString(1, name);
+			statement.setInt(2, resultLimit);
 			logger.log(Level.INFO, "Executing query" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();
 

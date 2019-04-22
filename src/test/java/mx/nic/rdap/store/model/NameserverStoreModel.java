@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -137,17 +136,11 @@ public class NameserverStoreModel {
 		preparedStatement.setString(1, ns.getHandle());
 
 		String nsName = ns.getLdhName();
-		String ldhName = DomainLabel.nameToASCII(nsName);
 		String unicodeName = DomainLabel.nameToUnicode(nsName);
-		if (ldhName.equals(unicodeName)) {
-			preparedStatement.setString(2, ldhName);
-			preparedStatement.setNull(3, Types.VARCHAR);
-		} else {
-			preparedStatement.setString(2, ldhName);
-			preparedStatement.setString(3, unicodeName);
-		}
 
-		preparedStatement.setString(4, ns.getPort43());
+		preparedStatement.setString(2, unicodeName);
+
+		preparedStatement.setString(3, ns.getPort43());
 	}
 
 	public static NameserverDbObj getByHandle(String handle, Connection rdapConnection) throws SQLException {
