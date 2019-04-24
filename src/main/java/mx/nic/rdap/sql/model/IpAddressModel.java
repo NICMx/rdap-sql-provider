@@ -66,6 +66,9 @@ public class IpAddressModel {
 					struct.getIpv4Adresses().add(ipAddressDAO);
 				} else if (ipAddressDAO.getType() == 6) {
 					struct.getIpv6Adresses().add(ipAddressDAO);
+				} else {
+					logger.log(Level.WARNING, "Invalid IP Address type '" + ipAddressDAO.getType()
+							+ "' for NameserverID:" + nameserverId);
 				}
 			} while (resultSet.next());
 			return struct;

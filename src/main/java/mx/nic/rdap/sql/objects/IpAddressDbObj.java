@@ -1,7 +1,5 @@
 package mx.nic.rdap.sql.objects;
 
-import java.net.Inet4Address;
-import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.ResultSet;
@@ -49,11 +47,7 @@ public class IpAddressDbObj extends IpAddress implements DatabaseObject {
 			// The address is validate in the store process,so this exception
 			// will never be throw.
 		}
-		if (this.getAddress() instanceof Inet4Address) {
-			this.setType(4);
-		} else if (this.getAddress() instanceof Inet6Address) {
-			this.setType(6);
-		}
+		this.setType(resultSet.getInt("iad_type"));
 
 	}
 

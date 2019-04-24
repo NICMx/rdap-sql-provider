@@ -276,9 +276,6 @@ public class NameserverModel {
 				List<Nameserver> nameservers = new ArrayList<Nameserver>();
 				do {
 					Nameserver nameserver = new NameserverDbObj(resultSet);
-					// Retrieve the ipAddress
-					nameserver.setIpAddresses(
-							IpAddressModel.getIpAddressStructByNameserverId(nameserver.getId(), connection));
 					NameserverModel.loadNestedObjects(nameserver, connection);
 					nameservers.add(nameserver);
 				} while (resultSet.next());
@@ -288,6 +285,7 @@ public class NameserverModel {
 	}
 
 	public static void loadNestedObjects(Nameserver nameserver, Connection connection) throws SQLException {
+		nameserver.setIpAddresses(IpAddressModel.getIpAddressStructByNameserverId(nameserver.getId(), connection));
 		// Retrieve the status
 		nameserver.getStatus().addAll(StatusModel.getByNameServerId(nameserver.getId(), connection));
 
