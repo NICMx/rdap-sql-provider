@@ -1089,10 +1089,8 @@ COMMENT = 'This table contains the catalog of Variant relations.';
 DROP TABLE IF EXISTS `rdap`.`variant_name` ;
 
 CREATE TABLE IF NOT EXISTS `rdap`.`variant_name` (
-  `vna_ldh_name` VARCHAR(63) NOT NULL COMMENT 'Variant\'s ldh name',
   `var_id` BIGINT NOT NULL COMMENT 'Variant\'s id',
-  `vna_unicode_name` VARCHAR(255) NULL COMMENT 'Variant\'s unicode name',
-  UNIQUE INDEX `vna_ldh_name_UNIQUE` (`vna_ldh_name` ASC),
+  `vna_unicode_name` VARCHAR(255) NOT NULL COMMENT 'Variant\'s unicode name' COLLATE utf8_bin,
   CONSTRAINT `fk_VARIANT_NAME_VARIANT1`
     FOREIGN KEY (`var_id`)
     REFERENCES `rdap`.`variant` (`var_id`)
@@ -1100,6 +1098,8 @@ CREATE TABLE IF NOT EXISTS `rdap`.`variant_name` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 COMMENT = 'This table contains the variants names.';
+
+
 
 
 -- -----------------------------------------------------
@@ -1928,7 +1928,9 @@ INSERT INTO rdap.country_code VALUES (732,'EH');
 INSERT INTO rdap.country_code VALUES (887,'YE');
 INSERT INTO rdap.country_code VALUES (894,'ZM');
 INSERT INTO rdap.country_code VALUES (716,'ZW');
-
+INSERT INTO rdap.country_code VALUES (531,'CW');
+INSERT INTO rdap.country_code VALUES (534,'SX');
+INSERT INTO rdap.country_code VALUES (535,'BQ');
 
 INSERT INTO rdap.ip_version VALUES (4, 'v4');
 INSERT INTO rdap.ip_version VALUES (6, 'v6');

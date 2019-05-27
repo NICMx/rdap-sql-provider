@@ -12,6 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import mx.nic.rdap.core.catalog.VariantRelation;
+import mx.nic.rdap.core.db.DomainLabel;
+import mx.nic.rdap.core.db.DomainLabelException;
 import mx.nic.rdap.core.db.Variant;
 import mx.nic.rdap.core.db.VariantName;
 import mx.nic.rdap.sql.QueryGroup;
@@ -131,8 +133,16 @@ public class VariantModel {
 			List<VariantName> variantNames = variant.getVariantNames();
 			do {
 				VariantName variantName = new VariantName();
-				variantName.setLdhName(resultSet.getString("vna_ldh_name"));
-				variantName.setUnicodeName(resultSet.getString("vna_unicode_name"));
+				String uNameResult = resultSet.getString("vna_unicode_name");
+				if (uNameResult != null && !uNameResult.isEmpty()) {
+					try {
+						DomainLabel d = new DomainLabel(uNameResult);
+						variantName.setLdhName(d.getALabel());
+						variantName.setUnicodeName(d.getULabel());
+					} catch (DomainLabelException e) {
+						throw new SQLException(e);
+					}
+				}
 				variantNames.add(variantName);
 			} while (resultSet.next());
 		}

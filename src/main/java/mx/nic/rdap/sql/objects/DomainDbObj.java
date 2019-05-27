@@ -41,8 +41,7 @@ public class DomainDbObj extends Domain implements DatabaseObject {
 			try {
 				DomainLabel d = new DomainLabel(resultSet.getString("dom_unicode_name"));
 				this.setLdhName(d.getALabel());
-				if (!d.isALabel())
-					this.setUnicodeName(d.getULabel());
+				this.setUnicodeName(d.getULabel());
 			} catch (DomainLabelException e) {
 				throw new SQLException(e);
 			}

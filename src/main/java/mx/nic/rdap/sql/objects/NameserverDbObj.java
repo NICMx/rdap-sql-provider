@@ -43,8 +43,7 @@ public class NameserverDbObj extends Nameserver implements DatabaseObject {
 			try {
 				DomainLabel d = new DomainLabel(resultSet.getString("nse_unicode_name"));
 				this.setLdhName(d.getALabel());
-				if (!d.isALabel())
-					this.setUnicodeName(d.getULabel());
+				this.setUnicodeName(d.getULabel());
 			} catch (DomainLabelException e) {
 				throw new SQLException(e);
 			}
