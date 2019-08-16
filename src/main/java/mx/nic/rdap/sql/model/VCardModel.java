@@ -51,10 +51,10 @@ public class VCardModel {
 	}
 
 	/**
-	 * Get a {@link List} of {@link VCard} belonging to a {@link Registrar} by
-	 * the registrar Id.
+	 * Get a {@link List} of {@link VCard} belonging to an Entity by
+	 * the entity Id.
 	 */
-	public static List<VCard> getByEntityId(Long registrarId, Connection connection) throws SQLException {
+	public static List<VCard> getByEntityId(Long entityId, Connection connection) throws SQLException {
 		List<VCard> vCardResults = null;
 		String query = getQueryGroup().getQuery(GET_BY_ENTITY_QUERY);
 		if (SQLProviderConfiguration.isUserSQL() && query == null) {
@@ -62,7 +62,7 @@ public class VCardModel {
 		}
 
 		try (PreparedStatement statement = connection.prepareStatement(query);) {
-			statement.setLong(1, registrarId);
+			statement.setLong(1, entityId);
 			logger.log(Level.INFO, "Executing QUERY:" + statement.toString());
 			ResultSet resultSet = statement.executeQuery();
 

@@ -2,11 +2,42 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>mx.nic.rdap</groupId>
+	<groupId>mx.nic.labs.reddog</groupId>
 	<artifactId>rdap-sql-provider</artifactId>
 	<version>1.4.1</version>
 	<packaging>jar</packaging>
-	<name>rdap-sql-provider</name>
+
+	<name>mx.nic.labs.reddog:rdap-sql-provider</name>
+	<description>Data Access reference implementation for Reddog Server</description>
+	<url>https://www.reddog.mx</url>
+
+	<licenses>
+		<license>
+			<name>The Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<name>Daniel Hernandez Felix</name>
+			<email>dhdzfelix@nic.mx</email>
+			<organization>NIC MX</organization>
+			<organizationUrl>http://www.nic.mx</organizationUrl>
+		</developer>
+		<developer>
+			<name>Francisco Moreno</name>
+			<email>fjarana@nic.mx</email>
+			<organization>NIC MX</organization>
+			<organizationUrl>http://www.nic.mx</organizationUrl>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:git://github.com/nicmx/rdap-sql-provider.git</connection>
+		<developerConnection>scm:git:ssh://github.com:nicmx/rdap-sql-provider.git</developerConnection>
+		<url>http://github.com/nicmx/rdap-sql-provider/tree/master</url>
+	</scm>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,7 +47,7 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>mx.nic.rdap</groupId>
+			<groupId>mx.nic.labs.reddog</groupId>
 			<artifactId>rdap-data-access-api</artifactId>
 			<version>1.2.0</version>
 		</dependency>
@@ -38,5 +69,41 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>2.2.1</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>3.1.1</version>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>

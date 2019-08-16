@@ -5,5 +5,5 @@ INSERT INTO {schema}.variant VALUES (null,?,?);
 INSERT INTO {schema}.variant_relation VALUES (?,?);
 
 #storeVariantNames
-INSERT INTO {schema}.variant_name VALUES (?,?,?);
+INSERT INTO {schema}.variant_name VALUES (?,?);
 

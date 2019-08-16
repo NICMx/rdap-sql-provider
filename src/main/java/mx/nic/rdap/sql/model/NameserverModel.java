@@ -257,9 +257,6 @@ public class NameserverModel {
 	/**
 	 * Find nameservers that belongs from a domain by the domain's id
 	 * 
-	 * @param useNameserverAsDomainAttribute
-	 *            if true, don't have to load nested objects
-	 * 
 	 */
 	public static List<Nameserver> getByDomainId(Long domainId, Connection connection) throws SQLException {
 		String query = getQueryGroup().getQuery(DOMAIN_GET_QUERY);

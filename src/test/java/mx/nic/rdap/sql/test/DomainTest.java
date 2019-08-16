@@ -136,14 +136,14 @@ public class DomainTest extends DatabaseTest {
 		relations1.add(VariantRelation.REGISTERED);
 		relations1.add(VariantRelation.CONJOINED);
 		List<VariantName> variantNames1 = new ArrayList<VariantName>();
-		variantNames1.add(DomainTest.createVariantName("xn--fo-cka" + randomInt + ".mx"));
-		variantNames1.add(DomainTest.createVariantName("xn--fo-fka" + randomInt + ".mx"));
+		variantNames1.add(DomainTest.createVariantName("xn--fo-cka" + ".mx"));
+		variantNames1.add(DomainTest.createVariantName("xn--fo-fka" + ".mx"));
 
 		List<VariantRelation> relations2 = new ArrayList<VariantRelation>();
 		relations2.add(VariantRelation.UNREGISTERED);
 		relations2.add(VariantRelation.REGISTRATION_RESTRICTED);
 		List<VariantName> variantNames2 = new ArrayList<VariantName>();
-		variantNames2.add(DomainTest.createVariantName("xn--fo-8ja" + randomInt + ".mx"));
+		variantNames2.add(DomainTest.createVariantName("xn--fo-8ja" + ".mx"));
 
 		variants.add(DomainTest.createVariant(null, relations1, variantNames1, null, null));
 		variants.add(DomainTest.createVariant(null, relations2, variantNames2, null, ".EXAMPLE Spanish"));
@@ -502,9 +502,12 @@ public class DomainTest extends DatabaseTest {
 		return variant;
 	}
 
-	public static VariantName createVariantName(String ldhName) {
+	public static VariantName createVariantName(String ldhName) throws DomainLabelException {
 		VariantName variantName = new VariantName();
-		variantName.setLdhName(ldhName);
+		
+		DomainLabel label = new DomainLabel(ldhName);
+		variantName.setLdhName(label.getALabel());
+		variantName.setUnicodeName(label.getULabel());
 		return variantName;
 	}
 
