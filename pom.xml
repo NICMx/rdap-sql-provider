@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>mx.nic.labs.reddog</groupId>
 	<artifactId>rdap-sql-provider</artifactId>
-	<version>1.4.1</version>
+	<version>1.4.2</version>
 	<packaging>jar</packaging>
 
 	<name>mx.nic.labs.reddog:rdap-sql-provider</name>
@@ -46,6 +46,11 @@
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>mx.nic.labs.reddog</groupId>
+			<artifactId>rdap-core</artifactId>
+			<version>1.2.1</version>
+		</dependency>
 		<dependency>
 			<groupId>mx.nic.labs.reddog</groupId>
 			<artifactId>rdap-data-access-api</artifactId>

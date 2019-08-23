@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import mx.nic.rdap.core.db.DomainLabel;
+import mx.nic.rdap.core.db.DomainLabelException;
 import mx.nic.rdap.db.exception.InitializationException;
 import mx.nic.rdap.sql.QueryGroup;
 import mx.nic.rdap.sql.SQLProviderConfiguration;
@@ -87,7 +89,13 @@ public class ZoneModel {
 			if (zone.startsWith(".")) {
 				zone = zone.substring(1);
 			}
-			configuredZones.add(zone);
+			DomainLabel zoneLabel;
+			try {
+				zoneLabel = new DomainLabel(zone);
+			} catch (DomainLabelException e) {
+				throw new InitializationException(e.getMessage());
+			}
+			configuredZones.add(zoneLabel.getULabel());
 		}
 
 		Map<Integer, String> zoneByIdForServer = new HashMap<Integer, String>();
@@ -147,7 +155,13 @@ public class ZoneModel {
 
 		do {
 			Integer zoneId = rs.getInt("zone_id");
-			String zoneName = rs.getString("zone_name").toLowerCase();
+			DomainLabel zoneLabel;
+			try {
+				zoneLabel = new DomainLabel(rs.getString("zone_name").toLowerCase());
+			} catch (DomainLabelException e) {
+				throw new SQLException(e);
+			}
+			String zoneName = zoneLabel.getULabel();
 			zoneById.put(zoneId, zoneName);
 			idByZone.put(zoneName, zoneId);
 		} while (rs.next());
