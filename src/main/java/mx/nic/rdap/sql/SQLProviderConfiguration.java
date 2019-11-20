@@ -32,6 +32,7 @@ public class SQLProviderConfiguration {
 	private static final String IS_REVERSE_IPV6_ENABLED_KEY = "is_reverse_ipv6_enabled";
 	private final static String USER_SQL_FILES_KEY = "sql_files_directory";
 	private final static String IS_NS_SHARING_NAME_ENABLED_KEY = "is_ns_sharing_name_enabled";
+	private final static String USER_CONSENT_CONFIGURATION_TYPE = "user_consent_type";
 
 	/**
 	 * Default Path in the META-INF folder of the server, to be use for the user
@@ -73,6 +74,11 @@ public class SQLProviderConfiguration {
 	 * Indicate if the nameserver-sharing-name conformance is active
 	 */
 	private static boolean isNsSharingNameEnabled;
+	
+	/**
+	 * Indicate the type of user consent for contact information in entity
+	 **/
+	private static UserConsentType userConsentType;
 
 	/**
 	 * Load properties configured from the server. The default properties are loaded
@@ -90,6 +96,13 @@ public class SQLProviderConfiguration {
 		isReverseIpv4Enabled = getBooleanProperty(serverProperties, IS_REVERSE_IPV4_ENABLED_KEY);
 		isReverseIpv6Enabled = getBooleanProperty(serverProperties, IS_REVERSE_IPV6_ENABLED_KEY);
 		isNsSharingNameEnabled = getBooleanProperty(serverProperties, IS_NS_SHARING_NAME_ENABLED_KEY);
+		
+		String userConsentTypeString = getStringProperty(serverProperties, USER_CONSENT_CONFIGURATION_TYPE);
+		try {
+			userConsentType = UserConsentType.valueOf(userConsentTypeString.toUpperCase());
+		} catch (IllegalArgumentException e) {
+			throw new InvalidConfigurationException("Invalid value for property:" + USER_CONSENT_CONFIGURATION_TYPE);
+		}
 
 		// checks if the user puts sql files outside of the project
 		String property = serverProperties.getProperty(USER_SQL_FILES_KEY);
@@ -253,5 +266,9 @@ public class SQLProviderConfiguration {
 	 */
 	public static boolean isNsSharingNameEnabled() {
 		return isNsSharingNameEnabled;
+	}
+	
+	public static UserConsentType getUserConsentType() {
+		return userConsentType;
 	}
 }

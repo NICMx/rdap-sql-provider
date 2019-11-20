@@ -18,6 +18,9 @@ import mx.nic.rdap.core.db.Entity;
 import mx.nic.rdap.core.db.Event;
 import mx.nic.rdap.core.db.IpNetwork;
 import mx.nic.rdap.core.db.PublicId;
+import mx.nic.rdap.core.db.UserConsent;
+import mx.nic.rdap.core.db.UserConsentGlobal;
+import mx.nic.rdap.core.db.UserConsentByAttribute;
 import mx.nic.rdap.core.db.VCard;
 import mx.nic.rdap.db.exception.http.NotImplementedException;
 import mx.nic.rdap.db.struct.SearchResultStruct;
@@ -52,6 +55,11 @@ public class EntityModel {
 
 	private final static String SEARCH_BY_HANDLE_REGEX_QUERY = "searchByRegexHandle";
 	private final static String SEARCH_BY_NAME_REGEX_QUERY = "searchByRegexName";
+	
+	private final static String GET_USER_GLOBAL_CONSENT = "userGlobalConsent";
+	private final static String GET_USER_CONSENT_BY_ATTR = "userConsentByAttribute";
+	
+	private static String GET_CONSENT;
 
 	public static void loadQueryGroup(String schema) {
 		try {
@@ -60,6 +68,21 @@ public class EntityModel {
 		} catch (IOException e) {
 			throw new RuntimeException("Error loading query group");
 		}
+		
+		switch (SQLProviderConfiguration.getUserConsentType()) {
+		case GLOBAL:
+			GET_CONSENT = GET_USER_GLOBAL_CONSENT;
+			break;
+		case ATTRIBUTES:
+			GET_CONSENT = GET_USER_CONSENT_BY_ATTR;
+			break;
+		case NONE:
+		default:
+			GET_CONSENT = null;
+			// nothing to do.
+			break;
+		}
+		
 	}
 
 	private static void setQueryGroup(QueryGroup qG) {
@@ -127,6 +150,70 @@ public class EntityModel {
 		// retrieve the entity roles
 		List<Role> mainEntityRole = RoleModel.getMainEntityRole(entityId, connection);
 		entity.getRoles().addAll(mainEntityRole);
+		
+		// retrieve the consent for this object;
+		entity.setConsent(getConsentById(entityId, connection));
+	}
+	
+	private static UserConsent getConsentById(long entityId, Connection connection) throws SQLException {
+		if (GET_CONSENT == null) {
+			return null;
+		}
+		
+		String query = getQueryGroup().getQuery(GET_CONSENT);
+		if (SQLProviderConfiguration.isUserSQL() && query == null) {
+			return null;
+		}
+
+		UserConsent result = null;
+		try (PreparedStatement statement = connection.prepareStatement(query);) {
+			statement.setLong(1, entityId);
+			logger.log(Level.INFO, "Executing QUERY: " + statement.toString());
+			ResultSet rs = statement.executeQuery();
+			if (!rs.next()) {
+				return null;
+			}
+			
+			// TODO handle result;
+			//result
+			switch (SQLProviderConfiguration.getUserConsentType()) {
+			case GLOBAL:
+				UserConsentGlobal userConsent = new UserConsentGlobal();
+				userConsent.setGlobalConsent(rs.getBoolean("ugc_consent"));
+				result = userConsent;
+				break;
+			case ATTRIBUTES:
+				UserConsentByAttribute consentByAttr = new UserConsentByAttribute();
+				
+				consentByAttr.setHandle(rs.getBoolean("uca_handle"));
+				consentByAttr.setName(rs.getBoolean("uca_name"));
+				consentByAttr.setCompanyName(rs.getBoolean("uca_companyName"));
+				consentByAttr.setCompanyURL(rs.getBoolean("uca_companyURL"));
+				consentByAttr.setEmail(rs.getBoolean("uca_email"));
+				consentByAttr.setVoice(rs.getBoolean("uca_voice"));
+				consentByAttr.setCellphone(rs.getBoolean("uca_cellphone"));
+				consentByAttr.setFax(rs.getBoolean("uca_fax"));
+				consentByAttr.setJobTitle(rs.getBoolean("uca_jobTitle"));
+				consentByAttr.setContactUri(rs.getBoolean("uca_contactUri"));
+				consentByAttr.setType(rs.getBoolean("uca_type"));
+				consentByAttr.setCountry(rs.getBoolean("uca_country"));
+				consentByAttr.setCountryCode(rs.getBoolean("uca_countryCode"));
+				consentByAttr.setCity(rs.getBoolean("uca_city"));
+				consentByAttr.setState(rs.getBoolean("uca_state"));
+				consentByAttr.setStreet1(rs.getBoolean("uca_street1"));
+				consentByAttr.setStreet2(rs.getBoolean("uca_street2"));
+				consentByAttr.setStreet3(rs.getBoolean("uca_street3"));
+				consentByAttr.setPostalCode(rs.getBoolean("uca_postalCode"));
+				
+				result = consentByAttr;
+				break;
+			default:
+				// Maybe Programming error?
+				break;
+			}
+		}
+
+		return result;
 	}
 
 	private static EntityDbObj processResultSet(ResultSet resultSet, Connection connection) throws SQLException {
@@ -234,6 +321,9 @@ public class EntityModel {
 
 			List<Event> eventList = EventModel.getByEntityId(entityId, connection);
 			entity.getEvents().addAll(eventList);
+			
+			// retrieve the consent for this object;
+			entity.setConsent(getConsentById(entityId, connection));
 			
 			if (isFirstNested) {
 				List<Entity> nestedEntities = getEntitiesByEntityId(entityId, connection, false);

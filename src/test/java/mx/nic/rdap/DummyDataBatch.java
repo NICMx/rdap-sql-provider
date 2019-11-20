@@ -212,6 +212,7 @@ public class DummyDataBatch extends DatabaseTest {
 				VariantName vn = new VariantName();
 				String[] variantsString = variants.get(idnChar);
 				String variantName = domainName + variantsString[i] + index + "." + tld;
+				vn.setUnicodeName(DomainLabel.nameToUnicode(variantName));
 				vn.setLdhName(DomainLabel.nameToASCII(variantName));
 				variant.getVariantNames().add(vn);
 			}

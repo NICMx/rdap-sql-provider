@@ -48,3 +48,9 @@ SELECT ent_id, ent_handle, ent_port43 FROM {schema}.entity e WHERE e.ent_handle 
 
 #searchByRegexName
 SELECT DISTINCT (ent.ent_id),  ent.ent_handle, ent.ent_port43 FROM {schema}.entity ent JOIN {schema}.entity_contact eco ON eco.ent_id=ent.ent_id JOIN {schema}.vcard vca ON vca.vca_id=eco.vca_id WHERE vca.vca_name REGEXP ? ORDER BY 1 LIMIT ?;
+
+#userGlobalConsent
+SELECT ugc_consent FROM {schema}.user_global_consent ugc WHERE ugc.ent_id = ?;
+
+#userConsentByAttribute
+SELECT * FROM {schema}.user_consent_by_attributes uca WHERE uca.ent_id = ?;
